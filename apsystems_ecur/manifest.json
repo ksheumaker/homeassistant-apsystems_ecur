@@ -1,0 +1,9 @@
+{
+  "codeowners": ["@ksheumaker"],
+  "config_flow": false,
+  "dependencies": [],
+  "documentation": "https://github.com/ksheumaker/homeassistant-apsystems_ecur",
+  "domain": "apsystems_ecur",
+  "name": "APSystems PV solar ECU-R",
+  "requirements": []
+}

@@ -27,7 +27,11 @@ from homeassistant.const import (
     FREQUENCY_HERTZ
 )
 
+
 _LOGGER = logging.getLogger(__name__)
+
+SOLAR_ICON = "mdi:solar-power"
+FREQ_ICON = "mdi:sine-wave"
 
 
 async def async_setup_platform(hass, config, add_entities, discovery_info=None):
@@ -35,23 +39,38 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
 
+
     sensors = [
-        APSystemsECUSensor(coordinator, ecu, "current_power", label="Current Power", unit=POWER_WATT, devclass=DEVICE_CLASS_POWER),
-        APSystemsECUSensor(coordinator, ecu, "today_energy", label="Today Energy", unit=ENERGY_KILO_WATT_HOUR, devclass=DEVICE_CLASS_ENERGY),
-        APSystemsECUSensor(coordinator, ecu, "lifetime_energy", label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, devclass=DEVICE_CLASS_ENERGY),
+        APSystemsECUSensor(coordinator, ecu, "current_power", 
+            label="Current Power", unit=POWER_WATT, 
+            devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON),
+        APSystemsECUSensor(coordinator, ecu, "today_energy", 
+            label="Today Energy", unit=ENERGY_KILO_WATT_HOUR, 
+            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON),
+        APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
+            label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
+            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON),
     ]
 
     inverters = coordinator.data.get("inverters", {})
     for uid,inv_data in inverters.items():
         #_LOGGER.warning(f"Inverter {uid} {inv_data.get('channel_qty')}")
         sensors.extend([
-                APSystemsECUInverterSensor(coordinator, ecu, uid, "temperature", label="Temperature", devclass=DEVICE_CLASS_TEMPERATURE, unit=TEMP_CELSIUS),
-                APSystemsECUInverterSensor(coordinator, ecu, uid, "frequency", label="Frequency", unit=FREQUENCY_HERTZ, devclass=None),
-                APSystemsECUInverterSensor(coordinator, ecu, uid, "voltage", label="Voltage", unit=VOLT, devclass=DEVICE_CLASS_VOLTAGE)
+                APSystemsECUInverterSensor(coordinator, ecu, uid, 
+                    "temperature", label="Temperature", 
+                    devclass=DEVICE_CLASS_TEMPERATURE, unit=TEMP_CELSIUS),
+                APSystemsECUInverterSensor(coordinator, ecu, uid, 
+                    "frequency", label="Frequency", unit=FREQUENCY_HERTZ, 
+                    devclass=None, icon=FREQ_ICON),
+                APSystemsECUInverterSensor(coordinator, ecu, uid, 
+                    "voltage", label="Voltage", unit=VOLT, 
+                    devclass=DEVICE_CLASS_VOLTAGE)
         ])
         for i in range(0, inv_data.get("channel_qty", 0)):
             sensors.append(
-                APSystemsECUInverterSensor(coordinator, ecu, uid, f"power", index=i, label=f"Power {i}", unit=POWER_WATT, devclass=DEVICE_CLASS_POWER)
+                APSystemsECUInverterSensor(coordinator, ecu, uid, f"power", 
+                    index=i, label=f"Power {i}", unit=POWER_WATT, 
+                    devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON)
             )
 
     add_entities(sensors)

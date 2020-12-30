@@ -20,9 +20,12 @@ _LOGGER = logging.getLogger(__name__)
 
 from .const import DOMAIN
 
+CONF_INTERVAL = "interval"
+
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN : vol.Schema({
         vol.Required(CONF_HOST): cv.string,
+        vol.Optional(CONF_INTERVAL) : cv.time_period_seconds
     })
 }, extra=vol.ALLOW_EXTRA)
 
@@ -33,6 +36,9 @@ async def async_setup(hass, config):
     hass.data.setdefault(DOMAIN, {})
 
     host = config[DOMAIN].get(CONF_HOST)
+    interval = config[DOMAIN].get(CONF_INTERVAL)
+    if not interval:
+        interval = timedelta(seconds=60)
 
     ecu = APSystemsECUR(host)
 
@@ -45,7 +51,7 @@ async def async_setup(hass, config):
             _LOGGER,
             name=DOMAIN,
             update_method=async_update_data,
-            update_interval=timedelta(minutes=1),
+            update_interval=interval,
     )
 
     await coordinator.async_refresh()

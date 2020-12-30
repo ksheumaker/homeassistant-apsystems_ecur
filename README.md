@@ -6,7 +6,7 @@ This integration queries the local ECU-R every 1 minute for new data. This was d
 
 This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1)
 
-Currently this is only been tested on QS1 and YC500 inverters
+Currently this is only been tested on QS1 inverters, but should work on YC600 too
 
 ## Setup
 Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)

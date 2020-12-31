@@ -44,7 +44,8 @@ There will be this set of sensors for every inverter you have in your system, UI
 * sensor.inverter_[UID]_frequency - the AC power frequency in Hz
 * sensor.inverter_[UID]_voltage - the AC voltage in V
 * sensor.inverter_[UID]_temperature - the temperature of the invertor in your local unit (C or F)
-* sensor.inverter_[UID]_power_[0-4] - the current power generation (in W) of each channel of the invertor - number of channels will depend on inverter model
+* sensor.inverter_[UID]_signal - the signal strength of the zigbee connection
+* sensor.inverter_[UID]_power_ch_[1-4] - the current power generation (in W) of each channel of the invertor - number of channels will depend on inverter model
 
 ## TODO
 1. Code cleanup - it probably needs some work

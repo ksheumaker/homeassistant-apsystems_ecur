@@ -22,6 +22,10 @@ class APSystemsECUR:
         self.ecu_query = 'APS1100160001END'
         self.inverter_query_prefix = 'APS1100280002'
         self.inverter_query_suffix = 'END'
+
+        self.inverter_signal_prefix = 'APS1100280030'
+        self.inverter_signal_suffix = 'APS1100280030'
+
         self.inverter_byte_start = 26
 
         self.ecu_id = None
@@ -36,6 +40,7 @@ class APSystemsECUR:
 
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
+        self.inverter_raw_signal = None
 
         self.last_inverter_data = None
 
@@ -61,8 +66,11 @@ class APSystemsECUR:
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         sock.send(cmd.encode('utf-8'))
-
         self.inverter_raw_data = sock.recv(self.recv_size)
+
+        cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
+        sock.send(cmd.encode('utf-8'))
+        self.inverter_raw_signal = sock.recv(self.recv_size)
 
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
@@ -80,6 +88,9 @@ class APSystemsECUR:
  
     def aps_int(self, codec, start):
         return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)
+ 
+    def aps_short(self, codec, start):
+        return int(binascii.b2a_hex(codec[(start):(start+1)]), 8)
 
     def aps_double(self, codec, start):
         return int (binascii.b2a_hex(codec[(start):(start+4)]), 16)
@@ -104,7 +115,6 @@ class APSystemsECUR:
         if len(data) < 16:
             raise Exception("ECU query didn't return minimum 16 bytes, no inverters active.")
 
-        print(binascii.b2a_hex(data))
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
         self.firmware = self.aps_str(data, 55, 15)
@@ -112,6 +122,29 @@ class APSystemsECUR:
         self.lifetime_energy = self.aps_double(data, 27) / 10
         self.today_energy = self.aps_double(data, 35) / 100
         self.current_power = self.aps_double(data, 31)
+
+
+    def process_signal_data(self, data=None):
+        signal_data = {}
+
+        if not data:
+            data = self.inverter_raw_signal
+
+        if not self.qty_of_inverters:
+            return signal_data
+
+        location = 15
+        for i in range(0, self.qty_of_inverters):
+            uid = self.aps_uid(data, location)
+            location += 6
+
+            strength = data[location]
+            location += 1
+
+            strength = int((strength / 255) * 100)
+            signal_data[uid] = strength
+
+        return signal_data
 
     def process_inverter_data(self, data=None):
         if not data:
@@ -129,6 +162,8 @@ class APSystemsECUR:
 
         # this is the start of the loop of inverters
         location = self.inverter_byte_start
+
+        signal = self.process_signal_data()
 
         inverters = {}
         for i in range(0, inverter_qty):
@@ -150,6 +185,8 @@ class APSystemsECUR:
 
             inv["temperature"] = self.aps_int(data, location) - 100
             location += 2
+
+            inv["signal"] = signal.get(inverter_uid, 0)
 
             # the first 3 digits determine the type of inverter
             inverter_type = inverter_uid[0:3]

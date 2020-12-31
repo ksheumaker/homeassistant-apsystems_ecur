@@ -24,6 +24,7 @@ from homeassistant.const import (
     POWER_WATT,
     VOLT,
     TEMP_CELSIUS,
+    PERCENTAGE,
     FREQUENCY_HERTZ
 )
 
@@ -32,6 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 
 SOLAR_ICON = "mdi:solar-power"
 FREQ_ICON = "mdi:sine-wave"
+SIGNAL_ICON = "mdi:signal"
 
 
 async def async_setup_platform(hass, config, add_entities, discovery_info=None):
@@ -64,12 +66,16 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
                     devclass=None, icon=FREQ_ICON),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "voltage", label="Voltage", unit=VOLT, 
-                    devclass=DEVICE_CLASS_VOLTAGE)
+                    devclass=DEVICE_CLASS_VOLTAGE),
+                APSystemsECUInverterSensor(coordinator, ecu, uid, 
+                    "signal", label="Signal", unit=PERCENTAGE, 
+                    icon=SIGNAL_ICON)
+
         ])
         for i in range(0, inv_data.get("channel_qty", 0)):
             sensors.append(
                 APSystemsECUInverterSensor(coordinator, ecu, uid, f"power", 
-                    index=i, label=f"Power {i}", unit=POWER_WATT, 
+                    index=i, label=f"Power Ch {i+1}", unit=POWER_WATT, 
                     devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON)
             )
 

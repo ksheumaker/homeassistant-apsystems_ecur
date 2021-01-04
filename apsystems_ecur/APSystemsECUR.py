@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import asyncio
 import socket
 import binascii
 import datetime
@@ -57,27 +56,26 @@ class APSystemsECUR:
         print(f"TZ : {self.timezone}")
         print(f"Qty of inverters : {self.qty_of_inverters}")
 
-    async def query_ecu(self):
-        reader, writer = await asyncio.open_connection(self.ipaddr, self.port)
+    def query_ecu(self):
 
-        #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #sock.connect((self.ipaddr,self.port))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((self.ipaddr,self.port))
 
-        writer.write(self.ecu_query.encode('utf-8'))
-        self.ecu_raw_data = await reader.read(self.recv_size)
-        # self.ecu_raw_data = sock.recv(self.recv_size)
+        sock.send(self.ecu_query.encode('utf-8'))
+        self.ecu_raw_data = sock.recv(self.recv_size)
 
         self.process_ecu_data()
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        writer.write(cmd.encode('utf-8'))
-        self.inverter_raw_data = await reader.read(self.recv_size)
+        sock.send(cmd.encode('utf-8'))
+        self.inverter_raw_data = sock.recv(self.recv_size)
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        writer.write(cmd.encode('utf-8'))
-        self.inverter_raw_signal = await reader.read(self.recv_size)
+        sock.send(cmd.encode('utf-8'))
+        self.inverter_raw_signal = sock.recv(self.recv_size)
 
-        writer.close()
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
 
         data = self.process_inverter_data()
 

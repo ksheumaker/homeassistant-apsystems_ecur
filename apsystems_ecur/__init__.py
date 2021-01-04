@@ -43,11 +43,11 @@ async def async_setup(hass, config):
     ecu = APSystemsECUR(host)
 
     async def async_update_data():
-        #_LOGGER.warning(f"Calling Update data... {ecu.current_power}")
+        _LOGGER.debug(f"Querying ECU data")
         try:
-            data = await ecu.query_ecu()
+            data = await hass.async_add_executor_job(ecu.query_ecu())
         except APSystemsInvalidData as err:
-            msg = f"Using cached data from last successful read from ECU.  (Error: {msg})"
+            msg = f"Using cached data from last successful communication from ECU. Current read provided this error {msg})"
             _LOGGER.warning(msg)
             data = ecu.last_data
 

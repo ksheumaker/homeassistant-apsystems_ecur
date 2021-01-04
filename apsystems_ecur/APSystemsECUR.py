@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
+import asyncio
 import socket
 import binascii
 import datetime
 import json
 
 from pprint import pprint
+
+class APSystemsInvalidData(Exception):
+    pass
 
 class APSystemsECUR:
 
@@ -19,12 +23,13 @@ class APSystemsECUR:
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
 
-        self.ecu_query = 'APS1100160001END'
-        self.inverter_query_prefix = 'APS1100280002'
-        self.inverter_query_suffix = 'END'
+        self.cmd_suffix = "END\n"
+        self.ecu_query = "APS1100160001" + self.cmd_suffix
+        self.inverter_query_prefix = "APS1100280002"
+        self.inverter_query_suffix = self.cmd_suffix
 
-        self.inverter_signal_prefix = 'APS1100280030'
-        self.inverter_signal_suffix = 'APS1100280030'
+        self.inverter_signal_prefix = "APS1100280030"
+        self.inverter_signal_suffix = self.cmd_suffix
 
         self.inverter_byte_start = 26
 
@@ -43,6 +48,7 @@ class APSystemsECUR:
         self.inverter_raw_signal = None
 
         self.last_inverter_data = None
+        self.last_data = None
 
 
     def dump(self):
@@ -51,29 +57,27 @@ class APSystemsECUR:
         print(f"TZ : {self.timezone}")
         print(f"Qty of inverters : {self.qty_of_inverters}")
 
-    async def async_query_ecu(self):
-        return self.query_ecu()
+    async def query_ecu(self):
+        reader, writer = await asyncio.open_connection(self.ipaddr, self.port)
 
+        #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #sock.connect((self.ipaddr,self.port))
 
-    def query_ecu(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.ipaddr,self.port))
-
-        sock.send(self.ecu_query.encode('utf-8'))
-        self.ecu_raw_data = sock.recv(self.recv_size)
+        writer.write(self.ecu_query.encode('utf-8'))
+        self.ecu_raw_data = await reader.read(self.recv_size)
+        # self.ecu_raw_data = sock.recv(self.recv_size)
 
         self.process_ecu_data()
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        sock.send(cmd.encode('utf-8'))
-        self.inverter_raw_data = sock.recv(self.recv_size)
+        writer.write(cmd.encode('utf-8'))
+        self.inverter_raw_data = await reader.read(self.recv_size)
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        sock.send(cmd.encode('utf-8'))
-        self.inverter_raw_signal = sock.recv(self.recv_size)
+        writer.write(cmd.encode('utf-8'))
+        self.inverter_raw_signal = await reader.read(self.recv_size)
 
-        sock.shutdown(socket.SHUT_RDWR)
-        sock.close()
+        writer.close()
 
         data = self.process_inverter_data()
 
@@ -83,6 +87,8 @@ class APSystemsECUR:
         data["current_power"] = self.current_power
 
         self.last_inverter_data = data
+
+        self.last_data = data
 
         return(data)
  
@@ -108,12 +114,22 @@ class APSystemsECUR:
         timestr=str(binascii.b2a_hex(codec[start:(start+amount)]))[2:(amount+2)]
         return timestr[0:4]+"-"+timestr[4:6]+"-"+timestr[6:8]+" "+timestr[8:10]+":"+timestr[10:12]+":"+timestr[12:14]
 
+    def check_ecu_checksum(self, data, cmd):
+        checksum = int(data[5:9])
+        datalen = len(data) - 1
+        #datalen = len(data)
+
+        if datalen != checksum:
+            debugdata = binascii.b2a_hex(data)
+            raise APSystemsInvalidData(f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}")
+
+        return True
+
     def process_ecu_data(self, data=None):
         if not data:
             data = self.ecu_raw_data
 
-        if len(data) < 16:
-            raise Exception("ECU query didn't return minimum 16 bytes, no inverters active.")
+        self.check_ecu_checksum(data, "ECU Query")
 
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
@@ -129,6 +145,8 @@ class APSystemsECUR:
 
         if not data:
             data = self.inverter_raw_signal
+
+        self.check_ecu_checksum(data, "Signal Query")
 
         if not self.qty_of_inverters:
             return signal_data
@@ -149,6 +167,8 @@ class APSystemsECUR:
     def process_inverter_data(self, data=None):
         if not data:
             data = self.inverter_raw_data
+
+        self.check_ecu_checksum(data, "Inverter data")
 
         output = {}
 
@@ -199,7 +219,7 @@ class APSystemsECUR:
                 inv.update(channel_data)    
 
             else:
-                raise Exception(f"Unsupported inverter type {inverter_type}")
+                raise APSystemsInvalidData(f"Unsupported inverter type {inverter_type}")
 
             inverters[inverter_uid] = inv
 

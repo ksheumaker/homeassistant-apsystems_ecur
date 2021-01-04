@@ -44,7 +44,12 @@ async def async_setup(hass, config):
 
     async def async_update_data():
         #_LOGGER.warning(f"Calling Update data... {ecu.current_power}")
-        return await ecu.async_query_ecu()
+        try:
+            data = await ecu.query_ecu()
+        except APSystemsInvalidData as err:
+            msg = f"Using cached data from last successful read from ECU.  (Error: {msg})"
+            _LOGGER.warning(msg)
+            data = ecu.last_data
 
     coordinator = DataUpdateCoordinator(
             hass,

@@ -41,19 +41,27 @@ async def async_setup(hass, config):
     if not interval:
         interval = timedelta(seconds=60)
 
+    cache_count = 0
     ecu = APSystemsECUR(host)
 
     async def async_update_data():
         _LOGGER.debug(f"Querying ECU data")
         try:
             data = await hass.async_add_executor_job(ecu.query_ecu)
+            cache_count = 0
         except APSystemsInvalidData as err:
             msg = f"Using cached data from last successful communication from ECU. Error: {err}"
             _LOGGER.warning(msg)
+            cache_count += 1
+            if cache_count > 5:
+                raise Exception("Error using cached data for more than 5 times.")
             data = ecu.last_data
         except Exception as err:
             msg = f"Using cached data from last successful communication from ECU. Error: {err}"
             _LOGGER.warning(msg)
+            cache_count += 1
+            if cache_count > 5:
+                raise Exception("Error using cached data for more than 5 times.")
             data = ecu.last_data
 
         return data

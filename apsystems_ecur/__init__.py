@@ -1,6 +1,7 @@
 import logging
 
 import voluptuous as vol
+import traceback
 from datetime import timedelta
 
 from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData
@@ -47,11 +48,11 @@ async def async_setup(hass, config):
         try:
             data = await hass.async_add_executor_job(ecu.query_ecu)
         except APSystemsInvalidData as err:
-            msg = f"Using cached data from last successful communication from ECU. Error: {err})"
+            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
             _LOGGER.warning(msg)
             data = ecu.last_data
         except Exception as err:
-            msg = f"Using cached data from last successful communication from ECU. Error: {err})"
+            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
             _LOGGER.warning(msg)
             data = ecu.last_data
 

@@ -61,17 +61,17 @@ class APSystemsECUR:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.ipaddr,self.port))
 
-        sock.send(self.ecu_query.encode('utf-8'))
+        sock.sendall(self.ecu_query.encode('utf-8'))
         self.ecu_raw_data = sock.recv(self.recv_size)
 
         self.process_ecu_data()
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        sock.send(cmd.encode('utf-8'))
+        sock.sendall(cmd.encode('utf-8'))
         self.inverter_raw_data = sock.recv(self.recv_size)
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        sock.send(cmd.encode('utf-8'))
+        sock.sendall(cmd.encode('utf-8'))
         self.inverter_raw_signal = sock.recv(self.recv_size)
 
         sock.shutdown(socket.SHUT_RDWR)
@@ -91,13 +91,25 @@ class APSystemsECUR:
         return(data)
  
     def aps_int(self, codec, start):
-        return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)
+        try:
+            return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)
+        except ValueError as err:
+            debugdata = binascii.b2a_hex(codec)
+            raise APSystemsInvalidData(f"Unable to convert binary to int location={start} data={debugdata}")
  
     def aps_short(self, codec, start):
-        return int(binascii.b2a_hex(codec[(start):(start+1)]), 8)
+        try:
+            return int(binascii.b2a_hex(codec[(start):(start+1)]), 8)
+        except ValueError as err:
+            debugdata = binascii.b2a_hex(codec)
+            raise APSystemsInvalidData(f"Unable to convert binary to short int location={start} data={debugdata}")
 
     def aps_double(self, codec, start):
-        return int (binascii.b2a_hex(codec[(start):(start+4)]), 16)
+        try:
+            return int (binascii.b2a_hex(codec[(start):(start+4)]), 16)
+        except ValueError as err:
+            debugdata = binascii.b2a_hex(codec)
+            raise APSystemsInvalidData(f"Unable to convert binary to double location={start} data={debugdata}")
     
     def aps_bool(self, codec, start):
         return bool(binascii.b2a_hex(codec[(start):(start+2)]))
@@ -113,13 +125,27 @@ class APSystemsECUR:
         return timestr[0:4]+"-"+timestr[4:6]+"-"+timestr[6:8]+" "+timestr[8:10]+":"+timestr[10:12]+":"+timestr[12:14]
 
     def check_ecu_checksum(self, data, cmd):
-        checksum = int(data[5:9])
         datalen = len(data) - 1
-        #datalen = len(data)
+        try:
+            checksum = int(data[5:9])
+        except ValueError as err:
+            debugdata = binascii.b2a_hex(data)
+            raise APSystemsInvalidData(f"Error getting checksum int from '{cmd}' data={debugdata}")
 
         if datalen != checksum:
             debugdata = binascii.b2a_hex(data)
             raise APSystemsInvalidData(f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}")
+
+        start_str = self.aps_str(data, 0, 3)
+        end_str = self.aps_str(data, len(data) - 4, 3)
+
+        if start_str != 'APS':
+            debugdata = binascii.b2a_hex(data)
+            raise APSystemsInvalidData(f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}")
+
+        if end_str != 'END':
+            debugdata = binascii.b2a_hex(data)
+            raise APSystemsInvalidData(f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}")
 
         return True
 

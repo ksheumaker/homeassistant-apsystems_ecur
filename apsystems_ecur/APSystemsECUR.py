@@ -24,7 +24,10 @@ class APSystemsECUR:
         self.recv_suffix = b'END\n'
 
         # how long to wait on socket commands until we get our recv_suffix
-        self.timeout = 10
+        self.timeout = 5
+
+        # how many times do we try the same command in a single update before failing
+        self.cmd_attempts = 3
 
         # how big of a buffer to read at a time from the socket
         self.recv_size = 4096
@@ -61,6 +64,10 @@ class APSystemsECUR:
         self.last_data = None
 
         self.read_buffer = b''
+        self.cache_count = 0
+
+        self.reader = None
+        self.writer = None
 
 
     def dump(self):
@@ -69,59 +76,51 @@ class APSystemsECUR:
         print(f"TZ : {self.timezone}")
         print(f"Qty of inverters : {self.qty_of_inverters}")
 
-
-    async def async_read_from_socket(self, reader):
+    async def async_read_from_socket(self):
         self.read_buffer = b''
         end_data = None
 
         while end_data != self.recv_suffix:
-            self.read_buffer += await reader.read(self.recv_size)
+            self.read_buffer += await self.reader.read(self.recv_size)
             size = len(self.read_buffer)
             end_data = self.read_buffer[size-4:]
 
         return self.read_buffer
 
+    async def async_send_read_from_socket(self, cmd):
+        current_attempt = 0
+        while current_attempt < self.cmd_attempts:
+            current_attempt += 1
+
+            self.writer.write(cmd.encode('utf-8'))
+            await self.writer.drain()
+
+            try:
+                return await asyncio.wait_for(self.async_read_from_socket(), 
+                    timeout=self.timeout)
+            except Exception as err:
+                print(f"Failed on attempt {current_attempt}", str(err))
+                pass
+
+        self.writer.close()
+        raise APSystemsInvalidData(f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}")
+
     async def async_query_ecu(self):
-        reader, writer = await asyncio.open_connection(self.ipaddr, self.port)
+        self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
         _LOGGER.info(f"Connected to {self.ipaddr} {self.port}")
 
         cmd = self.ecu_query
-        writer.write(cmd.encode('utf-8'))
-        await writer.drain()
-
-        try:
-            self.ecu_raw_data = await asyncio.wait_for(
-                self.async_read_from_socket(reader), timeout=self.timeout)
-        except Exception as err:
-            writer.close()
-            raise APSystemsInvalidData(f"Incomplete data from ECU, cmd='{cmd.rstrip()}' data={self.read_buffer}")
+        self.ecu_raw_data = await self.async_send_read_from_socket(cmd)
 
         self.process_ecu_data()
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        writer.write(cmd.encode('utf-8'))
-        await writer.drain()
-
-        try:
-            self.inverter_raw_data = await asyncio.wait_for(
-                self.async_read_from_socket(reader), timeout=self.timeout)
-        except Exception as err:
-            writer.close()
-            raise APSystemsInvalidData(f"Incomplete data from ECU, cmd='{cmd.rstrip()}' data={self.read_buffer}")
-
+        self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        writer.write(cmd.encode('utf-8'))
-        await writer.drain()
+        self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)
 
-        try:
-            self.inverter_raw_signal = await asyncio.wait_for(
-                self.async_read_from_socket(reader), timeout=self.timeout)
-        except Exception as err:
-            writer.close()
-            raise APSystemsInvalidData(f"Incomplete data from ECU, cmd='{cmd.rstrip()}' data={self.read_buffer}")
-
-        writer.close()
+        self.writer.close()
 
         data = self.process_inverter_data()
         data["ecu_id"] = self.ecu_id

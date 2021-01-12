@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
+import asyncio
 import socket
 import binascii
 import datetime
 import json
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 from pprint import pprint
 
@@ -16,7 +20,14 @@ class APSystemsECUR:
         self.ipaddr = ipaddr
         self.port = port
 
-        self.recv_size = 2048
+        # what do we expect socket data to end in
+        self.recv_suffix = b'END\n'
+
+        # how long to wait on socket commands until we get our recv_suffix
+        self.timeout = 10
+
+        # how big of a buffer to read at a time from the socket
+        self.recv_size = 4096
 
         self.qs1_ids = [ "802", "801" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
@@ -49,12 +60,78 @@ class APSystemsECUR:
         self.last_inverter_data = None
         self.last_data = None
 
+        self.read_buffer = b''
+
 
     def dump(self):
         print(f"ECU : {self.ecu_id}")
         print(f"Firmware : {self.firmware}")
         print(f"TZ : {self.timezone}")
         print(f"Qty of inverters : {self.qty_of_inverters}")
+
+
+    async def async_read_from_socket(self, reader):
+        self.read_buffer = b''
+        end_data = None
+
+        while end_data != self.recv_suffix:
+            self.read_buffer += await reader.read(self.recv_size)
+            size = len(self.read_buffer)
+            end_data = self.read_buffer[size-4:]
+
+        return self.read_buffer
+
+    async def async_query_ecu(self):
+        reader, writer = await asyncio.open_connection(self.ipaddr, self.port)
+        _LOGGER.info(f"Connected to {self.ipaddr} {self.port}")
+
+        cmd = self.ecu_query
+        writer.write(cmd.encode('utf-8'))
+        await writer.drain()
+
+        try:
+            self.ecu_raw_data = await asyncio.wait_for(
+                self.async_read_from_socket(reader), timeout=self.timeout)
+        except Exception as err:
+            writer.close()
+            raise APSystemsInvalidData(f"Incomplete data from ECU, cmd='{cmd.rstrip()}' data={self.read_buffer}")
+
+        self.process_ecu_data()
+
+        cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
+        writer.write(cmd.encode('utf-8'))
+        await writer.drain()
+
+        try:
+            self.inverter_raw_data = await asyncio.wait_for(
+                self.async_read_from_socket(reader), timeout=self.timeout)
+        except Exception as err:
+            writer.close()
+            raise APSystemsInvalidData(f"Incomplete data from ECU, cmd='{cmd.rstrip()}' data={self.read_buffer}")
+
+
+        cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
+        writer.write(cmd.encode('utf-8'))
+        await writer.drain()
+
+        try:
+            self.inverter_raw_signal = await asyncio.wait_for(
+                self.async_read_from_socket(reader), timeout=self.timeout)
+        except Exception as err:
+            writer.close()
+            raise APSystemsInvalidData(f"Incomplete data from ECU, cmd='{cmd.rstrip()}' data={self.read_buffer}")
+
+        writer.close()
+
+        data = self.process_inverter_data()
+        data["ecu_id"] = self.ecu_id
+        data["today_energy"] = self.today_energy
+        data["lifetime_energy"] = self.lifetime_energy
+        data["current_power"] = self.current_power
+
+        self.last_inverter_data = data
+        self.last_data = data
+        return(data)
 
     def query_ecu(self):
 

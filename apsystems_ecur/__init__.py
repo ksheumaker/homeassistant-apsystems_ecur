@@ -47,7 +47,7 @@ async def async_setup(hass, config):
     async def async_update_data():
         _LOGGER.debug(f"Querying ECU data")
         try:
-            data = await hass.async_add_executor_job(ecu.query_ecu)
+            data = await ecu.async_query_ecu()
             cache_count = 0
         except APSystemsInvalidData as err:
             msg = f"Using cached data from last successful communication from ECU. Error: {err}"

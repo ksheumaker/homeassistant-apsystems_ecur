@@ -60,11 +60,7 @@ class APSystemsECUR:
         self.inverter_raw_data = raw_inverter
         self.inverter_raw_signal = None
 
-        self.last_inverter_data = None
-        self.last_data = None
-
         self.read_buffer = b''
-        self.cache_count = 0
 
         self.reader = None
         self.writer = None
@@ -127,8 +123,6 @@ class APSystemsECUR:
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
 
-        self.last_inverter_data = data
-        self.last_data = data
         return(data)
 
     def query_ecu(self):
@@ -159,9 +153,6 @@ class APSystemsECUR:
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
 
-        self.last_inverter_data = data
-
-        self.last_data = data
 
         return(data)
  

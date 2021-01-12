@@ -12,7 +12,12 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    SOLAR_ICON,
+    FREQ_ICON,
+    SIGNAL_ICON
+)
 
 from homeassistant.const import (
     DEVICE_CLASS_TEMPERATURE,
@@ -28,13 +33,7 @@ from homeassistant.const import (
     FREQUENCY_HERTZ
 )
 
-
 _LOGGER = logging.getLogger(__name__)
-
-SOLAR_ICON = "mdi:solar-power"
-FREQ_ICON = "mdi:sine-wave"
-SIGNAL_ICON = "mdi:signal"
-
 
 async def async_setup_platform(hass, config, add_entities, discovery_info=None):
 
@@ -108,7 +107,7 @@ class APSystemsECUInverterSensor(CoordinatorEntity, Entity):
         field = self._field
         if self._index != None:
             field = f"{field}_{self._index}"
-        return f"{self._ecu.ecu_id}_{self._uid}_{field}"
+        return f"{self._ecu.ecu.ecu_id}_{self._uid}_{field}"
 
     @property
     def device_class(self):
@@ -142,8 +141,8 @@ class APSystemsECUInverterSensor(CoordinatorEntity, Entity):
     def device_state_attributes(self):
 
         attrs = {
-            "ecu_id" : self._ecu.ecu_id,
-            "last_update" : self._ecu.last_update,
+            "ecu_id" : self._ecu.ecu.ecu_id,
+            "last_update" : self._ecu.ecu.last_update,
         }
         return attrs
 
@@ -171,7 +170,7 @@ class APSystemsECUSensor(CoordinatorEntity, Entity):
 
     @property
     def unique_id(self):
-        return f"{self._ecu.ecu_id}_{self._field}"
+        return f"{self._ecu.ecu.ecu_id}_{self._field}"
 
     @property
     def name(self):
@@ -199,9 +198,9 @@ class APSystemsECUSensor(CoordinatorEntity, Entity):
     def device_state_attributes(self):
 
         attrs = {
-            "ecu_id" : self._ecu.ecu_id,
-            "firmware" : self._ecu.firmware,
-            "last_update" : self._ecu.last_update
+            "ecu_id" : self._ecu.ecu.ecu_id,
+            "firmware" : self._ecu.ecu.firmware,
+            "last_update" : self._ecu.ecu.last_update
         }
         return attrs
 

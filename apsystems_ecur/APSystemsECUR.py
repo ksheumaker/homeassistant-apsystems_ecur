@@ -99,7 +99,6 @@ class APSystemsECUR:
                 return await asyncio.wait_for(self.async_read_from_socket(), 
                     timeout=self.timeout)
             except Exception as err:
-                print(f"Failed on attempt {current_attempt}", str(err))
                 pass
 
         self.writer.close()

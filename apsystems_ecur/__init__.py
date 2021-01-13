@@ -37,7 +37,7 @@ PLATFORMS = [ "sensor", "binary_sensor" ]
 class ECUR():
 
     def __init__(self, ipaddr):
-        self.ecu = APsystemsECUR(ipaddr)
+        self.ecu = APSystemsECUR(ipaddr)
         self.cache_count = 0
         self.cache_max = 5
         self.data_from_cache = False
@@ -45,10 +45,10 @@ class ECUR():
         self.error_messge = ""
         self.cached_data = {}
 
-    def stop_query(self):
+    async def stop_query(self):
         self.querying = False
 
-    def start_query(self):
+    async def start_query(self):
         self.querying = True
 
     async def update(self):
@@ -58,7 +58,7 @@ class ECUR():
         # this is so we can stop querying after sunset
         if not self.querying:
 
-            _LOGGER.warning("Not querying ECU due to stopped")
+            _LOGGER.debug("Not querying ECU due to stopped")
             data = self.cached_data
             self.data_from_cache = True
 
@@ -66,9 +66,10 @@ class ECUR():
             data["querying"] = self.querying
             return self.cached_data
 
-        _LOGGER.warning("Querying ECU")
+        _LOGGER.debug("Querying ECU")
         try:
-            data = await ecu.async_query_ecu()
+            data = await self.ecu.async_query_ecu()
+            _LOGGER.debug("Got data from ECU")
 
             # we got good results, so we store it and set flags about our
             # cache state
@@ -107,6 +108,7 @@ class ECUR():
 
         data["data_from_cache"] = self.data_from_cache
         data["querying"] = self.querying
+        _LOGGER.debug(f"Returning {data}")
         return data
 
 async def async_setup(hass, config):
@@ -135,16 +137,16 @@ async def async_setup(hass, config):
         "coordinator" : coordinator
     }
 
-    def handle_stop_query(call):
-        ecu.stop_query()
-        await coordinator.async_request_refresh()
+    async def handle_stop_query(call):
+        await ecu.stop_query()
+        coordinator.async_refresh()
 
-    def handle_start_query(call):
-        ecu.start_query()
-        await coordinator.async_request_refresh()
+    async def handle_start_query(call):
+        await ecu.start_query()
+        coordinator.async_refresh()
 
-    hass.services.register(DOMAIN, "start_query", handle_start_query)
-    hass.services.register(DOMAIN, "stop_query", handle_stop_query)
+    hass.services.async_register(DOMAIN, "start_query", handle_start_query)
+    hass.services.async_register(DOMAIN, "stop_query", handle_stop_query)
 
     for component in PLATFORMS:
         load_platform(hass, component, DOMAIN, {}, config)

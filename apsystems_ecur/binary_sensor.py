@@ -5,7 +5,10 @@ import logging
 
 import async_timeout
 
-from homeassistant.helpers.entity import Entity
+from homeassistant.components.binary_sensor import (
+    BinarySensorEntity,
+)
+
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -14,7 +17,8 @@ from homeassistant.helpers.update_coordinator import (
 
 from .const import (
     DOMAIN,
-    SOLAR_ICON
+    RELOAD_ICON,
+    CACHE_ICON
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,18 +31,17 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
 
     sensors = [
         APSystemsECUBinarySensor(coordinator, ecu, "data_from_cache", 
-            label="Using Cached Data", icon=SOLAR_ICON),
+            label="Using Cached Data", icon=CACHE_ICON),
         APSystemsECUBinarySensor(coordinator, ecu, "querying", 
-            label="Querying Enabled", icon=SOLAR_ICON),
+            label="Querying Enabled", icon=RELOAD_ICON),
     ]
 
     add_entities(sensors)
 
-   
 
-class APSystemsECUBinarySensor(CoordinatorEntity, Entity):
+class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
-    def __init__(self, coordinator, ecu, field, label=None, devclass=None):
+    def __init__(self, coordinator, ecu, field, label=None, devclass=None, icon=None):
 
         super().__init__(coordinator)
 

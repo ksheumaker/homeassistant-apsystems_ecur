@@ -30,7 +30,86 @@ CONFIG_SCHEMA = vol.Schema({
     })
 }, extra=vol.ALLOW_EXTRA)
 
-PLATFORMS = [ "sensor" ]
+PLATFORMS = [ "sensor", "binary_sensor" ]
+
+
+## handle all the communications with the ECUR class and deal with our need for caching, etc
+class ECUR():
+
+    def __init__(self, ipaddr):
+        self.ecu = APSystemsECUR(ipaddr)
+        self.cache_count = 0
+        self.cache_max = 5
+        self.data_from_cache = False
+        self.querying = True
+        self.error_messge = ""
+        self.cached_data = {}
+
+    async def stop_query(self):
+        self.querying = False
+
+    async def start_query(self):
+        self.querying = True
+
+    async def update(self):
+        data = {}
+
+        # if we aren't actively quering data, pull data form the cache
+        # this is so we can stop querying after sunset
+        if not self.querying:
+
+            _LOGGER.debug("Not querying ECU due to stopped")
+            data = self.cached_data
+            self.data_from_cache = True
+
+            data["data_from_cache"] = self.data_from_cache
+            data["querying"] = self.querying
+            return self.cached_data
+
+        _LOGGER.debug("Querying ECU")
+        try:
+            data = await self.ecu.async_query_ecu()
+            _LOGGER.debug("Got data from ECU")
+
+            # we got good results, so we store it and set flags about our
+            # cache state
+            self.cached_data = data
+            self.cache_count = 0
+            self.data_from_cache = False
+            self.error_message = ""
+
+        except APSystemsInvalidData as err:
+
+            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
+            _LOGGER.warning(msg)
+
+            # we got invalid data, so we need to pull from cache
+            self.error_msg = msg
+            self.cache_count += 1
+            self.data_from_cache = True
+            data = self.cached_data
+
+            if self.cache_count > self.cache_max:
+                raise Exception(f"Error using cached data for more than {self.cache_max} times.")
+
+        except Exception as err:
+
+            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
+            _LOGGER.warning(msg)
+
+            # we got invalid data, so we need to pull from cache
+            self.error_msg = msg
+            self.cache_count += 1
+            self.data_from_cache = True
+            data = self.cached_data
+
+            if self.cache_count > self.cache_max:
+                raise Exception(f"Error using cached data for more than {self.cache_max} times.")
+
+        data["data_from_cache"] = self.data_from_cache
+        data["querying"] = self.querying
+        _LOGGER.debug(f"Returning {data}")
+        return data
 
 async def async_setup(hass, config):
     """ Setup the APsystems platform """
@@ -41,35 +120,13 @@ async def async_setup(hass, config):
     if not interval:
         interval = timedelta(seconds=60)
 
-    ecu = APSystemsECUR(host)
-
-    async def async_update_data():
-        _LOGGER.debug(f"Querying ECU data")
-        try:
-            data = await ecu.async_query_ecu()
-            ecu.cache_count = 0
-        except APSystemsInvalidData as err:
-            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
-            _LOGGER.warning(msg)
-            ecu.cache_count += 1
-            if ecu.cache_count > 5:
-                raise Exception("Error using cached data for more than 5 times.")
-            data = ecu.last_data
-        except Exception as err:
-            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
-            _LOGGER.warning(msg)
-            ecu.cache_count += 1
-            if ecu.cache_count > 5:
-                raise Exception("Error using cached data for more than 5 times.")
-            data = ecu.last_data
-
-        return data
+    ecu = ECUR(host)
 
     coordinator = DataUpdateCoordinator(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_method=async_update_data,
+            update_method=ecu.update,
             update_interval=interval,
     )
 
@@ -79,6 +136,17 @@ async def async_setup(hass, config):
         "ecu" : ecu,
         "coordinator" : coordinator
     }
+
+    async def handle_stop_query(call):
+        await ecu.stop_query()
+        coordinator.async_refresh()
+
+    async def handle_start_query(call):
+        await ecu.start_query()
+        coordinator.async_refresh()
+
+    hass.services.async_register(DOMAIN, "start_query", handle_start_query)
+    hass.services.async_register(DOMAIN, "stop_query", handle_stop_query)
 
     for component in PLATFORMS:
         load_platform(hass, component, DOMAIN, {}, config)

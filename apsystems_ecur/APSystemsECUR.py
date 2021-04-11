@@ -306,7 +306,11 @@ class APSystemsECUR:
 
             elif inverter_type in self.qs1_ids:
                 (channel_data, location) = self.process_qs1(data, location)
-                inv.update(channel_data)    
+                inv.update(channel_data)
+            
+            elif inverter_type in self.yc1000_ids:
+                (channel_data, location) = self.process_yc1000(data, location)
+                inv.update(channel_data)
 
             else:
                 raise APSystemsInvalidData(f"Unsupported inverter type {inverter_type}")
@@ -315,7 +319,45 @@ class APSystemsECUR:
 
         output["inverters"] = inverters
         return (output)
+    
+    def process_yc1000(self, data, location):
 
+        power = []
+        voltages = []
+
+        power.append(self.aps_int(data, location))
+        location += 2
+
+        voltage = self.aps_int(data, location)
+        location += 2
+
+        power.append(self.aps_int(data, location))
+        location += 2
+        
+        voltage = self.aps_int(data, location)
+        location += 2
+
+        power.append(self.aps_int(data, location))
+        location += 2
+        
+        voltage = self.aps_int(data, location)
+        location += 2
+
+        power.append(self.aps_int(data, location))
+        location += 2
+
+        voltages.append(voltage)
+
+        output = {
+            "model" : "YC1000",
+            "channel_qty" : 4,
+            "power" : power,
+            "voltage" : voltages
+        }
+
+        return (output, location)
+
+    
     def process_qs1(self, data, location):
 
         power = []

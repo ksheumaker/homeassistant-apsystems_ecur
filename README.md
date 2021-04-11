@@ -2,11 +2,16 @@
 This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the APSystems ECU-R solar energy monitoring unit [APsystem](http://www.apsystems.com).
 
 ## Background & acknowledgement
-This integration queries the local ECU-R every 1 minute for new data. This was done without a public API, and by reverse engineering the protocol the APSystems ECU phone app uses when setting up the array.
+This integration queries the local ECU-R every 1 minute for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app uses when setting up the PV array.
 
 This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1)
 
-Currently this is only been tested on QS1 inverters, but should work on YC600 too
+Currently this is only been tested and used on QS1 and YC600 inverters. The ECU-R is also compatible with the YC1000 inverter but this integration doesn't support the YC1000 yet.
+
+## Prerequisites
+This component only works if the ECU-R is attached to your network by Wifi. To enable and configure WiFi on the ECU-R use the ECUapp and temporarily enable the ECU-R's accesspoint by pressing the button on the side of the ECU-R. Then connect your phone's WiFi to the ECU-R's accesspoint to enable the ECUapp to connect and configure the ECU-R.
+Although there's no need to also attach the ECU-R by ethernet cable, your free to do so if you like.
+```
 
 ## Setup
 Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)
@@ -21,7 +26,7 @@ Your directory structure should look like this:
 ```
 
 ## Configuration
-Add the following snippet into your ```configuration.yaml```  replace [IPADDR] with the IP address of your ECU-R device.  _NOTE_ testing has shown this only works on the WiFi IP address.  If you use the Ethernet IP of the ECU-R you will get no response from port 8899 on the ECU-R.
+Add the following snippet into your ```configuration.yaml```  replace [IPADDR] with the WiFi connected IP address of your ECU-R device. 
 
 ```
 

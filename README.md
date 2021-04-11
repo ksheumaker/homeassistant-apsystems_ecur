@@ -13,7 +13,7 @@ This component only works if the ECU-R is attached to your network by Wifi. To e
 Although there's no need to also attach the ECU-R by ethernet cable, your free to do so if you like.
 ```
 
-## Release notes
+Release notes
 v1.0.0 First release
 v1.0.1 Revised the readme and added support for YC1000 (hopefully)
 ```

@@ -9,13 +9,13 @@ This couldn't have been done without the hardwork of @checking12 and @HAEdwin on
 Currently this is only been tested and used on QS1 and YC600 inverters. The ECU-R is also compatible with the YC1000 inverter but work is in progress to support the YC1000.
 
 ## Prerequisites
-This component only works if the ECU-R is attached to your network by Wifi. To enable and configure WiFi on the ECU-R use the ECUapp and temporarily enable the ECU-R's accesspoint by pressing the button on the side of the ECU-R. Then connect your phone's WiFi to the ECU-R's accesspoint to enable the ECUapp to connect and configure the ECU-R.
-Although there's no need to also attach the ECU-R by ethernet cable, your free to do so if you like.
+This component only works if the ECU-R is attached to your network by Wifi. To enable and configure WiFi on the ECU-R, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU-R's accesspoint by pressing the button on the side of the ECU-R. Then connect your phone's WiFi to the ECU-R's accesspoint to enable the ECUapp to connect and configure the ECU-R.
+Although there's no need to also attach the ECU-R by ethernet cable, you are free to do so if you like.
 ```
 
 Release notes
 v1.0.0 First release
-v1.0.1 Revised the readme and added support for YC1000 (hopefully)
+v1.0.1 Revised the readme added support for YC1000 (hopefully) and added versioning to the manifest
 ```
 
 ## Setup

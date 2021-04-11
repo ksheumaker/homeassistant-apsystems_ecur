@@ -16,6 +16,7 @@ Although there's no need to also attach the ECU-R by ethernet cable, your free t
 ## Release notes
 v1.0.0 First release
 v1.0.1 Revised the readme and added support for YC1000 (hopefully)
+```
 
 ## Setup
 Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)

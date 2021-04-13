@@ -1,14 +1,14 @@
 # homeassistant-apsystems_ecur
-This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the APSystems ECU-R solar energy monitoring unit [APsystem](http://www.apsystems.com).
+This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the APSystems ECU-R solar Energy Communication Unit [APsystems](http://www.apsystems.com). With this component you are able to monitor your PV installation (inverters) in detail.
+
 
 ## Background & acknowledgement
-This integration queries the local ECU-R every 1 minute for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app uses when setting up the PV array.
+This integration queries the local ECU-R every 1 minute for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array.
 
 This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1)
 
-Currently this is only been tested and used on QS1 and YC600 inverters. The ECU-R is also compatible with the YC1000 inverter but work is in progress to support the YC1000.
-
 ## Prerequisites
+You own an APSystems ECU-R and any combination of YC600, YC1000 or QS1 inverter.
 This component only works if the ECU-R is attached to your network by Wifi. To enable and configure WiFi on the ECU-R, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU-R's accesspoint by pressing the button on the side of the ECU-R. Then connect your phone's WiFi to the ECU-R's accesspoint to enable the ECUapp to connect and configure the ECU-R.
 Although there's no need to also attach the ECU-R by ethernet cable, you are free to do so if you like.
 ```
@@ -59,5 +59,3 @@ There will be this set of sensors for every inverter you have in your system, UI
 
 ## TODO
 1. Code cleanup - it probably needs some work
-1. Further testing on more systems
-

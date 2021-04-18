@@ -218,8 +218,12 @@ class APSystemsECUR:
     def process_ecu_data(self, data=None):
         if not data:
             data = self.ecu_raw_data
-
-        self.check_ecu_checksum(data, "ECU Query")
+            if data[13:16:1] == b'215': #Is it an ECU-C?
+                data = data.replace(b'\\', b'\\x',data.count(b'\\') -1) #Correct data for generetic interpretation
+                #todo: correct checksum because of changed length datastring
+            else:
+                self.check_ecu_checksum(data, "ECU Query")
+                
 
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
@@ -235,8 +239,11 @@ class APSystemsECUR:
 
         if not data:
             data = self.inverter_raw_signal
-
-        self.check_ecu_checksum(data, "Signal Query")
+            if self.ecu_id[0:3:1] == b'215': #Is it an ECU-C?
+                data = data.replace(b'\\', b'\\x',data.count(b'\\') -1) #Correct data for generetic interpretation
+                #todo: correct checksum because of changed length datastring
+            else: 
+                self.check_ecu_checksum(data, "Signal Query")
 
         if not self.qty_of_inverters:
             return signal_data
@@ -257,8 +264,11 @@ class APSystemsECUR:
     def process_inverter_data(self, data=None):
         if not data:
             data = self.inverter_raw_data
-
-        self.check_ecu_checksum(data, "Inverter data")
+            if self.ecu_id[0:3:1] == b'215': #Is it an ECU-C?
+                data = data.replace(b'\\', b'\\x',data.count(b'\\') -1) #Correct data for generetic interpretation
+                #todo: correct checksum because of changed length datastring
+            else:
+                self.check_ecu_checksum(data, "Inverter data")
 
         output = {}
 

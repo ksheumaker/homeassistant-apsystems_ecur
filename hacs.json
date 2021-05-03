@@ -1,0 +1,6 @@
+{
+  "domains": ["sensor,binary_sensor"],
+  "name": "APSystems ECU-R",
+  "render_readme": true,
+  "homeassistant": "20.3.0"
+}

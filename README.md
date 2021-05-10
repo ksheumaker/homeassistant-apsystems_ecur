@@ -15,7 +15,7 @@ Although there's no need to also attach the ECU-R by ethernet cable, you are fre
 
 Release notes
 v1.0.0 First release
-v1.0.1 Revised the readme, added support for YC1000 (hopefully) and added versioning to the manifest
+v1.0.1 Revised the readme, added support for YC1000 and versioning to the manifest
 ```
 
 ## Setup

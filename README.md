@@ -1,3 +1,5 @@
+![GitHub Logo](https://github.com/HAEdwin/homeassistant-apsystems_ecur/blob/main/APSystems%20HA%20ECU_logo.png)
+
 # homeassistant-apsystems_ecur
 This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the [APSystems](http://www.apsystems.com) ECU-R solar Energy Communication Unit (ECU). With this component you are able to monitor your PV installation (inverters) in detail.
 
@@ -57,4 +59,4 @@ There will be this set of sensors for every inverter you have in your system, UI
 
 ## TODO
 1. Code cleanup - it probably needs some work
-2. Compatibility with the ECU-C model (see issue)
+2. Compatibility with the ECU-C model (see issues)

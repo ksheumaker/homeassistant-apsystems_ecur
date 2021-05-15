@@ -122,40 +122,13 @@ class APSystemsECUR:
         data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
+        if self.daily_max_power < self.current_power or self.today_energy == 0:
+            self.daily_max_power = self.current_power
+        data["daily_max_power"] = self.daily_max_power
 
         return(data)
 
-    def query_ecu(self):
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.ipaddr,self.port))
-
-        sock.sendall(self.ecu_query.encode('utf-8'))
-        self.ecu_raw_data = sock.recv(self.recv_size)
-
-        self.process_ecu_data()
-
-        cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        sock.sendall(cmd.encode('utf-8'))
-        self.inverter_raw_data = sock.recv(self.recv_size)
-
-        cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        sock.sendall(cmd.encode('utf-8'))
-        self.inverter_raw_signal = sock.recv(self.recv_size)
-
-        sock.shutdown(socket.SHUT_RDWR)
-        sock.close()
-
-        data = self.process_inverter_data()
-
-        data["ecu_id"] = self.ecu_id
-        data["today_energy"] = self.today_energy
-        data["lifetime_energy"] = self.lifetime_energy
-        data["current_power"] = self.current_power
-
-
-        return(data)
- 
+     
     def aps_int(self, codec, start):
         try:
             return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)

@@ -1,5 +1,5 @@
 # homeassistant-apsystems_ecur
-This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the APSystems ECU-R solar Energy Communication Unit [APsystems](http://www.apsystems.com). With this component you are able to monitor your PV installation (inverters) in detail.
+This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) ECU-R solar Energy Communication Unit. With this component you are able to monitor your PV installation (inverters) in detail.
 
 
 ## Background & acknowledgement
@@ -15,7 +15,7 @@ Although there's no need to also attach the ECU-R by ethernet cable, you are fre
 
 Release notes
 v1.0.0 First release
-v1.0.1 Revised the readme, added support for YC1000 (hopefully) and added versioning to the manifest
+v1.0.1 Revised the readme, added support for YC1000 and added versioning to the manifest
 ```
 
 ## Setup

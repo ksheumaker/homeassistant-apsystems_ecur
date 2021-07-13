@@ -8,7 +8,7 @@ This integration queries the local ECU-R every 1 minute for new data. This was d
 This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1)
 
 ## Prerequisites
-You own an APSystems ECU-R and any combination of YC600, YC1000 or QS1 inverter.
+You own an APSystems ECU-R and any combination of YC600, YC1000 or QS1/QS1A inverter.
 This component only works if the ECU-R is attached to your network by Wifi. To enable and configure WiFi on the ECU-R, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU-R's accesspoint by pressing the button on the side of the ECU-R. Then connect your phone's WiFi to the ECU-R's accesspoint to enable the ECUapp to connect and configure the ECU-R.
 Although there's no need to also attach the ECU-R by ethernet cable, you are free to do so if you like.
 ```
@@ -16,6 +16,7 @@ Although there's no need to also attach the ECU-R by ethernet cable, you are fre
 Release notes
 v1.0.0 First release
 v1.0.1 Revised the readme, added support for YC1000 and added versioning to the manifest
+v1.0.2 Added support for QS1A
 ```
 
 ## Setup

@@ -32,7 +32,7 @@ class APSystemsECUR:
         # how big of a buffer to read at a time from the socket
         self.recv_size = 4096
 
-        self.qs1_ids = [ "802", "801", "804" ]
+        self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
 

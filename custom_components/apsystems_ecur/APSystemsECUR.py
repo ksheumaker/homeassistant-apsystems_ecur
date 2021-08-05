@@ -109,8 +109,19 @@ class APSystemsECUR:
 
         self.process_ecu_data()
 
+        if "ECU_R_PRO" in self.firmware:
+            self.writer.close()
+            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
+            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
+
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
+
+
+        if "ECU_R_PRO" in self.firmware:
+            self.writer.close()
+            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
+            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)

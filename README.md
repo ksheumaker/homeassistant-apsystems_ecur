@@ -17,6 +17,7 @@ Release notes
 v1.0.0 First release
 v1.0.1 Revised the readme, added support for YC1000 and added versioning to the manifest
 v1.0.2 Added support for QS1A
+v1.0.3 Added support for 2021.8.0 (including energy panel), fixed some issues with ECU_R_PRO
 ```
 
 ## Setup

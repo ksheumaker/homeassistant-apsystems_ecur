@@ -42,7 +42,7 @@ _Warning_ the ECU device isn't the most powerful querying it more frequently cou
 
 apsystems_ecur:
     host: [IPADDR]
-	scan_interval: 60
+    scan_interval: 60
 
 ```
 

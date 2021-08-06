@@ -1,15 +1,20 @@
 """Example integration using DataUpdateCoordinator."""
 
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 import logging
 
 import async_timeout
 
-from homeassistant.helpers.entity import Entity
+from homeassistant.util import dt as dt_util
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
+)
+
+from homeassistant.components.sensor import (
+    STATE_CLASS_MEASUREMENT,
 )
 
 from .const import (
@@ -27,11 +32,12 @@ from homeassistant.const import (
     DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
-    VOLT,
+    ELECTRIC_POTENTIAL_VOLT,
     TEMP_CELSIUS,
     PERCENTAGE,
     FREQUENCY_HERTZ
 )
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,7 +56,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
             devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON),
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
             label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
-            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON),
+            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_MEASUREMENT),
     ]
 
     inverters = coordinator.data.get("inverters", {})
@@ -64,7 +70,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
                     "frequency", label="Frequency", unit=FREQUENCY_HERTZ, 
                     devclass=None, icon=FREQ_ICON),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                    "voltage", label="Voltage", unit=VOLT, 
+                    "voltage", label="Voltage", unit=ELECTRIC_POTENTIAL_VOLT, 
                     devclass=DEVICE_CLASS_VOLTAGE),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "signal", label="Signal", unit=PERCENTAGE, 
@@ -81,7 +87,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
     add_entities(sensors)
 
 
-class APSystemsECUInverterSensor(CoordinatorEntity, Entity):
+class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator, ecu, uid, field, index=0, label=None, icon=None, unit=None, devclass=None):
 
         super().__init__(coordinator)
@@ -148,9 +154,9 @@ class APSystemsECUInverterSensor(CoordinatorEntity, Entity):
 
     
 
-class APSystemsECUSensor(CoordinatorEntity, Entity):
+class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
-    def __init__(self, coordinator, ecu, field, label=None, icon=None, unit=None, devclass=None):
+    def __init__(self, coordinator, ecu, field, label=None, icon=None, unit=None, devclass=None, stateclass=None):
 
         super().__init__(coordinator)
 
@@ -164,6 +170,7 @@ class APSystemsECUSensor(CoordinatorEntity, Entity):
         self._icon = icon
         self._unit = unit
         self._devclass = devclass
+        self._stateclass = stateclass
 
         self._name = f"ECU {self._label}"
         self._state = None
@@ -193,7 +200,6 @@ class APSystemsECUSensor(CoordinatorEntity, Entity):
     def unit_of_measurement(self):
         return self._unit
 
-
     @property
     def device_state_attributes(self):
 
@@ -204,5 +210,16 @@ class APSystemsECUSensor(CoordinatorEntity, Entity):
         }
         return attrs
 
+    @property
+    def state_class(self):
+        #_LOGGER.debug(f"State class {self._stateclass} - {self._field}")
+        return self._stateclass
+
+    @property
+    def last_reset(self):
+        #_LOGGER.debug(f"Last Reset - {self._field}")
+        if self._stateclass == STATE_CLASS_MEASUREMENT:
+            return dt_util.utc_from_timestamp(0)
+        return None
 
     

@@ -32,7 +32,7 @@ class APSystemsECUR:
         # how big of a buffer to read at a time from the socket
         self.recv_size = 4096
 
-        self.qs1_ids = [ "802", "801", "804" ]
+        self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
 
@@ -77,7 +77,10 @@ class APSystemsECUR:
         end_data = None
 
         while end_data != self.recv_suffix:
-            self.read_buffer += await self.reader.read(self.recv_size)
+            data = await self.reader.read(self.recv_size)
+            if data == b'':
+                break
+            self.read_buffer += data
             size = len(self.read_buffer)
             end_data = self.read_buffer[size-4:]
 
@@ -109,8 +112,19 @@ class APSystemsECUR:
 
         self.process_ecu_data()
 
+        if "ECU_R_PRO" in self.firmware:
+            self.writer.close()
+            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
+            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
+
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
+
+
+        if "ECU_R_PRO" in self.firmware:
+            self.writer.close()
+            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
+            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)

@@ -18,6 +18,7 @@ v1.0.0 First release
 v1.0.1 Revised the readme, added support for YC1000 and added versioning to the manifest
 v1.0.2 Added support for QS1A
 v1.0.3 Added support for 2021.8.0 (including energy panel), fixed some issues with ECU_R_PRO
+v1.0.4 Added optional scan_interval to config
 ```
 
 ## Setup
@@ -33,12 +34,15 @@ Your directory structure should look like this:
 ```
 
 ## Configuration
-Add the following snippet into your ```configuration.yaml```  replace [IPADDR] with the WiFi connected IP address of your ECU-R device. 
+Add the following snippet into your ```configuration.yaml```  replace [IPADDR] with the WiFi connected IP address of your ECU-R device. By default the integration will query the ECU every 60 seconds, you can alter this by altering the scan interval configuration option.  
+
+_Warning_ the ECU device isn't the most powerful querying it more frequently could lead to stability issues with the ECU and require a power cycle.
 
 ```
 
 apsystems_ecur:
     host: [IPADDR]
+	scan_interval: 60
 
 ```
 

@@ -7,7 +7,7 @@ from datetime import timedelta
 from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData
 from homeassistant.helpers.discovery import load_platform
 import homeassistant.helpers.config_validation as cv
-from homeassistant.const import CONF_HOST
+from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
@@ -21,12 +21,13 @@ _LOGGER = logging.getLogger(__name__)
 
 from .const import DOMAIN
 
-CONF_INTERVAL = "interval"
-
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN : vol.Schema({
         vol.Required(CONF_HOST): cv.string,
-        vol.Optional(CONF_INTERVAL) : cv.time_period_seconds
+        vol.Optional(
+            CONF_SCAN_INTERVAL, 
+            default=timedelta(seconds=60),
+        ) : cv.positive_time_period
     })
 }, extra=vol.ALLOW_EXTRA)
 
@@ -116,9 +117,7 @@ async def async_setup(hass, config):
     hass.data.setdefault(DOMAIN, {})
 
     host = config[DOMAIN].get(CONF_HOST)
-    interval = config[DOMAIN].get(CONF_INTERVAL)
-    if not interval:
-        interval = timedelta(seconds=60)
+    interval = config[DOMAIN].get(CONF_SCAN_INTERVAL)
 
     ecu = ECUR(host)
 

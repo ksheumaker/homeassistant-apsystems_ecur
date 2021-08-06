@@ -77,7 +77,10 @@ class APSystemsECUR:
         end_data = None
 
         while end_data != self.recv_suffix:
-            self.read_buffer += await self.reader.read(self.recv_size)
+            data = await self.reader.read(self.recv_size)
+            if data == b'':
+                break
+            self.read_buffer += data
             size = len(self.read_buffer)
             end_data = self.read_buffer[size-4:]
 

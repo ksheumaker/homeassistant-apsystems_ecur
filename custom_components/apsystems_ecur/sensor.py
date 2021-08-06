@@ -27,7 +27,7 @@ from homeassistant.const import (
     DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
-    VOLT,
+    ELECTRIC_POTENTIAL_VOLT,
     TEMP_CELSIUS,
     PERCENTAGE,
     FREQUENCY_HERTZ
@@ -64,7 +64,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
                     "frequency", label="Frequency", unit=FREQUENCY_HERTZ, 
                     devclass=None, icon=FREQ_ICON),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                    "voltage", label="Voltage", unit=VOLT, 
+                    "voltage", label="Voltage", unit=ELECTRIC_POTENTIAL_VOLT, 
                     devclass=DEVICE_CLASS_VOLTAGE),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "signal", label="Signal", unit=PERCENTAGE, 

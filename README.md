@@ -19,11 +19,15 @@ v1.0.1 Revised the readme, added support for YC1000 and added versioning to the 
 v1.0.2 Added support for QS1A
 v1.0.3 Added support for 2021.8.0 (including energy panel), fixed some issues with ECU_R_PRO
 v1.0.4 Added optional scan_interval to config
+v1.0.5 Fixed energy dashboard and added HACS setup option description in readme.md
 ```
 
 ## Setup
-Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)
+Option 1:
+Easiest option, install the custom component using HACS by searching for "APSystems ECU-R"
 
+Option 2:
+Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)
 Your directory structure should look like this:
 ```
    config/custom_components/apsystems_ecur/__init__.py

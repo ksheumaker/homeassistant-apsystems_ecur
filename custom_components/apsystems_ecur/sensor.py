@@ -15,6 +15,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING
 )
 
 from .const import (
@@ -56,7 +57,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
             devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON),
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
             label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
-            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_MEASUREMENT),
+            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
     ]
 
     inverters = coordinator.data.get("inverters", {})
@@ -144,7 +145,7 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
 
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
 
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,
@@ -201,7 +202,7 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
         return self._unit
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
 
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,

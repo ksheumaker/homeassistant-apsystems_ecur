@@ -74,7 +74,7 @@ class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
         return self._icon
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
 
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,

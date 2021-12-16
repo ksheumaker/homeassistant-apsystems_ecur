@@ -45,6 +45,8 @@ Add the following snippet into your ```configuration.yaml```  replace [IPADDR] w
 
 _Warning_ the ECU device isn't the most powerful querying it more frequently could lead to stability issues with the ECU and require a power cycle.
 
+Although you can query the ECU 24/7, it is good practice to stop the query an hour after sunset (apsystems_ecur.stop_query) and only start the query again at sunrise (apsystems_ecur.start_query). You can do this by adding automations. Reason for this are the maintenance tasks that take place on the ECU around 02.15 local time. During this period the ECU port is closed which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates.
+
 ```
 
 apsystems_ecur:

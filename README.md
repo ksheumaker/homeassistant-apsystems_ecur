@@ -20,7 +20,7 @@ v1.0.2 Added support for QS1A
 v1.0.3 Added support for 2021.8.0 (including energy panel), fixed some issues with ECU_R_PRO
 v1.0.4 Added optional scan_interval to config
 v1.0.5 Fixed energy dashboard and added HACS setup option description in readme.md
-v1.0.6 Replaces deprecated device_state_attributes for extra_state_attributes and mentioned the ECU-B because of compatibility with this component
+v1.0.6 Replaces deprecated device_state_attributes for extra_state_attributes, added the ECU-B compatibility with this component
 ```
 
 ## Setup

@@ -52,9 +52,9 @@ apsystems_ecur:
     scan_interval: 60
 
 ```
-Although you can query the ECU 24/7, it is good practice to stop the query after sunset (apsystems_ecur.stop_query) and only start the query again at sunrise (apsystems_ecur.start_query). You can do this by adding automations. 
+Although you can query the ECU 24/7, it is an option to stop the query after sunset (apsystems_ecur.stop_query) and only start the query again at sunrise (apsystems_ecur.start_query). You can do this by adding automations. 
 
-Reason for this are the maintenance tasks that take place on the ECU around 02.45 AM local time. During this period the ECU port is closed which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable.
+Reason for this are the maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. During this period the ECU port is closed which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable. Besides the log entries no harm is done if you query the ECU 24/7.
 
 ## Data available
 The component supports getting data from the array as a whole as well as each individual invertor.

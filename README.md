@@ -26,7 +26,7 @@ v1.0.7 Improved configuration notes and cleanup code
 
 ## Setup
 Option 1:
-Easiest option, install the custom component using HACS by searching for "APSystems ECU-R"
+Easiest option, install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
 
 Option 2:
 Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)

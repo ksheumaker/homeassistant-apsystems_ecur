@@ -55,6 +55,8 @@ class APSystemsECUR:
         self.firmware = None
         self.timezone = None
         self.last_update = None
+        self.VSL = 0
+        self.TSL = 0
 
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
@@ -64,13 +66,6 @@ class APSystemsECUR:
 
         self.reader = None
         self.writer = None
-
-
-    def dump(self):
-        print(f"ECU : {self.ecu_id}")
-        print(f"Firmware : {self.firmware}")
-        print(f"TZ : {self.timezone}")
-        print(f"Qty of inverters : {self.qty_of_inverters}")
 
     async def async_read_from_socket(self):
         self.read_buffer = b''
@@ -206,8 +201,10 @@ class APSystemsECUR:
 
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
-        self.firmware = self.aps_str(data, 55, 15)
-        self.timezone = self.aps_str(data, 70, 9)
+        self.VSL = int(self.aps_str(data, 52,3))
+        self.firmware = self.aps_str(data, 55, self.VSL)
+        self.TSL = int(self.aps_str(data, 55 + self.VSL,3))
+        self.timezone = self.aps_str(data, 58 + self.VSL, self.TSL)
         self.lifetime_energy = self.aps_double(data, 27) / 10
         self.today_energy = self.aps_double(data, 35) / 100
         self.current_power = self.aps_double(data, 31)

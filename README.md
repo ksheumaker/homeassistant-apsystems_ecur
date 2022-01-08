@@ -77,3 +77,4 @@ There will be this set of sensors for every inverter you have in your system, UI
 ## TODO
 1. Code cleanup - it probably needs some work
 2. Add online status of individual inverters
+3. Improve ECU-R-PRO firmware compatibility

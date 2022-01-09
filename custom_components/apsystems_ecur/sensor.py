@@ -1,4 +1,4 @@
-"""Example integration using DataUpdateCoordinator."""
+"""Integration is using DataUpdateCoordinator."""
 
 from datetime import timedelta, datetime, date
 import logging

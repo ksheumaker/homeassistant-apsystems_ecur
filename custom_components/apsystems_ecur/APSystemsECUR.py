@@ -35,6 +35,7 @@ class APSystemsECUR:
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
+        self.DS3_ids = [ "703" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
@@ -132,6 +133,37 @@ class APSystemsECUR:
         data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
+
+        return(data)
+    
+    def query_ecu(self):
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((self.ipaddr,self.port))
+
+        sock.sendall(self.ecu_query.encode('utf-8'))
+        self.ecu_raw_data = sock.recv(self.recv_size)
+
+        self.process_ecu_data()
+
+        cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
+        sock.sendall(cmd.encode('utf-8'))
+        self.inverter_raw_data = sock.recv(self.recv_size)
+
+        cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
+        sock.sendall(cmd.encode('utf-8'))
+        self.inverter_raw_signal = sock.recv(self.recv_size)
+
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+
+        data = self.process_inverter_data()
+
+        data["ecu_id"] = self.ecu_id
+        data["today_energy"] = self.today_energy
+        data["lifetime_energy"] = self.lifetime_energy
+        data["current_power"] = self.current_power
+
 
         return(data)
  
@@ -293,6 +325,10 @@ class APSystemsECUR:
             elif inverter_type in self.yc1000_ids:
                 (channel_data, location) = self.process_yc1000(data, location)
                 inv.update(channel_data)
+                
+            elif inverter_type in self.ds3_ids:
+                (channel_data, location) = self.process_ds3(data, location)
+                inv.update(channel_data)    
 
             else:
                 raise APSystemsInvalidData(f"Unsupported inverter type {inverter_type}")
@@ -385,6 +421,26 @@ class APSystemsECUR:
 
         output = {
             "model" : "YC600",
+            "channel_qty" : 2,
+            "power" : power,
+            "voltage" : voltages,
+        }
+
+        return (output, location)
+    
+    def process_ds3(self, data, location):
+        power = []
+        voltages = []
+
+        for i in range(0, 2):
+            power.append(self.aps_int(data, location))
+            location += 2
+
+            voltages.append(self.aps_int(data, location))
+            location += 2
+
+        output = {
+            "model" : "DS3",
             "channel_qty" : 2,
             "power" : power,
             "voltage" : voltages,

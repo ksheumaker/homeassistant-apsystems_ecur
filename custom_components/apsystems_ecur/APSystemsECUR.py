@@ -57,8 +57,8 @@ class APSystemsECUR:
         self.firmware = None
         self.timezone = None
         self.last_update = None
-        self.VSL = 0
-        self.TSL = 0
+        self.vsl = 0
+        self.tsl = 0
 
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
@@ -235,10 +235,10 @@ class APSystemsECUR:
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
         self.qty_of_online_inverters = self.aps_int(data, 48)
-        self.VSL = int(self.aps_str(data, 52, 3))
-        self.firmware = self.aps_str(data, 55, self.VSL)
-        self.TSL = int(self.aps_str(data, 55 + self.VSL, 3))
-        self.timezone = self.aps_str(data, 58 + self.VSL, self.TSL)
+        self.vsl = int(self.aps_str(data, 52, 3))
+        self.firmware = self.aps_str(data, 55, self.vsl)
+        self.tsl = int(self.aps_str(data, 55 + self.vsl, 3))
+        self.timezone = self.aps_str(data, 58 + self.vsl, self.tsl)
         self.lifetime_energy = self.aps_double(data, 27) / 10
         self.today_energy = self.aps_double(data, 35) / 100
         self.current_power = self.aps_double(data, 31)

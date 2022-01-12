@@ -35,7 +35,7 @@ class APSystemsECUR:
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
-        self.DS3_ids = [ "703" ]
+        self.ds3_ids = [ "703" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix

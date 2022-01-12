@@ -35,6 +35,7 @@ class APSystemsECUR:
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
+        self.ds3_ids = [ "703" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
@@ -48,6 +49,7 @@ class APSystemsECUR:
 
         self.ecu_id = None
         self.qty_of_inverters = 0
+        self.qty_of_online_inverters = 0
         self.lifetime_energy = 0
         self.current_power = 0
         self.today_energy = 0
@@ -55,6 +57,8 @@ class APSystemsECUR:
         self.firmware = None
         self.timezone = None
         self.last_update = None
+        self.vsl = 0
+        self.tsl = 0
 
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
@@ -64,13 +68,6 @@ class APSystemsECUR:
 
         self.reader = None
         self.writer = None
-
-
-    def dump(self):
-        print(f"ECU : {self.ecu_id}")
-        print(f"Firmware : {self.firmware}")
-        print(f"TZ : {self.timezone}")
-        print(f"Qty of inverters : {self.qty_of_inverters}")
 
     async def async_read_from_socket(self):
         self.read_buffer = b''
@@ -138,7 +135,7 @@ class APSystemsECUR:
         data["current_power"] = self.current_power
 
         return(data)
-
+    
     def query_ecu(self):
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -237,8 +234,11 @@ class APSystemsECUR:
 
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
-        self.firmware = self.aps_str(data, 55, 15)
-        self.timezone = self.aps_str(data, 70, 9)
+        self.qty_of_online_inverters = self.aps_int(data, 48)
+        self.vsl = int(self.aps_str(data, 52, 3))
+        self.firmware = self.aps_str(data, 55, self.vsl)
+        self.tsl = int(self.aps_str(data, 55 + self.vsl, 3))
+        self.timezone = self.aps_str(data, 58 + self.vsl, self.tsl)
         self.lifetime_energy = self.aps_double(data, 27) / 10
         self.today_energy = self.aps_double(data, 35) / 100
         self.current_power = self.aps_double(data, 31)
@@ -325,6 +325,10 @@ class APSystemsECUR:
             elif inverter_type in self.yc1000_ids:
                 (channel_data, location) = self.process_yc1000(data, location)
                 inv.update(channel_data)
+                
+            elif inverter_type in self.ds3_ids:
+                (channel_data, location) = self.process_ds3(data, location)
+                inv.update(channel_data)    
 
             else:
                 raise APSystemsInvalidData(f"Unsupported inverter type {inverter_type}")
@@ -417,6 +421,26 @@ class APSystemsECUR:
 
         output = {
             "model" : "YC600",
+            "channel_qty" : 2,
+            "power" : power,
+            "voltage" : voltages,
+        }
+
+        return (output, location)
+    
+    def process_ds3(self, data, location):
+        power = []
+        voltages = []
+
+        for i in range(0, 2):
+            power.append(self.aps_int(data, location))
+            location += 2
+
+            voltages.append(self.aps_int(data, location))
+            location += 2
+
+        output = {
+            "model" : "DS3",
             "channel_qty" : 2,
             "power" : power,
             "voltage" : voltages,

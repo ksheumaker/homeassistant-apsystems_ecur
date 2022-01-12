@@ -78,7 +78,10 @@ class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,
+            "inverters" : self._ecu.ecu.qty_of_inverters,
+            "online" : self._ecu.ecu.qty_of_online_inverters,
             "firmware" : self._ecu.ecu.firmware,
+            "timezone" : self._ecu.ecu.timezone,
             "last_update" : self._ecu.ecu.last_update
         }
         return attrs

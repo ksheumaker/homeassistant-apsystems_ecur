@@ -1,5 +1,5 @@
-# homeassistant-apsystems_ecur
-This is a custom component for [Home Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) ECU-R and ECU-B solar Energy Communication Unit. With this component you are able to monitor your PV installation (inverters) in detail.
+# Home-Assistant APSystems ECU-R and ECU-B Integration
+This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) ECU-R and ECU-B solar Energy Communication Unit. With this component you are able to monitor your PV installation (inverters) in detail.
 
 
 ## Background & acknowledgement
@@ -20,12 +20,13 @@ v1.0.2 Added support for QS1A
 v1.0.3 Added support for 2021.8.0 (including energy panel), fixed some issues with ECU_R_PRO
 v1.0.4 Added optional scan_interval to config
 v1.0.5 Fixed energy dashboard and added HACS setup option description in readme.md
-v1.0.6 Replaces deprecated device_state_attributes for extra_state_attributes and mentioned the ECU-B because of compatibility with this component
+v1.0.6 Replaces deprecated device_state_attributes, added ECU-B compatibility
+2022.1.0 Improved configuration notes, applied CalVer, cleanup code, improvements on ECU data
 ```
 
 ## Setup
 Option 1:
-Easiest option, install the custom component using HACS by searching for "APSystems ECU-R"
+Easiest option, install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
 
 Option 2:
 Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)
@@ -52,6 +53,9 @@ apsystems_ecur:
     scan_interval: 60
 
 ```
+Although you can query the ECU 24/7, it is an option to stop the query after sunset (apsystems_ecur.stop_query) and only start the query again at sunrise (apsystems_ecur.start_query). You can do this by adding automations. 
+
+Reason for this are the maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. During this period the ECU port is closed which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable. Besides the log entries no harm is done if you query the ECU 24/7.
 
 ## Data available
 The component supports getting data from the array as a whole as well as each individual invertor.
@@ -72,3 +76,5 @@ There will be this set of sensors for every inverter you have in your system, UI
 
 ## TODO
 1. Code cleanup - it probably needs some work
+2. Add online status of individual inverters
+3. Improve ECU-R-PRO firmware compatibility

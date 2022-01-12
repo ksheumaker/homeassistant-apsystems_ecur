@@ -1,4 +1,4 @@
-"""Example integration using DataUpdateCoordinator."""
+"""Integration is using DataUpdateCoordinator."""
 
 from datetime import timedelta, datetime, date
 import logging
@@ -206,7 +206,10 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,
-            "firmware" : self._ecu.ecu.firmware,
+            "Inverter qty" : self._ecu.ecu.qty_of_inverters,
+            "Inverter qty online" : self._ecu.ecu.qty_of_online_inverters,
+            "Firmware" : self._ecu.ecu.firmware,
+            "Timezone" : self._ecu.ecu.timezone,
             "last_update" : self._ecu.ecu.last_update
         }
         return attrs

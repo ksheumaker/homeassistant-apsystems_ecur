@@ -115,7 +115,7 @@ class APSystemsECUR:
             self.writer.close()
             await self.writer.wait_closed()
 
-            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy data={self.ecu_raw_data}")
+            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}")
 
         if "ECU_R_PRO" in self.firmware:
             self.writer.close()

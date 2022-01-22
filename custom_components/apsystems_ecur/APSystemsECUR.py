@@ -264,9 +264,6 @@ class APSystemsECUR:
         self.today_energy = self.aps_double(data, 35) / 100
         self.current_power = self.aps_double(data, 31)
 
-        if self.lifetime_energy == 0:
-            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy data={data}")
-
     def process_signal_data(self, data=None):
         signal_data = {}
 

@@ -98,6 +98,8 @@ class APSystemsECUR:
                 pass
 
         self.writer.close()
+        await self.writer.wait_closed()
+
         raise APSystemsInvalidData(f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}")
 
     async def async_query_ecu(self):
@@ -109,8 +111,19 @@ class APSystemsECUR:
 
         self.process_ecu_data()
 
+        if self.lifetime_energy == 0:
+            self.writer.close()
+            await self.writer.wait_closed()
+
+            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}")
+
         if "ECU_R_PRO" in self.firmware:
             self.writer.close()
+            await self.writer.wait_closed()
+
+            # sleep 1 seconds before re-opening the socket
+            await asyncio.sleep(1)
+
             _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
             self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
 
@@ -120,6 +133,11 @@ class APSystemsECUR:
 
         if "ECU_R_PRO" in self.firmware:
             self.writer.close()
+            await self.writer.wait_closed()
+
+            # sleep 1 seconds before re-opening the socket
+            await asyncio.sleep(1)
+
             _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
             self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
 
@@ -127,12 +145,15 @@ class APSystemsECUR:
         self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)
 
         self.writer.close()
+        await self.writer.wait_closed()
+
 
         data = self.process_inverter_data()
         data["ecu_id"] = self.ecu_id
         data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
+
 
         return(data)
     
@@ -243,6 +264,8 @@ class APSystemsECUR:
         self.today_energy = self.aps_double(data, 35) / 100
         self.current_power = self.aps_double(data, 31)
 
+        if self.lifetime_energy == 0:
+            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy data={data}")
 
     def process_signal_data(self, data=None):
         signal_data = {}

@@ -23,6 +23,7 @@ v1.0.5 Fixed energy dashboard and added HACS setup option description in readme.
 v1.0.6 Replaces deprecated device_state_attributes, added ECU-B compatibility
 2022.1.0 Improved configuration notes, applied CalVer, cleanup code, improvements on ECU data
 2022.1.0 - [update] Attempt to fix issues with ECU_R_PRO, detect 0 from lifetime energy to prevent issues in energy dashboard
+v1.0.7 - provide stateclass for current_power and today_energy and start git tagging version number
 ```
 
 ## Setup

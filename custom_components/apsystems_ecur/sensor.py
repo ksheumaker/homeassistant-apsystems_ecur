@@ -54,7 +54,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
             devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON, stateclass=STATE_CLASS_MEASUREMENT),
         APSystemsECUSensor(coordinator, ecu, "today_energy", 
             label="Today Energy", unit=ENERGY_KILO_WATT_HOUR, 
-            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON stateclass=STATE_CLASS_TOTAL_INCREASING),
+            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
             label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
             devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),

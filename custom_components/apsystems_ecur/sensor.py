@@ -222,8 +222,6 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
     @property
     def last_reset(self):
         #_LOGGER.debug(f"Last Reset - {self._field}")
-        if self._stateclass == STATE_CLASS_MEASUREMENT:
-            return dt_util.utc_from_timestamp(0)
         return None
 
     

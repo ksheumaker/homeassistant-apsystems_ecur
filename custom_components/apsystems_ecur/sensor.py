@@ -219,9 +219,3 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
         #_LOGGER.debug(f"State class {self._stateclass} - {self._field}")
         return self._stateclass
 
-    @property
-    def last_reset(self):
-        #_LOGGER.debug(f"Last Reset - {self._field}")
-        return None
-
-    

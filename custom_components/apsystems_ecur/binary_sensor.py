@@ -23,7 +23,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
@@ -86,4 +86,12 @@ class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
         }
         return attrs
 
+    @property
+    def device_info(self):
+        parent = f"ecu_{self._ecu.ecu.ecu_id}"
+        return {
+            "identifiers": {
+                (DOMAIN, parent),
+            }
+        }
     

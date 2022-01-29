@@ -53,7 +53,7 @@ class APSystemsECUR:
         self.lifetime_energy = 0
         self.current_power = 0
         self.today_energy = 0
-        self.inverters = []
+        self.inverters = {}
         self.firmware = None
         self.timezone = None
         self.last_update = None
@@ -366,25 +366,23 @@ class APSystemsECUR:
         power.append(self.aps_int(data, location))
         location += 2
 
-        voltage = self.aps_int(data, location)
+        voltages.append(self.aps_int(data, location))
         location += 2
 
         power.append(self.aps_int(data, location))
         location += 2
         
-        voltage = self.aps_int(data, location)
+        voltages.append(self.aps_int(data, location))
         location += 2
 
         power.append(self.aps_int(data, location))
         location += 2
         
-        voltage = self.aps_int(data, location)
+        voltages.append(self.aps_int(data, location))
         location += 2
 
         power.append(self.aps_int(data, location))
         location += 2
-
-        voltages.append(voltage)
 
         output = {
             "model" : "YC1000",

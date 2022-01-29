@@ -1,6 +1,6 @@
 {
   "codeowners": ["@ksheumaker"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/ksheumaker/homeassistant-apsystems_ecur",
   "domain": "apsystems_ecur",

@@ -187,7 +187,7 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def unique_id(self):
-        return f"ecu_{self._ecu.ecu.ecu_id}_{self._field}"
+        return f"{self._ecu.ecu.ecu_id}_{self._field}"
 
     @property
     def name(self):

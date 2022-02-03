@@ -14,6 +14,10 @@ Although there's no need to also attach the ECU-R by ethernet cable (for the ECU
 
 ## Release notes
 
+
+### v1.1.2
+Make ECU-C devices behave like ECU_R_PRO devices and close the socket down between each query.  Add support for new ds3 inverter type 704
+
 ### v1.1.1
 Added support to setup the integration in the new config flow GUI.  Fixed a caching issue when the ECU is down on startup leading to creation of sensor entries.  Once you install this update all configuration is done via the GUI.
 

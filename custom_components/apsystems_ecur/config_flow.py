@@ -17,7 +17,7 @@ CONFIG_SCHEMA = vol.Schema({
         vol.Required(CONF_HOST): str,
         vol.Optional(
             CONF_SCAN_INTERVAL, 
-            default=60
+            default=300
         ) : int
     })
 

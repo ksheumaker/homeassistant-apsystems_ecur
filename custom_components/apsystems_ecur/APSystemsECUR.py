@@ -35,7 +35,7 @@ class APSystemsECUR:
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
-        self.ds3_ids = [ "703" ]
+        self.ds3_ids = [ "703", "704" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
@@ -117,7 +117,7 @@ class APSystemsECUR:
 
             raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}")
 
-        if "ECU_R_PRO" in self.firmware:
+        if "ECU_R_PRO" in self.firmware or "ECU_C" in self.firmware or "ECU-C" in self.firmware:
             self.writer.close()
             await self.writer.wait_closed()
 
@@ -131,7 +131,7 @@ class APSystemsECUR:
         self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
 
 
-        if "ECU_R_PRO" in self.firmware:
+        if "ECU_R_PRO" in self.firmware or "ECU_C" in  or "ECU-C" in self.firmware:
             self.writer.close()
             await self.writer.wait_closed()
 

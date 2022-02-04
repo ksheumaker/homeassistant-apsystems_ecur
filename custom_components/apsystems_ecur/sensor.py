@@ -42,7 +42,7 @@ from homeassistant.const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
@@ -54,7 +54,7 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
             devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON, stateclass=STATE_CLASS_MEASUREMENT),
         APSystemsECUSensor(coordinator, ecu, "today_energy", 
             label="Today Energy", unit=ENERGY_KILO_WATT_HOUR, 
-            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON stateclass=STATE_CLASS_TOTAL_INCREASING),
+            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
             label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
             devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
@@ -153,7 +153,16 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
         }
         return attrs
 
-    
+
+    @property
+    def device_info(self):
+        parent = f"inverter_{self._uid}"
+        return {
+            "identifiers": {
+                (DOMAIN, parent),
+            }
+        }
+   
 
 class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
@@ -220,10 +229,11 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
         return self._stateclass
 
     @property
-    def last_reset(self):
-        #_LOGGER.debug(f"Last Reset - {self._field}")
-        if self._stateclass == STATE_CLASS_MEASUREMENT:
-            return dt_util.utc_from_timestamp(0)
-        return None
-
+    def device_info(self):
+        parent = f"ecu_{self._ecu.ecu.ecu_id}"
+        return {
+            "identifiers": {
+                (DOMAIN, parent),
+            }
+        }
     

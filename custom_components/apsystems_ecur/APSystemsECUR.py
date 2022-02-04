@@ -35,7 +35,7 @@ class APSystemsECUR:
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
-        self.ds3_ids = [ "703" ]
+        self.ds3_ids = [ "703", "704" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
@@ -53,7 +53,7 @@ class APSystemsECUR:
         self.lifetime_energy = 0
         self.current_power = 0
         self.today_energy = 0
-        self.inverters = []
+        self.inverters = {}
         self.firmware = None
         self.timezone = None
         self.last_update = None
@@ -117,7 +117,7 @@ class APSystemsECUR:
 
             raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}")
 
-        if "ECU_R_PRO" in self.firmware:
+        if "ECU_R_PRO" in self.firmware or "ECU-C" in self.firmware:
             self.writer.close()
             await self.writer.wait_closed()
 
@@ -131,7 +131,7 @@ class APSystemsECUR:
         self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
 
 
-        if "ECU_R_PRO" in self.firmware:
+        if "ECU_R_PRO" in self.firmware or "ECU-C" in self.firmware:
             self.writer.close()
             await self.writer.wait_closed()
 
@@ -366,25 +366,23 @@ class APSystemsECUR:
         power.append(self.aps_int(data, location))
         location += 2
 
-        voltage = self.aps_int(data, location)
+        voltages.append(self.aps_int(data, location))
         location += 2
 
         power.append(self.aps_int(data, location))
         location += 2
         
-        voltage = self.aps_int(data, location)
+        voltages.append(self.aps_int(data, location))
         location += 2
 
         power.append(self.aps_int(data, location))
         location += 2
         
-        voltage = self.aps_int(data, location)
+        voltages.append(self.aps_int(data, location))
         location += 2
 
         power.append(self.aps_int(data, location))
         location += 2
-
-        voltages.append(voltage)
 
         output = {
             "model" : "YC1000",

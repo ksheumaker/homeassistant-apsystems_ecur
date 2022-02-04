@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "ECU-R WIFI IP address (must be wifi)",
+          "scan_interval" : "Query every X seconds"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Can't connect to ECU-R",
+      "no_ecuid": "No ECU ID returned from ECU-R",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}
+

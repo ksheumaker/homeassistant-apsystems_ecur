@@ -11,9 +11,18 @@ This couldn't have been done without the hardwork of @checking12 and @HAEdwin on
 You own an APSystems ECU-R or ECU-B and any combination of YC600, YC1000 or QS1/QS1A inverter.
 This component only works if the ECU-R or ECU-B is attached to your network by Wifi. To enable and configure WiFi on the ECU, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU's accesspoint by pressing the button on the side of the ECU. Then connect your phone's WiFi to the ECU's accesspoint to enable the ECUapp to connect and configure the ECU.
 Although there's no need to also attach the ECU-R by ethernet cable (for the ECU-B LAN ports are disabled), you are free to do so if you like.
-```
 
-Release notes
+## Release notes
+
+
+### v1.1.2
+Make ECU-C devices behave like ECU_R_PRO devices and close the socket down between each query.  Add support for new ds3 inverter type 704
+
+### v1.1.1
+Added support to setup the integration in the new config flow GUI.  Fixed a caching issue when the ECU is down on startup leading to creation of sensor entries.  Once you install this update all configuration is done via the GUI.
+
+### Old release notes
+```
 v1.0.0 First release
 v1.0.1 Revised the readme, added support for YC1000 and added versioning to the manifest
 v1.0.2 Added support for QS1A
@@ -42,20 +51,15 @@ Your directory structure should look like this:
    config/custom_components/apsystems_ecur/manifest.json
    config/custom_components/apsystems_ecur/sensor.py
    config/custom_components/apsystems_ecur/services.yaml
+   ....
 ```
 
 ## Configuration
-Add the following snippet into your ```configuration.yaml```  replace [IPADDR] with the WiFi connected IP address of your ECU-R or ECU-B device. By default the integration will query the ECU every 60 seconds, you can alter this by altering the scan interval configuration option.  
+
+Go to the integrations screen and choose "Add Integration" search for APSystemsECU-R and provide the WIFI IP address, and update interval (60 seconds is the default).
 
 _Warning_ the ECU device isn't the most powerful querying it more frequently could lead to stability issues with the ECU and require a power cycle.
 
-```
-
-apsystems_ecur:
-    host: [IPADDR]
-    scan_interval: 60
-
-```
 Although you can query the ECU 24/7, it is an option to stop the query after sunset (apsystems_ecur.stop_query) and only start the query again at sunrise (apsystems_ecur.start_query). You can do this by adding automations. 
 
 Reason for this are the maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. During this period the ECU port is closed which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable. Besides the log entries no harm is done if you query the ECU 24/7.
@@ -64,12 +68,16 @@ Reason for this are the maintenance tasks that take place on the ECU around 02.4
 The component supports getting data from the array as a whole as well as each individual invertor.
 
 ### Array Level Sensors
+
+These sensors will show up under an `ECU [ID]` device, where [ID] is the unique ID of your ECU
+
 * sensor.ecu_current_power - total amount of power (in W) being generated right now
 * sensor.ecu_today_energy - total amount of energy (in kWh) generated today now
 * sensor.ecu_lifetime_energy - total amount of energy (in kWh) generated from the lifetime of the array
 
 ### Inverter Level Sensors
-There will be this set of sensors for every inverter you have in your system, UID will be replaced by the UID of the inverter discovered
+
+A new device will be created for each inverter called `Inverter [UID]` where [UID] is the unique ID of the Inverter
 
 * sensor.inverter_[UID]_frequency - the AC power frequency in Hz
 * sensor.inverter_[UID]_voltage - the AC voltage in V

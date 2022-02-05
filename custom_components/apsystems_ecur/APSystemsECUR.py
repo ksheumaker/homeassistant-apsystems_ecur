@@ -84,20 +84,19 @@ class APSystemsECUR:
         self.read_buffer = b''
         end_data = None
 
-        data = await self.reader.readline()
-        if data == b'':
+        self.read_buffer = await self.reader.readline()
+        if self.read_buffer == b'':
             error = f"Got empty string from socket"
             self.add_error(error)
             raise APSystemsInvalidData(error)
 
-        size = len(data)
-        end_data = data[size-4:]
+        size = len(self.read_buffer)
+        end_data = self.read_buffer[size-4:]
         if end_data != self.recv_suffix:
-            error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={data}"
+            error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={self.read_buffer}"
             self.add_error(error)
             raise APSystemsInvalidData(error)
 
-        self.read_buffer = data
         return self.read_buffer
 
     async def async_send_read_from_socket(self, cmd):

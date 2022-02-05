@@ -14,6 +14,9 @@ Although there's no need to also attach the ECU-R by ethernet cable (for the ECU
 
 ## Release notes
 
+### v1.2.2 (beta)
+* Fix some other issues in error handling and caching
+
 ### v1.2.0 (beta)
 New features
 * Remove `apsystems_ecur.start_query` and `apsystems_ecu.end_query` service, now there is a switch on the ECU called `switch.ecu_query_device` if the switch is on, will query the device, if off it will read from cache.  Can be used with an automation to turn on/off querying when the sun has set or risen

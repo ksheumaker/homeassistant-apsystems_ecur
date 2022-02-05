@@ -18,6 +18,7 @@ Although there's no need to also attach the ECU-R by ethernet cable (for the ECU
 New features
 * Remove `apsystems_ecur.start_query` and `apsystems_ecu.end_query` service, now there is a switch on the ECU called `switch.ecu_query_device` if the switch is on, will query the device, if off it will read from cache.  Can be used with an automation to turn on/off querying when the sun has set or risen
 * Add support for the download diagnostics button the on the devices - hopefully will help debugging when there are problems
+* Add 2 additional sensors `sensor.ecu_inverters` and `sensor.ecu_inverters_online` to show you how man inverters have been configured in your ECU and how many are currently reporting data
 
 Bug fixes
 * Change code to always close socket between commands to ECU (before this was only done on the ECU-C and ECU_R_PRO)

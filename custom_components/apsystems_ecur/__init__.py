@@ -52,8 +52,7 @@ class ECUR():
         if self.cache_count > self.cache_max:
             raise UpdateFailed(f"Error using cached data for more than {self.cache_max} times.")
 
-        if self.cached_data.get("ecu_id", None) == None:
-            _LOGGER.debug("Cached data {self.cached_data}")
+        if self.cached_data.get("ecu_id", None) != None:
             raise UpdateFailed(f"Cached data doesn't contain a valid ecu_id")
 
         return self.cached_data

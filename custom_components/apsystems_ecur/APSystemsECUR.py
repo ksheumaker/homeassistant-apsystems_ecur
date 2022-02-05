@@ -84,19 +84,20 @@ class APSystemsECUR:
         self.read_buffer = b''
         end_data = None
 
-        self.read_buffer = await self.reader.readline()
-        if self.read_buffer == b'':
+        data = await self.reader.readline()
+        if data == b'':
             error = f"Got empty string from socket"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
-        size = len(self.read_buffer)
-        end_data = self.read_buffer[size-4:]
+        size = len(data)
+        end_data = data[size-4:]
         if end_data != self.recv_suffix:
-            error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={self.read_buffer}"
-            self.add_error(error)
+            error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={data}"
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
+        self.read_buffer = data
         return self.read_buffer
 
     async def async_send_read_from_socket(self, cmd):
@@ -124,7 +125,7 @@ class APSystemsECUR:
 
         await self.async_close_socket()
         error = f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}"
-        self.add_errorerror)
+        self.errors.append(error)
         raise APSystemsInvalidData(error)
 
     async def async_close_socket(self):
@@ -161,7 +162,7 @@ class APSystemsECUR:
         if self.lifetime_energy == 0:
             await self.async_close_socket()
             error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
         # the ECU likes the socket to be closed and re-opened between commands
@@ -225,7 +226,7 @@ class APSystemsECUR:
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
             error = f"Unable to convert binary to int location={start} data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
  
     def aps_short(self, codec, start):
@@ -234,7 +235,7 @@ class APSystemsECUR:
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
             error = f"Unable to convert binary to short int location={start} data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
     def aps_double(self, codec, start):
@@ -243,7 +244,7 @@ class APSystemsECUR:
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
             error = f"Unable to convert binary to double location={start} data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
     
     def aps_bool(self, codec, start):
@@ -266,13 +267,13 @@ class APSystemsECUR:
         except ValueError as err:
             debugdata = binascii.b2a_hex(data)
             error = f"Error getting checksum int from '{cmd}' data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
         if datalen != checksum:
             debugdata = binascii.b2a_hex(data)
             error = f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
         start_str = self.aps_str(data, 0, 3)
@@ -281,13 +282,13 @@ class APSystemsECUR:
         if start_str != 'APS':
             debugdata = binascii.b2a_hex(data)
             error = f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
         if end_str != 'END':
             debugdata = binascii.b2a_hex(data)
             error = f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}"
-            self.add_error(error)
+            self.errors.append(error)
             raise APSystemsInvalidData(error)
 
         return True
@@ -397,7 +398,7 @@ class APSystemsECUR:
 
             else:
                 error = f"Unsupported inverter type {inverter_type} please create GitHub issue."
-                self.add_error(error)
+                self.errors.append(error)
                 raise APSystemsInvalidData(error)
 
             inverters[inverter_uid] = inv
@@ -514,11 +515,6 @@ class APSystemsECUR:
         }
 
         return (output, location)
-
-    def add_error(self, error):
-        timestamp = datetime.datetime.now()
-        msg = f"[{timestamp}] {error}"
-        self.errors.append(error)
 
     def dump_data(self):
         return {

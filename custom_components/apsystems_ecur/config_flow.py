@@ -4,7 +4,7 @@ import voluptuous as vol
 import traceback
 from datetime import timedelta
 
-from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData
+from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData, APSystemsInvalidInverter
 from homeassistant import config_entries, exceptions
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 import homeassistant.helpers.config_validation as cv
@@ -47,6 +47,9 @@ class APSsystemsFlowHandler(config_entries.ConfigFlow):
             except APSystemsInvalidData as err:
                 _LOGGER.exception(f"APSystemsInvalidData exception: {err}")
                 errors["host"] = "cannot_connect"
+            except APSystemsInvalidInverter as err:
+                _LOGGER.exception(f"APSystemsInvalidInverter exception: {err}")
+                errors["host"] = "unknown_inverter"
             except Exception as err:
                 _LOGGER.exception(f"Unhandled exception: {err}")
                 errors["host"] = "unknown"

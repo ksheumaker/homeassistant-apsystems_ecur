@@ -14,6 +14,10 @@ from pprint import pprint
 class APSystemsInvalidData(Exception):
     pass
 
+class APSystemsInvalidInverter(Exception):
+    pass
+
+
 class APSystemsECUR:
 
     def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None):
@@ -31,6 +35,9 @@ class APSystemsECUR:
 
         # how big of a buffer to read at a time from the socket
         self.recv_size = 4096
+
+        # how long to wait between socket open/closes
+        self.socket_sleep_time = 2.0
 
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
@@ -69,18 +76,28 @@ class APSystemsECUR:
         self.reader = None
         self.writer = None
 
+        self.socket_open = False
+
+        self.errors = []
+
     async def async_read_from_socket(self):
         self.read_buffer = b''
         end_data = None
 
-        while end_data != self.recv_suffix:
-            data = await self.reader.read(self.recv_size)
-            if data == b'':
-                break
-            self.read_buffer += data
-            size = len(self.read_buffer)
-            end_data = self.read_buffer[size-4:]
+        data = await self.reader.readline()
+        if data == b'':
+            error = f"Got empty string from socket"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
+        size = len(data)
+        end_data = data[size-4:]
+        if end_data != self.recv_suffix:
+            error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={data}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
+
+        self.read_buffer = data
         return self.read_buffer
 
     async def async_send_read_from_socket(self, cmd):
@@ -94,66 +111,81 @@ class APSystemsECUR:
             try:
                 return await asyncio.wait_for(self.async_read_from_socket(), 
                     timeout=self.timeout)
+            except APSystemsInvalidData as err:
+                _LOGGER.warning(f"Invalid data from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
+                await self.async_reopen_socket()
+                pass
+                
             except Exception as err:
+                # if we get a timeout or invalid data we close the socket 
+                # and try again
+                _LOGGER.warning(f"Error from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
+                await self.async_reopen_socket()
                 pass
 
-        self.writer.close()
-        await self.writer.wait_closed()
+        await self.async_close_socket()
+        error = f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}"
+        self.errors.append(error)
+        raise APSystemsInvalidData(error)
 
-        raise APSystemsInvalidData(f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}")
+    async def async_close_socket(self):
+        if self.socket_open:
+            self.writer.close()
+            await self.writer.wait_closed()
+            self.socket_open = False
+
+    async def async_reopen_socket(self):
+        await self.async_close_socket()
+
+        # sleep X seconds before re-opening the socket
+        await asyncio.sleep(self.socket_sleep_time)
+
+        return await self.async_open_socket()
+
+    async def async_open_socket(self):
+        _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
+        self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
+        _LOGGER.debug(f"Connected to ECU {self.ipaddr} {self.port}")
+        self.socket_open = True
+
 
     async def async_query_ecu(self):
-        self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
-        _LOGGER.info(f"Connected to {self.ipaddr} {self.port}")
+
+        await self.async_open_socket()
 
         cmd = self.ecu_query
         self.ecu_raw_data = await self.async_send_read_from_socket(cmd)
+        self.async_close_socket()
 
         self.process_ecu_data()
 
         if self.lifetime_energy == 0:
-            self.writer.close()
-            await self.writer.wait_closed()
+            await self.async_close_socket()
+            error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
-            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}")
-
-        if "ECU_R_PRO" in self.firmware or "ECU-C" in self.firmware:
-            self.writer.close()
-            await self.writer.wait_closed()
-
-            # sleep 1 seconds before re-opening the socket
-            await asyncio.sleep(1)
-
-            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
-            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
+        # the ECU likes the socket to be closed and re-opened between commands
+        await self.async_reopen_socket()
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
 
-
-        if "ECU_R_PRO" in self.firmware or "ECU-C" in self.firmware:
-            self.writer.close()
-            await self.writer.wait_closed()
-
-            # sleep 1 seconds before re-opening the socket
-            await asyncio.sleep(1)
-
-            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
-            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
+        # the ECU likes the socket to be closed and re-opened between commands
+        await self.async_reopen_socket()
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)
 
-        self.writer.close()
-        await self.writer.wait_closed()
-
+        await self.async_close_socket()
 
         data = self.process_inverter_data()
         data["ecu_id"] = self.ecu_id
         data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
-
+        data["qty_of_inverters"] = self.qty_of_inverters
+        data["qty_of_online_inverters"] = self.qty_of_online_inverters
 
         return(data)
     
@@ -193,21 +225,27 @@ class APSystemsECUR:
             return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            raise APSystemsInvalidData(f"Unable to convert binary to int location={start} data={debugdata}")
+            error = f"Unable to convert binary to int location={start} data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
  
     def aps_short(self, codec, start):
         try:
             return int(binascii.b2a_hex(codec[(start):(start+1)]), 8)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            raise APSystemsInvalidData(f"Unable to convert binary to short int location={start} data={debugdata}")
+            error = f"Unable to convert binary to short int location={start} data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
     def aps_double(self, codec, start):
         try:
             return int (binascii.b2a_hex(codec[(start):(start+4)]), 16)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            raise APSystemsInvalidData(f"Unable to convert binary to double location={start} data={debugdata}")
+            error = f"Unable to convert binary to double location={start} data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
     
     def aps_bool(self, codec, start):
         return bool(binascii.b2a_hex(codec[(start):(start+2)]))
@@ -228,22 +266,30 @@ class APSystemsECUR:
             checksum = int(data[5:9])
         except ValueError as err:
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Error getting checksum int from '{cmd}' data={debugdata}")
+            error = f"Error getting checksum int from '{cmd}' data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
         if datalen != checksum:
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}")
+            error = f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
         start_str = self.aps_str(data, 0, 3)
         end_str = self.aps_str(data, len(data) - 4, 3)
 
         if start_str != 'APS':
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}")
+            error = f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
         if end_str != 'END':
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}")
+            error = f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}"
+            self.errors.append(error)
+            raise APSystemsInvalidData(error)
 
         return True
 
@@ -351,9 +397,13 @@ class APSystemsECUR:
                 inv.update(channel_data)    
 
             else:
-                raise APSystemsInvalidData(f"Unsupported inverter type {inverter_type}")
+                error = f"Unsupported inverter type {inverter_type} please create GitHub issue."
+                self.errors.append(error)
+                raise APSystemsInvalidData(error)
 
             inverters[inverter_uid] = inv
+
+        self.inverters = inverters
 
         output["inverters"] = inverters
         return (output)
@@ -465,5 +515,23 @@ class APSystemsECUR:
         }
 
         return (output, location)
+
+    def dump_data(self):
+        return {
+            "ecu_id" : self.ecu_id,
+            "qty_of_inverters" : self.qty_of_inverters,
+            "qty_of_online_inverters" : self.qty_of_online_inverters,
+            "lifetime_energy" : self.lifetime_energy,
+            "current_power" : self.current_power,
+            "today_energy" : self.today_energy,
+            "firmware" : self.firmware,
+            "timezone" : self.timezone,
+            "lastupdate" : self.last_update,
+            "ecu_raw_data" : str(binascii.b2a_hex(self.ecu_raw_data)),
+            "inverter_raw_data" : str(binascii.b2a_hex(self.inverter_raw_data)),
+            "inverter_raw_signal" : str(binascii.b2a_hex(self.inverter_raw_signal)),
+            "errors" : self.errors,
+            "inverters" : self.inverters
+        }
 
 

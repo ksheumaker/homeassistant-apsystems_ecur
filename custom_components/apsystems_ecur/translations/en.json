@@ -9,7 +9,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Can't connect to ECU-R",
+      "cannot_connect": "Can't connect to ECU, check log",
+      "inverter": "Unknown inverter type, check log",
       "no_ecuid": "No ECU ID returned from ECU-R",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },

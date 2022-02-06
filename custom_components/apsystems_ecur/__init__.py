@@ -54,7 +54,7 @@ class ECUR():
 
         if self.cached_data.get("ecu_id", None) == None:
             _LOGGER.debug(f"Cached data {self.cached_data}")
-            raise UpdateFailed(f"Cached data doesn't contain a valid ecu_id")
+            raise UpdateFailed(f"Unable to get correct data from ECU, and the cach doesn't contain a valid data. See log for details.")
 
         return self.cached_data
 

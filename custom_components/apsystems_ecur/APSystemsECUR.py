@@ -89,6 +89,20 @@ class APSystemsECUR:
         self.read_buffer = b''
         end_data = None
 
+        while end_data != self.recv_suffix:
+            data = await self.reader.read(self.recv_size)
+            if data == b'':
+                break
+            self.read_buffer += data
+            size = len(self.read_buffer)
+            end_data = self.read_buffer[size-4:]
+
+        return self.read_buffer
+
+    async def async_readline_from_socket(self):
+        self.read_buffer = b''
+        end_data = None
+
         self.read_buffer = await self.reader.readline()
         if self.read_buffer == b'':
             error = f"Got empty string from socket"
@@ -537,7 +551,7 @@ class APSystemsECUR:
     def add_error(self, error):
         timestamp = datetime.datetime.now()
 
-        self.errors.append("[{timestamp}] {error}")
+        self.errors.append(f"[{timestamp}] {error}")
 
     def dump_data(self):
         return {

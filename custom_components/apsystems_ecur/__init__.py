@@ -153,7 +153,7 @@ async def async_setup_entry(hass, config):
 
     host = config.data[CONF_HOST]
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
-    config_reopen_socket = config.data[CONF_REOPEN_SOCKET]
+    config_reopen_socket = config.data.get(CONF_REOPEN_SOCKET, "False")
 
     ecu = ECUR(host, reopen_socket = config_reopen_socket)
 

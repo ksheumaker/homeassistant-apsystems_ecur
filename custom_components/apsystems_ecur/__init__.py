@@ -21,15 +21,15 @@ from homeassistant.helpers.update_coordinator import (
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_REOPEN_SOCKET
 
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
 ## handle all the communications with the ECUR class and deal with our need for caching, etc
 class ECUR():
 
-    def __init__(self, ipaddr):
-        self.ecu = APSystemsECUR(ipaddr)
+    def __init__(self, ipaddr, reopen_socket = False):
+        self.ecu = APSystemsECUR(ipaddr, reopen_socket = reopen_socket)
         self.cache_count = 0
         self.cache_max = 5
         self.data_from_cache = False
@@ -153,8 +153,9 @@ async def async_setup_entry(hass, config):
 
     host = config.data[CONF_HOST]
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
+    config_reopen_socket = config.data[CONF_REOPEN_SOCKET]
 
-    ecu = ECUR(host)
+    ecu = ECUR(host, reopen_socket = config_reopen_socket)
 
     coordinator = DataUpdateCoordinator(
             hass,

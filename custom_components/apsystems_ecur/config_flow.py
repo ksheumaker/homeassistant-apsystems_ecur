@@ -11,14 +11,18 @@ import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_REOPEN_SOCKET
 
 CONFIG_SCHEMA = vol.Schema({
         vol.Required(CONF_HOST): str,
         vol.Optional(
             CONF_SCAN_INTERVAL, 
             default=300
-        ) : int
+        ) : int,
+        vol.Optional(
+            CONF_REOPEN_SOCKET,
+            default=False,
+        ): bool,
     })
 
 @config_entries.HANDLERS.register(DOMAIN)

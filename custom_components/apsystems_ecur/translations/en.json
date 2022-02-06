@@ -4,7 +4,8 @@
       "user": {
         "data": {
           "host": "ECU-R WIFI IP address (must be wifi)",
-          "scan_interval" : "Query every X seconds"
+          "scan_interval" : "Query every X seconds",
+          "reopen_socket" : "Close and re-open socket for every command issued to ECU, maybe helpful for ECU_R_PRO and ECU-C. Try both and please report which is stable for your ECU."
         }
       }
     },

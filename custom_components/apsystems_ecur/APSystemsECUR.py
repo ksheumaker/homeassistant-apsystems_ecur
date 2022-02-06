@@ -20,7 +20,7 @@ class APSystemsInvalidInverter(Exception):
 
 class APSystemsECUR:
 
-    def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None):
+    def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None, reopen_socket = False):
         self.ipaddr = ipaddr
         self.port = port
 
@@ -38,6 +38,11 @@ class APSystemsECUR:
 
         # how long to wait between socket open/closes
         self.socket_sleep_time = 2.0
+
+        # should we close and re-open the socket between each command
+        self.reopen_socket = reopen_socket
+
+        _LOGGER.warning(f"Status of reopen_socket {self.reopen_socket}")
 
         self.qs1_ids = [ "802", "801", "804", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
@@ -93,9 +98,10 @@ class APSystemsECUR:
         size = len(self.read_buffer)
         end_data = self.read_buffer[size-4:]
         if end_data != self.recv_suffix:
-            error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={self.read_buffer}"
-            self.add_error(error)
-            raise APSystemsInvalidData(error)
+           data = binascii.b2a_hex(self.read_buffer)
+           error = f"End suffix ({self.recv_suffix}) missing from ECU response end_data={end_data} data={data}"
+           self.add_error(error)
+           raise APSystemsInvalidData(error)
 
         return self.read_buffer
 
@@ -113,17 +119,20 @@ class APSystemsECUR:
 
             except asyncio.TimeoutError as err:
                 _LOGGER.warning(f"Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
-                await self.async_reopen_socket()
+                if self.reopen_socket:
+                    await self.async_reopen_socket()
                 pass
  
             except APSystemsInvalidData as err:
                 _LOGGER.warning(f"Invalid data from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
-                await self.async_reopen_socket()
+                if self.reopen_socket:
+                    await self.async_reopen_socket()
                 pass
                 
             except Exception as err:
                 _LOGGER.warning(f"Unkonwn error from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
-                await self.async_reopen_socket()
+                if self.reopen_socket:
+                    await self.async_reopen_socket()
                 pass
 
         await self.async_close_socket()
@@ -158,9 +167,13 @@ class APSystemsECUR:
 
         cmd = self.ecu_query
         self.ecu_raw_data = await self.async_send_read_from_socket(cmd)
-        self.async_close_socket()
+        #await self.async_close_socket()
 
-        self.process_ecu_data()
+        try:
+            self.process_ecu_data()
+        except APSsystemsInvalidData as err:
+            await self.async_close_socket()
+            raise
 
         if self.lifetime_energy == 0:
             await self.async_close_socket()
@@ -168,14 +181,16 @@ class APSystemsECUR:
             self.add_error(error)
             raise APSystemsInvalidData(error)
 
-        # the ECU likes the socket to be closed and re-opened between commands
-        await self.async_reopen_socket()
+        # Some ECUs likes the socket to be closed and re-opened between commands
+        if self.reopen_socket:
+            await self.async_reopen_socket()
 
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
 
-        # the ECU likes the socket to be closed and re-opened between commands
-        await self.async_reopen_socket()
+        # Some ECUs likes the socket to be closed and re-opened between commands
+        if self.reopen_socket:
+            await self.async_reopen_socket()
 
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)

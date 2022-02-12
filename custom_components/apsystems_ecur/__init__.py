@@ -37,10 +37,10 @@ class ECUR():
         self.error_messge = ""
         self.cached_data = {}
 
-    async def stop_query(self):
+    def stop_query(self):
         self.querying = False
 
-    async def start_query(self):
+    def start_query(self):
         self.querying = True
 
     def use_cached_data(self, msg):
@@ -58,7 +58,7 @@ class ECUR():
 
         return self.cached_data
 
-    async def update(self):
+    def update(self):
         data = {}
 
         # if we aren't actively quering data, pull data form the cache
@@ -75,7 +75,7 @@ class ECUR():
 
         _LOGGER.debug("Querying ECU")
         try:
-            data = await self.ecu.async_query_ecu()
+            data = self.ecu.query_ecu()
             _LOGGER.debug("Got data from ECU")
 
             # we got good results, so we store it and set flags about our
@@ -155,13 +155,16 @@ async def async_setup_entry(hass, config):
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
     config_reopen_socket = config.data.get(CONF_REOPEN_SOCKET, "False")
 
-    ecu = ECUR(host, reopen_socket = config_reopen_socket)
+    ecu = ECUR(hass, host, reopen_socket = config_reopen_socket)
+
+    async def do_ecu_update():
+        await self.hass.async_add_executor_job(ecu.update)
 
     coordinator = DataUpdateCoordinator(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_method=ecu.update,
+            update_method=do_ecu_update(),
             update_interval=interval,
     )
 
@@ -213,7 +216,7 @@ async def async_unload_entry(hass, config):
     coordinator = hass.data[DOMAIN].get("coordinator")
     ecu = hass.data[DOMAIN].get("ecu")
 
-    await ecu.stop_query()
+    ecu.stop_query()
 
     if unload_ok:
         hass.data[DOMAIN].pop(config.entry_id)

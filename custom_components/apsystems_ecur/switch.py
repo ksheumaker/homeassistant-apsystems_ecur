@@ -72,11 +72,11 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
         return self._ecu.querying
 
     async def async_turn_off(self, **kwargs):
-        await self._ecu.stop_query()
+        self._ecu.stop_query()
         await self.coordinator.async_request_refresh()
 
     async def async_turn_on(self, **kwargs):
-        await self._ecu.start_query()
+        self._ecu.start_query()
         await self.coordinator.async_request_refresh()
 
 

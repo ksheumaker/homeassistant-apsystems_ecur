@@ -42,7 +42,7 @@ class APSsystemsFlowHandler(config_entries.ConfigFlow):
             try:
                 ap_ecu = APSystemsECUR(user_input["host"])
 
-                test_query = await hass.async_add_executor_job(ap_ecu.query_ecu())
+                test_query = await self.hass.async_add_executor_job(ap_ecu.query_ecu)
                 ecu_id = test_query.get("ecu_id", None)
                 if ecu_id != None:
                     return self.async_create_entry(title=f"ECU: {ecu_id}", data=user_input)

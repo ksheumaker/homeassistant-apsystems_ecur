@@ -155,16 +155,16 @@ async def async_setup_entry(hass, config):
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
     config_reopen_socket = config.data.get(CONF_REOPEN_SOCKET, "False")
 
-    ecu = ECUR(hass, host, reopen_socket = config_reopen_socket)
+    ecu = ECUR(host, reopen_socket = config_reopen_socket)
 
     async def do_ecu_update():
-        await self.hass.async_add_executor_job(ecu.update)
+        return await hass.async_add_executor_job(ecu.update)
 
     coordinator = DataUpdateCoordinator(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_method=do_ecu_update(),
+            update_method=do_ecu_update,
             update_interval=interval,
     )
 

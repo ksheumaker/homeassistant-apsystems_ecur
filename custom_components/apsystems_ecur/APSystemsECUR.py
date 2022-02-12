@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import asyncio
 import socket
 import binascii
 import datetime
@@ -44,7 +43,7 @@ class APSystemsECUR:
 
         _LOGGER.warning(f"Status of reopen_socket {self.reopen_socket}")
 
-        self.qs1_ids = [ "802", "801", "804", "806" ]
+        self.qs1_ids = [ "802", "801", "804", "805", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
         self.ds3_ids = [ "703", "704" ]
@@ -87,7 +86,7 @@ class APSystemsECUR:
         self.errors = []
 
 
-   def read_from_socket(self):
+    def read_from_socket(self):
         self.read_buffer = b''
         end_data = None
 
@@ -159,10 +158,9 @@ class APSystemsECUR:
         sock = self.open_socket()
         _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
 
-        try:
-            cmd = self.ecu_query
-            _LOGGER.debug(f"Sending ECU query to socket {cmd}")
-            self.ecu_raw_data = self.send_read_from_socket(cmd)
+        cmd = self.ecu_query
+        _LOGGER.debug(f"Sending ECU query to socket {cmd}")
+        self.ecu_raw_data = self.send_read_from_socket(cmd)
                 
         if self.reopen_socket:
             self.close_socket()

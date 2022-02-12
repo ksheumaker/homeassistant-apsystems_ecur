@@ -5,6 +5,7 @@ import binascii
 import datetime
 import json
 import logging
+import time
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ class APSystemsECUR:
         self.recv_size = 4096
 
         # how long to wait between socket open/closes
-        self.socket_sleep_time = 2.0
+        self.socket_sleep_time = 1.0
 
         # should we close and re-open the socket between each command
         self.reopen_socket = reopen_socket
@@ -144,12 +145,14 @@ class APSystemsECUR:
 
     def close_open_socket(self):
         self.close_socket()
+        time.sleep(self.socket_sleep_time)
         self.open_socket()
 
 
     def open_socket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.ipaddr, self.port))
+        self.sock.settimeout(self.timeout)
         self.socket_open = True
     
     def query_ecu(self):

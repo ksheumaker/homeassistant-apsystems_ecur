@@ -115,19 +115,19 @@ class APSystemsECUR:
             except TimeoutError as err:
                 _LOGGER.warning(f"Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
                 if self.reopen_socket:
-                    self.reopen_socket()
+                    self.close_open_socket()
                 pass
  
             except APSystemsInvalidData as err:
                 _LOGGER.warning(f"Invalid data from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
                 if self.reopen_socket:
-                    self.reopen_socket()
+                    self.close_open_socket()
                 pass
                 
             except Exception as err:
                 _LOGGER.warning(f"Unkonwn error from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
                 if self.reopen_socket:
-                    self.reopen_socket()
+                    self.close_open_socket()
                 pass
 
         self.close_socket()

@@ -4,7 +4,7 @@ import voluptuous as vol
 import traceback
 from datetime import timedelta
 
-from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData, APSystemsInvalidInverter
+from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData, APSystemsInvalidInverter
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import load_platform
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
@@ -21,15 +21,15 @@ from homeassistant.helpers.update_coordinator import (
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN, CONF_REOPEN_SOCKET
+from .const import DOMAIN, CONF_REOPEN_SOCKET, CONF_QUERY_METHOD
 
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
 ## handle all the communications with the ECUR class and deal with our need for caching, etc
 class ECUR():
 
-    def __init__(self, ipaddr, reopen_socket = False):
-        self.ecu = APSystemsECUR(ipaddr, reopen_socket = reopen_socket)
+    def __init__(self, ipaddr):
+        self.ecu = APSystemsSocket(ipaddr)
         self.cache_count = 0
         self.cache_max = 5
         self.data_from_cache = False
@@ -50,11 +50,11 @@ class ECUR():
         self.data_from_cache = True
 
         if self.cache_count > self.cache_max:
-            raise UpdateFailed(f"Error using cached data for more than {self.cache_max} times.")
+            raise UpdateFailed(f"Error using cached data more than {self.cache_max} times. See log, and try power cycling the ECU.")
 
         if self.cached_data.get("ecu_id", None) == None:
             _LOGGER.debug(f"Cached data {self.cached_data}")
-            raise UpdateFailed(f"Unable to get correct data from ECU, and the cach doesn't contain a valid data. See log for details.")
+            raise UpdateFailed(f"Unable to get correct data from ECU, and no cached data. See log for details, and try power cycling the ECU.")
 
         return self.cached_data
 
@@ -153,9 +153,8 @@ async def async_setup_entry(hass, config):
 
     host = config.data[CONF_HOST]
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
-    config_reopen_socket = config.data.get(CONF_REOPEN_SOCKET, "False")
 
-    ecu = ECUR(host, reopen_socket = config_reopen_socket)
+    ecu = ECUR(host)
 
     async def do_ecu_update():
         return await hass.async_add_executor_job(ecu.update)
@@ -173,15 +172,6 @@ async def async_setup_entry(hass, config):
         "coordinator" : coordinator
     }
     await coordinator.async_config_entry_first_refresh()
-
-    #async def handle_stop_query(call):
-        #await ecu.stop_query()
-        #coordinator.async_refresh()
-
-    #async def handle_start_query(call):
-        #await ecu.start_query()
-        #coordinator.async_refresh()
-
 
     device_registry = dr.async_get(hass)
 

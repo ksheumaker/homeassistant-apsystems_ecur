@@ -14,6 +14,10 @@ Although there's no need to also attach the ECU-R by ethernet cable (for the ECU
 
 ## Release notes
 
+### v1.2.11
+* Remove async socket code and refactor some code to support the coming soon HTTP method for ECU_R_PRO (and possibly ECU-C).
+* Removed the multiple retries if we get bad data from the ECU, just use cache, and hope next iteration is fine in attempt to provide more stability to the ECU
+
 ### v1.2.9 (beta)
 * Remove async socket code from APSystemsECUR revert to using standard socket calls and using homeassistant's `async_add_executor_job` functionality
 * Add QS1 type 805

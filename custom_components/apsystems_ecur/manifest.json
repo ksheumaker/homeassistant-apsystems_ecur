@@ -4,7 +4,7 @@
   "dependencies": [],
   "documentation": "https://github.com/ksheumaker/homeassistant-apsystems_ecur",
   "domain": "apsystems_ecur",
-  "name": "APSystems PV solar ECU-R",
-  "version": "v1.2.5",
+  "name": "APSystems PV solar ECU",
+  "version": "v1.2.11",
   "requirements": []
 }

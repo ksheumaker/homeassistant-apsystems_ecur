@@ -18,9 +18,9 @@ class APSystemsInvalidInverter(Exception):
     pass
 
 
-class APSystemsECUR:
+class APSystemsSocket:
 
-    def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None, reopen_socket = False):
+    def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None):
         self.ipaddr = ipaddr
         self.port = port
 
@@ -40,9 +40,7 @@ class APSystemsECUR:
         self.socket_sleep_time = 1.0
 
         # should we close and re-open the socket between each command
-        self.reopen_socket = reopen_socket
-
-        _LOGGER.warning(f"Status of reopen_socket {self.reopen_socket}")
+        self.reopen_socket = False
 
         self.qs1_ids = [ "802", "801", "804", "805", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
@@ -101,41 +99,15 @@ class APSystemsECUR:
 
         return self.read_buffer
 
-
     def send_read_from_socket(self, cmd):
-        current_attempt = 0
-        while current_attempt < self.cmd_attempts:
-            current_attempt += 1
-
-            self.sock.sendall(cmd.encode('utf-8'))
-
-            try:
-                return self.read_from_socket()
-
-            except TimeoutError as err:
-                _LOGGER.warning(f"Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
-                if self.reopen_socket:
-                    self.reopen_socket()
-                pass
- 
-            except APSystemsInvalidData as err:
-                _LOGGER.warning(f"Invalid data from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
-                if self.reopen_socket:
-                    self.reopen_socket()
-                pass
-                
-            except Exception as err:
-                _LOGGER.warning(f"Unkonwn error from ECU after issuing cmd={cmd.rstrip()} error={err}. Closing socket and trying again try {current_attempt} of {self.cmd_attempts}")
-                if self.reopen_socket:
-                    self.reopen_socket()
-                pass
-
-        self.close_socket()
-        error = f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}"
-        self.add_error(error)
-        raise APSystemsInvalidData(error)
-
-
+        self.sock.sendall(cmd.encode('utf-8'))
+        try:
+            return self.read_from_socket()
+        except TimeoutError as err:
+            self.close_socket()
+            msg = "Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket."
+            self.add_error(msg)
+            raise
 
     def close_socket(self):
         if self.socket_open:
@@ -143,16 +115,10 @@ class APSystemsECUR:
             self.sock.close()
             self.socket_open = False
 
-    def close_open_socket(self):
-        self.close_socket()
-        time.sleep(self.socket_sleep_time)
-        self.open_socket()
-
-
     def open_socket(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.ipaddr, self.port))
         self.sock.settimeout(self.timeout)
+        self.sock.connect((self.ipaddr, self.port))
         self.socket_open = True
     
     def query_ecu(self):
@@ -165,9 +131,6 @@ class APSystemsECUR:
         _LOGGER.debug(f"Sending ECU query to socket {cmd}")
         self.ecu_raw_data = self.send_read_from_socket(cmd)
                 
-        if self.reopen_socket:
-            self.close_socket()
-
         self.process_ecu_data()
 
         try:
@@ -183,16 +146,10 @@ class APSystemsECUR:
             raise APSystemsInvalidData(error)
 
         # Some ECUs likes the socket to be closed and re-opened between commands
-        if self.reopen_socket:
-            self.close_open_socket()
-
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = self.send_read_from_socket(cmd)
 
         # Some ECUs likes the socket to be closed and re-opened between commands
-        if self.reopen_socket:
-            self.close_open_socket()
-
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = self.send_read_from_socket(cmd)
 

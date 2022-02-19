@@ -4,25 +4,25 @@ import voluptuous as vol
 import traceback
 from datetime import timedelta
 
-from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData, APSystemsInvalidInverter
+from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData, APSystemsInvalidInverter
 from homeassistant import config_entries, exceptions
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN, CONF_REOPEN_SOCKET
+from .const import DOMAIN, CONF_REOPEN_SOCKET, CONF_QUERY_METHOD
 
 CONFIG_SCHEMA = vol.Schema({
         vol.Required(CONF_HOST): str,
+        #vol.Required(
+        #    CONF_QUERY_METHOD,
+        #    default="socket",
+        #): vol.In(["socket", "http"]),
         vol.Optional(
             CONF_SCAN_INTERVAL, 
             default=300
         ) : int,
-        vol.Optional(
-            CONF_REOPEN_SOCKET,
-            default=False,
-        ): bool,
     })
 
 @config_entries.HANDLERS.register(DOMAIN)
@@ -40,7 +40,7 @@ class APSsystemsFlowHandler(config_entries.ConfigFlow):
         if user_input is not None:
             _LOGGER.debug("User Input is not none")
             try:
-                ap_ecu = APSystemsECUR(user_input["host"])
+                ap_ecu = APSystemsSocket(user_input["host"])
 
                 test_query = await self.hass.async_add_executor_job(ap_ecu.query_ecu)
                 ecu_id = test_query.get("ecu_id", None)

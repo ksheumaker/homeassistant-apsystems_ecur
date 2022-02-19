@@ -1,18 +1,14 @@
-from datetime import timedelta
 import logging
 
-from homeassistant.components.binary_sensor import (
-    BinarySensorEntity,
-)
-
+from homeassistant.util import dt as dt_util
+from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
+    CoordinatorEntity
 )
 
 from .const import (
     DOMAIN,
-    RELOAD_ICON,
-    CACHE_ICON
+    RELOAD_ICON
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,21 +18,20 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
 
-    sensors = [
-        APSystemsECUBinarySensor(coordinator, ecu, "data_from_cache", 
-            label="Using Cached Data", icon=CACHE_ICON)
+    switches = [
+        APSystemsECUQuerySwitch(coordinator, ecu, "query_device", 
+            label="Query Device", icon=RELOAD_ICON),
     ]
-    add_entities(sensors)
+    add_entities(switches)
 
 
-class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
+class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
 
-    def __init__(self, coordinator, ecu, field, label=None, devclass=None, icon=None):
+    def __init__(self, coordinator, ecu, field, label=None, icon=None):
 
         super().__init__(coordinator)
 
         self.coordinator = coordinator
-
         self._ecu = ecu
         self._field = field
         self._label = label
@@ -56,27 +51,8 @@ class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
         return self._name
 
     @property
-    def is_on(self):
-        return self.coordinator.data.get(self._field)
-
-    @property
     def icon(self):
         return self._icon
-
-    @property
-    def extra_state_attributes(self):
-
-        attrs = {
-            "ecu_id" : self._ecu.ecu.ecu_id,
-            "firmware" : self._ecu.ecu.firmware,
-            "timezone" : self._ecu.ecu.timezone,
-            "last_update" : self._ecu.ecu.last_update
-        }
-        return attrs
-
-    @property
-    def entity_category(self):
-        return "diagnostic"
 
     @property
     def device_info(self):
@@ -86,4 +62,21 @@ class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
                 (DOMAIN, parent),
             }
         }
+
+    @property
+    def entity_category(self):
+        return "config"
     
+    @property
+    def is_on(self):
+        return self._ecu.querying
+
+    async def async_turn_off(self, **kwargs):
+        self._ecu.stop_query()
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_on(self, **kwargs):
+        self._ecu.start_query()
+        await self.coordinator.async_request_refresh()
+
+

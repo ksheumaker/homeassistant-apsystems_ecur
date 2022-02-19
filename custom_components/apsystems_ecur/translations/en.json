@@ -3,13 +3,15 @@
     "step": {
       "user": {
         "data": {
-          "host": "ECU-R WIFI IP address (must be wifi)",
-          "scan_interval" : "Query every X seconds"
+          "host": "ECU IP address (must be wifi for ECU-R)",
+          "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
+          "scan_interval" : "Query every X seconds, ECU only updates data every 300 seconds, choosing shorter interval not recommended."
         }
       }
     },
     "error": {
-      "cannot_connect": "Can't connect to ECU-R",
+      "cannot_connect": "Can't connect to ECU, check log",
+      "inverter": "Unknown inverter type, check log",
       "no_ecuid": "No ECU ID returned from ECU-R",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },

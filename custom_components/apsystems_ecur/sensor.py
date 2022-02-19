@@ -1,5 +1,3 @@
-"""Integration is using DataUpdateCoordinator."""
-
 from datetime import timedelta, datetime, date
 import logging
 
@@ -9,8 +7,6 @@ from homeassistant.util import dt as dt_util
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed,
 )
 
 from homeassistant.components.sensor import (
@@ -47,7 +43,6 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
 
-
     sensors = [
         APSystemsECUSensor(coordinator, ecu, "current_power", 
             label="Current Power", unit=POWER_WATT, 
@@ -58,6 +53,10 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
             label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
             devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
+        APSystemsECUSensor(coordinator, ecu, "qty_of_inverters", 
+            label="Inverters", icon=SOLAR_ICON, entity_category="diagnostic"),
+        APSystemsECUSensor(coordinator, ecu, "qty_of_online_inverters", 
+            label="Inverters Online", icon=SOLAR_ICON, entity_category="diagnostic"),
     ]
 
     inverters = coordinator.data.get("inverters", {})
@@ -66,16 +65,17 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
         sensors.extend([
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "temperature", label="Temperature", 
-                    devclass=DEVICE_CLASS_TEMPERATURE, unit=TEMP_CELSIUS),
+                    devclass=DEVICE_CLASS_TEMPERATURE, unit=TEMP_CELSIUS, 
+                    entity_category="diagnostic"),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "frequency", label="Frequency", unit=FREQUENCY_HERTZ, 
-                    devclass=None, icon=FREQ_ICON),
+                    devclass=None, icon=FREQ_ICON, entity_category="diagnostic"),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "voltage", label="Voltage", unit=ELECTRIC_POTENTIAL_VOLT, 
-                    devclass=DEVICE_CLASS_VOLTAGE),
+                    devclass=DEVICE_CLASS_VOLTAGE, entity_category="diagnostic"),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "signal", label="Signal", unit=PERCENTAGE, 
-                    icon=SIGNAL_ICON)
+                    icon=SIGNAL_ICON, entity_category="diagnostic")
 
         ])
         for i in range(0, inv_data.get("channel_qty", 0)):
@@ -89,7 +89,7 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
 
 class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, ecu, uid, field, index=0, label=None, icon=None, unit=None, devclass=None):
+    def __init__(self, coordinator, ecu, uid, field, index=0, label=None, icon=None, unit=None, devclass=None, entity_category=None):
 
         super().__init__(coordinator)
 
@@ -105,6 +105,7 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
             self._label = field
         self._icon = icon
         self._unit = unit
+        self._entity_category = entity_category
 
         self._name = f"Inverter {self._uid} {self._label}"
         self._state = None
@@ -163,10 +164,13 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
             }
         }
    
+    @property
+    def entity_category(self):
+        return self._entity_category
 
 class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
-    def __init__(self, coordinator, ecu, field, label=None, icon=None, unit=None, devclass=None, stateclass=None):
+    def __init__(self, coordinator, ecu, field, label=None, icon=None, unit=None, devclass=None, stateclass=None, entity_category=None):
 
         super().__init__(coordinator)
 
@@ -181,6 +185,7 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
         self._unit = unit
         self._devclass = devclass
         self._stateclass = stateclass
+        self._entity_category = entity_category
 
         self._name = f"ECU {self._label}"
         self._state = None
@@ -215,8 +220,6 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,
-            "Inverter qty" : self._ecu.ecu.qty_of_inverters,
-            "Inverter qty online" : self._ecu.ecu.qty_of_online_inverters,
             "Firmware" : self._ecu.ecu.firmware,
             "Timezone" : self._ecu.ecu.timezone,
             "last_update" : self._ecu.ecu.last_update
@@ -236,4 +239,9 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
                 (DOMAIN, parent),
             }
         }
-    
+     
+    @property
+    def entity_category(self):
+        return self._entity_category
+
+

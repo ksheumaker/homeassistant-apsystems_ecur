@@ -1,5 +1,0 @@
-start_query:
-  description: Start querying the ECU for new data (i.e. when sunrise)
-
-stop_query:
-  description: Stop querying the ECU for new data (i.e. when sunset)

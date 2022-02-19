@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import asyncio
 import socket
 import binascii
 import datetime
 import json
 import logging
+import time
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,7 +14,11 @@ from pprint import pprint
 class APSystemsInvalidData(Exception):
     pass
 
-class APSystemsECUR:
+class APSystemsInvalidInverter(Exception):
+    pass
+
+
+class APSystemsSocket:
 
     def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None):
         self.ipaddr = ipaddr
@@ -32,7 +36,13 @@ class APSystemsECUR:
         # how big of a buffer to read at a time from the socket
         self.recv_size = 4096
 
-        self.qs1_ids = [ "802", "801", "804", "806" ]
+        # how long to wait between socket open/closes
+        self.socket_sleep_time = 1.0
+
+        # should we close and re-open the socket between each command
+        self.reopen_socket = False
+
+        self.qs1_ids = [ "802", "801", "804", "805", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
         self.ds3_ids = [ "703", "704" ]
@@ -69,12 +79,18 @@ class APSystemsECUR:
         self.reader = None
         self.writer = None
 
-    async def async_read_from_socket(self):
+        self.socket = None
+        self.socket_open = False
+
+        self.errors = []
+
+
+    def read_from_socket(self):
         self.read_buffer = b''
         end_data = None
 
         while end_data != self.recv_suffix:
-            data = await self.reader.read(self.recv_size)
+            data = self.sock.recv(self.recv_size)
             if data == b'':
                 break
             self.read_buffer += data
@@ -83,100 +99,61 @@ class APSystemsECUR:
 
         return self.read_buffer
 
-    async def async_send_read_from_socket(self, cmd):
-        current_attempt = 0
-        while current_attempt < self.cmd_attempts:
-            current_attempt += 1
+    def send_read_from_socket(self, cmd):
+        self.sock.sendall(cmd.encode('utf-8'))
+        try:
+            return self.read_from_socket()
+        except TimeoutError as err:
+            self.close_socket()
+            msg = "Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket."
+            self.add_error(msg)
+            raise
 
-            self.writer.write(cmd.encode('utf-8'))
-            await self.writer.drain()
+    def close_socket(self):
+        if self.socket_open:
+            self.sock.shutdown(socket.SHUT_RDWR)
+            self.sock.close()
+            self.socket_open = False
 
-            try:
-                return await asyncio.wait_for(self.async_read_from_socket(), 
-                    timeout=self.timeout)
-            except Exception as err:
-                pass
-
-        self.writer.close()
-        await self.writer.wait_closed()
-
-        raise APSystemsInvalidData(f"Incomplete data from ECU after {current_attempt} attempts, cmd='{cmd.rstrip()}' data={self.read_buffer}")
-
-    async def async_query_ecu(self):
-        self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
-        _LOGGER.info(f"Connected to {self.ipaddr} {self.port}")
-
-        cmd = self.ecu_query
-        self.ecu_raw_data = await self.async_send_read_from_socket(cmd)
-
-        self.process_ecu_data()
-
-        if self.lifetime_energy == 0:
-            self.writer.close()
-            await self.writer.wait_closed()
-
-            raise APSystemsInvalidData(f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}")
-
-        if "ECU_R_PRO" in self.firmware or "ECU-C" in self.firmware:
-            self.writer.close()
-            await self.writer.wait_closed()
-
-            # sleep 1 seconds before re-opening the socket
-            await asyncio.sleep(1)
-
-            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
-            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
-
-        cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        self.inverter_raw_data = await self.async_send_read_from_socket(cmd)
-
-
-        if "ECU_R_PRO" in self.firmware or "ECU-C" in self.firmware:
-            self.writer.close()
-            await self.writer.wait_closed()
-
-            # sleep 1 seconds before re-opening the socket
-            await asyncio.sleep(1)
-
-            _LOGGER.info(f"Re-connecting to ECU_R_PRO on {self.ipaddr} {self.port}")
-            self.reader, self.writer = await asyncio.open_connection(self.ipaddr, self.port)
-
-        cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        self.inverter_raw_signal = await self.async_send_read_from_socket(cmd)
-
-        self.writer.close()
-        await self.writer.wait_closed()
-
-
-        data = self.process_inverter_data()
-        data["ecu_id"] = self.ecu_id
-        data["today_energy"] = self.today_energy
-        data["lifetime_energy"] = self.lifetime_energy
-        data["current_power"] = self.current_power
-
-
-        return(data)
+    def open_socket(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout)
+        self.sock.connect((self.ipaddr, self.port))
+        self.socket_open = True
     
     def query_ecu(self):
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.ipaddr,self.port))
+        _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
+        sock = self.open_socket()
+        _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
 
-        sock.sendall(self.ecu_query.encode('utf-8'))
-        self.ecu_raw_data = sock.recv(self.recv_size)
-
+        cmd = self.ecu_query
+        _LOGGER.debug(f"Sending ECU query to socket {cmd}")
+        self.ecu_raw_data = self.send_read_from_socket(cmd)
+                
         self.process_ecu_data()
 
+        try:
+            self.process_ecu_data()
+        except APSsystemsInvalidData as err:
+            self.close_socket()
+            raise
+
+        if self.lifetime_energy == 0:
+            self.socket_close()
+            error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
+
+        # Some ECUs likes the socket to be closed and re-opened between commands
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
-        sock.sendall(cmd.encode('utf-8'))
-        self.inverter_raw_data = sock.recv(self.recv_size)
+        self.inverter_raw_data = self.send_read_from_socket(cmd)
 
+        # Some ECUs likes the socket to be closed and re-opened between commands
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
-        sock.sendall(cmd.encode('utf-8'))
-        self.inverter_raw_signal = sock.recv(self.recv_size)
+        self.inverter_raw_signal = self.send_read_from_socket(cmd)
 
-        sock.shutdown(socket.SHUT_RDWR)
-        sock.close()
+        self.close_socket()
 
         data = self.process_inverter_data()
 
@@ -184,7 +161,8 @@ class APSystemsECUR:
         data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
-
+        data["qty_of_inverters"] = self.qty_of_inverters
+        data["qty_of_online_inverters"] = self.qty_of_online_inverters
 
         return(data)
  
@@ -193,21 +171,27 @@ class APSystemsECUR:
             return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            raise APSystemsInvalidData(f"Unable to convert binary to int location={start} data={debugdata}")
+            error = f"Unable to convert binary to int location={start} data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
  
     def aps_short(self, codec, start):
         try:
             return int(binascii.b2a_hex(codec[(start):(start+1)]), 8)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            raise APSystemsInvalidData(f"Unable to convert binary to short int location={start} data={debugdata}")
+            error = f"Unable to convert binary to short int location={start} data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
 
     def aps_double(self, codec, start):
         try:
             return int (binascii.b2a_hex(codec[(start):(start+4)]), 16)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            raise APSystemsInvalidData(f"Unable to convert binary to double location={start} data={debugdata}")
+            error = f"Unable to convert binary to double location={start} data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
     
     def aps_bool(self, codec, start):
         return bool(binascii.b2a_hex(codec[(start):(start+2)]))
@@ -228,22 +212,30 @@ class APSystemsECUR:
             checksum = int(data[5:9])
         except ValueError as err:
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Error getting checksum int from '{cmd}' data={debugdata}")
+            error = f"Error getting checksum int from '{cmd}' data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
 
         if datalen != checksum:
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}")
+            error = f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
 
         start_str = self.aps_str(data, 0, 3)
         end_str = self.aps_str(data, len(data) - 4, 3)
 
         if start_str != 'APS':
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}")
+            error = f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
 
         if end_str != 'END':
             debugdata = binascii.b2a_hex(data)
-            raise APSystemsInvalidData(f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}")
+            error = f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}"
+            self.add_error(error)
+            raise APSystemsInvalidData(error)
 
         return True
 
@@ -351,9 +343,13 @@ class APSystemsECUR:
                 inv.update(channel_data)    
 
             else:
-                raise APSystemsInvalidData(f"Unsupported inverter type {inverter_type}")
+                error = f"Unsupported inverter type {inverter_type} please create GitHub issue."
+                self.add_error(error)
+                raise APSystemsInvalidData(error)
 
             inverters[inverter_uid] = inv
+
+        self.inverters = inverters
 
         output["inverters"] = inverters
         return (output)
@@ -465,5 +461,28 @@ class APSystemsECUR:
         }
 
         return (output, location)
+
+    def add_error(self, error):
+        timestamp = datetime.datetime.now()
+
+        self.errors.append(f"[{timestamp}] {error}")
+
+    def dump_data(self):
+        return {
+            "ecu_id" : self.ecu_id,
+            "qty_of_inverters" : self.qty_of_inverters,
+            "qty_of_online_inverters" : self.qty_of_online_inverters,
+            "lifetime_energy" : self.lifetime_energy,
+            "current_power" : self.current_power,
+            "today_energy" : self.today_energy,
+            "firmware" : self.firmware,
+            "timezone" : self.timezone,
+            "lastupdate" : self.last_update,
+            "ecu_raw_data" : str(binascii.b2a_hex(self.ecu_raw_data)),
+            "inverter_raw_data" : str(binascii.b2a_hex(self.inverter_raw_data)),
+            "inverter_raw_signal" : str(binascii.b2a_hex(self.inverter_raw_signal)),
+            "errors" : self.errors,
+            "inverters" : self.inverters
+        }
 
 

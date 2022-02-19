@@ -4,7 +4,7 @@ import voluptuous as vol
 import traceback
 from datetime import timedelta
 
-from .APSystemsECUR import APSystemsECUR, APSystemsInvalidData
+from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData, APSystemsInvalidInverter
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import load_platform
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
@@ -21,15 +21,15 @@ from homeassistant.helpers.update_coordinator import (
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_REOPEN_SOCKET, CONF_QUERY_METHOD
 
-PLATFORMS = [ "sensor", "binary_sensor" ]
+PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
 ## handle all the communications with the ECUR class and deal with our need for caching, etc
 class ECUR():
 
     def __init__(self, ipaddr):
-        self.ecu = APSystemsECUR(ipaddr)
+        self.ecu = APSystemsSocket(ipaddr)
         self.cache_count = 0
         self.cache_max = 5
         self.data_from_cache = False
@@ -37,10 +37,10 @@ class ECUR():
         self.error_messge = ""
         self.cached_data = {}
 
-    async def stop_query(self):
+    def stop_query(self):
         self.querying = False
 
-    async def start_query(self):
+    def start_query(self):
         self.querying = True
 
     def use_cached_data(self, msg):
@@ -50,21 +50,22 @@ class ECUR():
         self.data_from_cache = True
 
         if self.cache_count > self.cache_max:
-            raise Exception(f"Error using cached data for more than {self.cache_max} times.")
+            raise UpdateFailed(f"Error using cached data more than {self.cache_max} times. See log, and try power cycling the ECU.")
 
-        if self.cached_data.get("ecu_id", None) != None:
-            raise Exception(f"Cached data doesn't contain a valid ecu_id")
+        if self.cached_data.get("ecu_id", None) == None:
+            _LOGGER.debug(f"Cached data {self.cached_data}")
+            raise UpdateFailed(f"Unable to get correct data from ECU, and no cached data. See log for details, and try power cycling the ECU.")
 
         return self.cached_data
 
-    async def update(self):
+    def update(self):
         data = {}
 
         # if we aren't actively quering data, pull data form the cache
         # this is so we can stop querying after sunset
         if not self.querying:
 
-            _LOGGER.debug("Not querying ECU due to stopped")
+            _LOGGER.debug("Not querying ECU due to query=False")
             data = self.cached_data
             self.data_from_cache = True
 
@@ -74,7 +75,7 @@ class ECUR():
 
         _LOGGER.debug("Querying ECU")
         try:
-            data = await self.ecu.async_query_ecu()
+            data = self.ecu.query_ecu()
             _LOGGER.debug("Got data from ECU")
 
             # we got good results, so we store it and set flags about our
@@ -106,7 +107,7 @@ class ECUR():
         _LOGGER.debug(f"Returning {data}")
 
         if data.get("ecu_id", None) == None:
-            raise Exception(f"Somehow data doesn't contain a valid ecu_id")
+            raise UpdateFailed(f"Somehow data doesn't contain a valid ecu_id")
             
         return data
 
@@ -145,7 +146,6 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass, config):
     """ Setup the APsystems platform """
-
     
     _LOGGER.debug(f"config={config.data}")
 
@@ -156,29 +156,22 @@ async def async_setup_entry(hass, config):
 
     ecu = ECUR(host)
 
+    async def do_ecu_update():
+        return await hass.async_add_executor_job(ecu.update)
+
     coordinator = DataUpdateCoordinator(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_method=ecu.update,
+            update_method=do_ecu_update,
             update_interval=interval,
     )
-
-    await coordinator.async_refresh()
 
     hass.data[DOMAIN] = {
         "ecu" : ecu,
         "coordinator" : coordinator
     }
-
-    async def handle_stop_query(call):
-        await ecu.stop_query()
-        coordinator.async_refresh()
-
-    async def handle_start_query(call):
-        await ecu.start_query()
-        coordinator.async_refresh()
-
+    await coordinator.async_config_entry_first_refresh()
 
     device_registry = dr.async_get(hass)
 
@@ -204,17 +197,17 @@ async def async_setup_entry(hass, config):
             model=inv_data.get("model")
         )
 
-    hass.services.async_register(DOMAIN, "start_query", handle_start_query)
-    hass.services.async_register(DOMAIN, "stop_query", handle_stop_query)
-
-    #for component in PLATFORMS:
     hass.config_entries.async_setup_platforms(config, PLATFORMS)
-    #load_platform(hass, component, DOMAIN, {}, config)
 
     return True
 
 async def async_unload_entry(hass, config):
     unload_ok = await hass.config_entries.async_unload_platforms(config, PLATFORMS)
+    coordinator = hass.data[DOMAIN].get("coordinator")
+    ecu = hass.data[DOMAIN].get("ecu")
+
+    ecu.stop_query()
+
     if unload_ok:
         hass.data[DOMAIN].pop(config.entry_id)
 

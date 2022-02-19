@@ -14,6 +14,27 @@ Although there's no need to also attach the ECU-R by ethernet cable (for the ECU
 
 ## Release notes
 
+### v1.2.11
+* Remove async socket code and refactor some code to support the coming soon HTTP method for ECU_R_PRO (and possibly ECU-C).
+* Removed the multiple retries if we get bad data from the ECU, just use cache, and hope next iteration is fine in attempt to provide more stability to the ECU
+
+### v1.2.9 (beta)
+* Remove async socket code from APSystemsECUR revert to using standard socket calls and using homeassistant's `async_add_executor_job` functionality
+* Add QS1 type 805
+
+### v1.2.2 (beta)
+* Fix some other issues in error handling and caching
+
+### v1.2.0 (beta)
+New features
+* Remove `apsystems_ecur.start_query` and `apsystems_ecu.end_query` service, now there is a switch on the ECU called `switch.ecu_query_device` if the switch is on, will query the device, if off it will read from cache.  Can be used with an automation to turn on/off querying when the sun has set or risen
+* Add support for the download diagnostics button the on the devices - hopefully will help debugging when there are problems
+* Add 2 additional sensors `sensor.ecu_inverters` and `sensor.ecu_inverters_online` to show you how man inverters have been configured in your ECU and how many are currently reporting data
+
+Bug fixes
+* Change code to always close socket between commands to ECU (before this was only done on the ECU-C and ECU_R_PRO)
+* Change the socket code to be a little more simplified and hopefully work better
+* Add more exception handling and detect error conditions
 
 ### v1.1.2
 Make ECU-C devices behave like ECU_R_PRO devices and close the socket down between each query.  Add support for new ds3 inverter type 704

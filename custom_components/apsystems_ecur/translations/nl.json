@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "ECU IP-adres (moet het WiFi IP-adres zijn voor ECU-R eigenaren)",
+          "query_method" : "Selecteer een methode om de ECU uit te lezen. ECU_R eigenaren kies socket, ECU_R_PRO and ECU_C eigenaren kies http",
+          "scan_interval" : "Uitvraag minimaal 300 sec. een kortere interval wordt niet aanbevolen"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kon geen verbinding opzetten met de ECU, controleer het logbestand",
+      "inverter": "Onbekend inverter model, controleer het logbestand",
+      "no_ecuid": "Geen ECU-ID ontvangen van de ECU-R",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "Reeds geconfigureerd": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}
+

@@ -5,7 +5,7 @@
         "data": {
           "host": "ECU IP-adres (moet het WiFi IP-adres zijn voor ECU-R eigenaren)",
           "query_method" : "Selecteer een methode om de ECU uit te lezen. ECU_R eigenaren kies socket, ECU_R_PRO and ECU_C eigenaren kies http",
-          "scan_interval" : "Uitvraag minimaal 300 sec. een kortere interval wordt niet aanbevolen"
+          "scan_interval" : "Uitvraag minimaal 300 sec. kleinere interval niet aanbevolen"
         }
       }
     },

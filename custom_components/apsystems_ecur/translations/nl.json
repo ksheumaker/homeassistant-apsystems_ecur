@@ -12,7 +12,7 @@
     "error": {
       "cannot_connect": "Kon geen verbinding opzetten met de ECU, controleer het logbestand",
       "inverter": "Onbekend inverter model, controleer het logbestand",
-      "no_ecuid": "Geen ECU-ID ontvangen van de ECU-R",
+      "no_ecuid": "Geen ECU-ID ontvangen van de ECU",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {

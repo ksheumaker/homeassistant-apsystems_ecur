@@ -8,8 +8,8 @@ This integration queries the local ECU-R and ECU-B every 1 minute for new data. 
 This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1)
 
 ## Prerequisites
-You own an APSystems ECU-R or ECU-B and any combination of YC600, YC1000 or QS1/QS1A inverter.
-This component only works if the ECU-R or ECU-B is attached to your network by Wifi. To enable and configure WiFi on the ECU, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU's accesspoint by pressing the button on the side of the ECU. Then connect your phone's WiFi to the ECU's accesspoint to enable the ECUapp to connect and configure the ECU.
+You own an APSystems ECU-R or ECU-B and any combination of YC600, YC1000,DS3 or QS1/QS1A inverter.
+This component only works if the ECU-R or ECU-B is attached to your network by Wifi. To enable and configure WiFi on the ECU, use the ECUmanager app (downloadable via Appstore or Google Play) and temporarily enable the ECU's accesspoint by pressing the button on the side of the ECU. Then connect your phone's WiFi to the ECU's accesspoint to enable the ECUmanager app to connect and configure the ECU.
 Although there's no need to also attach the ECU-R by ethernet cable (for the ECU-B LAN ports are disabled), you are free to do so if you like.
 
 ## Release notes
@@ -108,5 +108,4 @@ A new device will be created for each inverter called `Inverter [UID]` where [UI
 
 ## TODO
 1. Code cleanup - it probably needs some work
-2. Add online status of individual inverters
-3. Improve ECU-R-PRO firmware compatibility
+2. Improve ECU-R-PRO firmware compatibility

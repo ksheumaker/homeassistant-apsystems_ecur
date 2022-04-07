@@ -5,6 +5,7 @@ import async_timeout
 
 from homeassistant.util import dt as dt_util
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
@@ -54,9 +55,9 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
             label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
             devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
         APSystemsECUSensor(coordinator, ecu, "qty_of_inverters", 
-            label="Inverters", icon=SOLAR_ICON, entity_category="diagnostic"),
+            label="Inverters", icon=SOLAR_ICON, entity_category=EntityCategory.DIAGNOSTIC),
         APSystemsECUSensor(coordinator, ecu, "qty_of_online_inverters", 
-            label="Inverters Online", icon=SOLAR_ICON, entity_category="diagnostic"),
+            label="Inverters Online", icon=SOLAR_ICON, entity_category=EntityCategory.DIAGNOSTIC),
     ]
 
     inverters = coordinator.data.get("inverters", {})
@@ -66,16 +67,16 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "temperature", label="Temperature", 
                     devclass=DEVICE_CLASS_TEMPERATURE, unit=TEMP_CELSIUS, 
-                    entity_category="diagnostic"),
+                    entity_category=EntityCategory.DIAGNOSTIC),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "frequency", label="Frequency", unit=FREQUENCY_HERTZ, 
-                    devclass=None, icon=FREQ_ICON, entity_category="diagnostic"),
+                    devclass=None, icon=FREQ_ICON, entity_category=EntityCategory.DIAGNOSTIC),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "voltage", label="Voltage", unit=ELECTRIC_POTENTIAL_VOLT, 
-                    devclass=DEVICE_CLASS_VOLTAGE, entity_category="diagnostic"),
+                    devclass=DEVICE_CLASS_VOLTAGE, entity_category=EntityCategory.DIAGNOSTIC),
                 APSystemsECUInverterSensor(coordinator, ecu, uid, 
                     "signal", label="Signal", unit=PERCENTAGE, 
-                    icon=SIGNAL_ICON, entity_category="diagnostic")
+                    icon=SIGNAL_ICON, entity_category=EntityCategory.DIAGNOSTIC)
 
         ])
         for i in range(0, inv_data.get("channel_qty", 0)):

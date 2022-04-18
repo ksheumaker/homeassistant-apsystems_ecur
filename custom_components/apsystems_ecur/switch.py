@@ -2,6 +2,7 @@ import logging
 
 from homeassistant.util import dt as dt_util
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity
 )
@@ -65,7 +66,7 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
 
     @property
     def entity_category(self):
-        return "config"
+        return EntityCategory.CONFIG
     
     @property
     def is_on(self):

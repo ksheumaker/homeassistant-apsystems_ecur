@@ -4,7 +4,7 @@ import logging
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
-
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
@@ -76,7 +76,7 @@ class APSystemsECUBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
     @property
     def entity_category(self):
-        return "diagnostic"
+        return EntityCategory.DIAGNOSTIC
 
     @property
     def device_info(self):

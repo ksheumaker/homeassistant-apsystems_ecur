@@ -125,13 +125,11 @@ class APSystemsSocket:
 
         _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
         sock = self.open_socket()
-        _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
 
+        
         cmd = self.ecu_query
         _LOGGER.debug(f"Sending ECU query to socket {cmd}")
         self.ecu_raw_data = self.send_read_from_socket(cmd)
-                
-        self.process_ecu_data()
 
         try:
             self.process_ecu_data()
@@ -140,16 +138,20 @@ class APSystemsSocket:
             raise
 
         if self.lifetime_energy == 0:
-            self.socket_close()
+            self.close_socket()
             error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
             self.add_error(error)
             raise APSystemsInvalidData(error)
 
         # Some ECUs likes the socket to be closed and re-opened between commands
+        self.close_socket()
+        self.open_socket()
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = self.send_read_from_socket(cmd)
 
         # Some ECUs likes the socket to be closed and re-opened between commands
+        self.close_socket()
+        self.open_socket()
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = self.send_read_from_socket(cmd)
 

@@ -105,8 +105,6 @@ class APSystemsSocket:
             return self.read_from_socket()
         except Exception as err:
             self.close_socket()
-            msg = "Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket."
-            self.add_error(msg)
             raise
 
     def close_socket(self):
@@ -124,7 +122,7 @@ class APSystemsSocket:
     def query_ecu(self):
 
         _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
-        sock = self.open_socket()
+        self.open_socket()
 
         
         cmd = self.ecu_query

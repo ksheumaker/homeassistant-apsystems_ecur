@@ -103,7 +103,7 @@ class APSystemsSocket:
         self.sock.sendall(cmd.encode('utf-8'))
         try:
             return self.read_from_socket()
-        except TimeoutError as err:
+        except Exception as err:
             self.close_socket()
             msg = "Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket."
             self.add_error(msg)

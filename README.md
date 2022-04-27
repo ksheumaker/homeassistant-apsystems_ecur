@@ -1,18 +1,24 @@
-# Home-Assistant APSystems ECU-R and ECU-B Integration
-This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) ECU-R and ECU-B solar Energy Communication Unit. With this component you are able to monitor your PV installation (inverters) in detail.
+# Home-Assistant APSystems ECU-R, ECU-B and ECU-C Integration
+This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
+Note for later ECU-R (SunSpec logo on the back) and ECU-C owners: there might still be a problem with compatibility issues that must be solved, read on for more important info on this!
 
 
 ## Background & acknowledgement
-This integration queries the local ECU-R and ECU-B every 1 minute for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array.
+This integration queries the ECU with a set interval for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array.
 
 This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1)
 
 ## Prerequisites
-You own an APSystems ECU-R or ECU-B and any combination of YC600, YC1000,DS3 or QS1/QS1A inverter.
-This component only works if the ECU-R or ECU-B is attached to your network by Wifi. To enable and configure WiFi on the ECU, use the ECUmanager app (downloadable via Appstore or Google Play) and temporarily enable the ECU's accesspoint by pressing the button on the side of the ECU. Then connect your phone's WiFi to the ECU's accesspoint to enable the ECUmanager app to connect and configure the ECU.
-Although there's no need to also attach the ECU-R by ethernet cable (for the ECU-B LAN ports are disabled), you are free to do so if you like.
+You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter.
+This component only works if the ECU is attached to your network by Wifi. To enable and configure WiFi on the ECU, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU's accesspoint by pressing the button on the side of the ECU. Then connect your phone's WiFi to the ECU's accesspoint to enable the ECUapp to connect and configure the ECU. Although there's no need to also attach the ECU by ethernet cable (for the ECU-B LAN ports are disabled), feel free to do so if you like but alway connect this integration to the ECU's WiFi enabled IP-Address.
 
 ## Release notes
+### v1.2.13
+* Corrected one flaw where the socket was left open when an exeption occured
+* Bug fix calling the function to capture an exception when returned data=b''
+
+### v1.2.12
+* Added better handling of the socket for ECU-R (later models with SunSpec logo on the back) and ECU-C
 
 ### v1.2.11
 * Remove async socket code and refactor some code to support the coming soon HTTP method for ECU_R_PRO (and possibly ECU-C).
@@ -61,32 +67,17 @@ v1.0.8 - fix HA version in hacs.json file
 Option 1:
 Easiest option, install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
 
-Option 2:
-Copy contents of the apsystems_ecur/ directory into your <HA-CONFIG>/custom_components/apsystems_ecur directory (```/config/custom_components``` on hassio)
-Your directory structure should look like this:
-```
-   config/custom_components/apsystems_ecur/__init__.py
-   config/custom_components/apsystems_ecur/APSystemsECUR.py
-   config/custom_components/apsystems_ecur/binary_sensor.py
-   config/custom_components/apsystems_ecur/const.py
-   config/custom_components/apsystems_ecur/manifest.json
-   config/custom_components/apsystems_ecur/sensor.py
-   config/custom_components/apsystems_ecur/services.yaml
-   ....
-```
 
 ## Configuration
-
-Go to the integrations screen and choose "Add Integration" search for APSystemsECU-R and provide the WIFI IP address, and update interval (60 seconds is the default).
-
+choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the WIFI IP-address from the ECU, and set the update interval (300 seconds is the default).
 _Warning_ the ECU device isn't the most powerful querying it more frequently could lead to stability issues with the ECU and require a power cycle.
 
-Although you can query the ECU 24/7, it is an option to stop the query after sunset (apsystems_ecur.stop_query) and only start the query again at sunrise (apsystems_ecur.start_query). You can do this by adding automations. 
+Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise. You can do this by adding automations and by triggering the ECU Query Device switch entity.  
 
-Reason for this are the maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. During this period the ECU port is closed which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable. Besides the log entries no harm is done if you query the ECU 24/7.
+Reason for this are the maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. During this period the ECU does not provide data which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable. Besides the log entries no harm is done if you query the ECU 24/7.
 
 ## Data available
-The component supports getting data from the array as a whole as well as each individual invertor.
+The component supports getting data from the PV array as a whole as well as each individual inverter.
 
 ### Array Level Sensors
 
@@ -108,4 +99,4 @@ A new device will be created for each inverter called `Inverter [UID]` where [UI
 
 ## TODO
 1. Code cleanup - it probably needs some work
-2. Improve ECU-R-PRO firmware compatibility
+2. Improve ECU-R-PRO firmware compatibility and ECU-C compatibility. If you can contribute in bugfixing/testing you're invited to help

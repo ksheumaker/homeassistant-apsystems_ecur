@@ -103,10 +103,8 @@ class APSystemsSocket:
         self.sock.sendall(cmd.encode('utf-8'))
         try:
             return self.read_from_socket()
-        except TimeoutError as err:
+        except Exception as err:
             self.close_socket()
-            msg = "Timeout after {self.timeout}s waiting or ECU data cmd={cmd.rstrip()}. Closing socket."
-            self.add_error(msg)
             raise
 
     def close_socket(self):
@@ -124,7 +122,7 @@ class APSystemsSocket:
     def query_ecu(self):
 
         _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
-        sock = self.open_socket()
+        self.open_socket()
 
         
         cmd = self.ecu_query
@@ -133,7 +131,7 @@ class APSystemsSocket:
 
         try:
             self.process_ecu_data()
-        except APSsystemsInvalidData as err:
+        except APSystemsInvalidData as err:
             self.close_socket()
             raise
 
@@ -214,7 +212,7 @@ class APSystemsSocket:
             checksum = int(data[5:9])
         except ValueError as err:
             debugdata = binascii.b2a_hex(data)
-            error = f"Error getting checksum int from '{cmd}' data={debugdata}"
+            error = f"could not extract checksum int from '{cmd}' data={debugdata}"
             self.add_error(error)
             raise APSystemsInvalidData(error)
 

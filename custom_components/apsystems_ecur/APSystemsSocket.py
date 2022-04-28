@@ -73,22 +73,16 @@ class APSystemsSocket:
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
         self.inverter_raw_signal = None
-
         self.read_buffer = b''
-
         self.reader = None
         self.writer = None
-
         self.socket = None
         self.socket_open = False
-
         self.errors = []
-
 
     def read_from_socket(self):
         self.read_buffer = b''
         end_data = None
-
         while end_data != self.recv_suffix:
             data = self.sock.recv(self.recv_size)
             if data == b'':
@@ -96,12 +90,11 @@ class APSystemsSocket:
             self.read_buffer += data
             size = len(self.read_buffer)
             end_data = self.read_buffer[size-4:]
-
         return self.read_buffer
 
     def send_read_from_socket(self, cmd):
-        self.sock.sendall(cmd.encode('utf-8'))
         try:
+            self.sock.sendall(cmd.encode('utf-8'))
             return self.read_from_socket()
         except Exception as err:
             self.close_socket()
@@ -114,27 +107,26 @@ class APSystemsSocket:
             self.socket_open = False
 
     def open_socket(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(self.timeout)
-        self.sock.connect((self.ipaddr, self.port))
-        self.socket_open = True
-    
-    def query_ecu(self):
+        self.socket_open = False
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.settimeout(self.timeout)
+            self.sock.connect((self.ipaddr, self.port))
+            self.socket_open = True
+        except Exception as err:
+            raise
 
+    def query_ecu(self):
         _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
         self.open_socket()
-
-        
         cmd = self.ecu_query
         _LOGGER.debug(f"Sending ECU query to socket {cmd}")
         self.ecu_raw_data = self.send_read_from_socket(cmd)
-
         try:
             self.process_ecu_data()
         except APSystemsInvalidData as err:
             self.close_socket()
             raise
-
         if self.lifetime_energy == 0:
             self.close_socket()
             error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
@@ -154,16 +146,13 @@ class APSystemsSocket:
         self.inverter_raw_signal = self.send_read_from_socket(cmd)
 
         self.close_socket()
-
         data = self.process_inverter_data()
-
         data["ecu_id"] = self.ecu_id
         data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
         data["qty_of_inverters"] = self.qty_of_inverters
         data["qty_of_online_inverters"] = self.qty_of_online_inverters
-
         return(data)
  
     def aps_int(self, codec, start):
@@ -242,9 +231,7 @@ class APSystemsSocket:
     def process_ecu_data(self, data=None):
         if not data:
             data = self.ecu_raw_data
-
         self.check_ecu_checksum(data, "ECU Query")
-
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
         self.qty_of_online_inverters = self.aps_int(data, 48)
@@ -258,39 +245,28 @@ class APSystemsSocket:
 
     def process_signal_data(self, data=None):
         signal_data = {}
-
         if not data:
             data = self.inverter_raw_signal
-
         self.check_ecu_checksum(data, "Signal Query")
-
         if not self.qty_of_inverters:
             return signal_data
-
         location = 15
         for i in range(0, self.qty_of_inverters):
             uid = self.aps_uid(data, location)
             location += 6
-
             strength = data[location]
             location += 1
-
             strength = int((strength / 255) * 100)
             signal_data[uid] = strength
-
         return signal_data
 
     def process_inverter_data(self, data=None):
         if not data:
             data = self.inverter_raw_data
-
         self.check_ecu_checksum(data, "Inverter data")
-
         output = {}
-
         timestamp = self.aps_timestamp(data, 19, 14)
         inverter_qty = self.aps_int(data, 17)
-
         self.last_update = timestamp
         output["timestamp"] = timestamp
         output["inverter_qty"] = inverter_qty
@@ -298,30 +274,21 @@ class APSystemsSocket:
 
         # this is the start of the loop of inverters
         location = self.inverter_byte_start
-
         signal = self.process_signal_data()
-
         inverters = {}
         for i in range(0, inverter_qty):
-
             inv={}
-
             inverter_uid = self.aps_uid(data, location)
             inv["uid"] = inverter_uid
             location += 6
-
             inv["online"] = self.aps_bool(data, location)
             location += 1
-
             inv["unknown"] = self.aps_str(data, location, 2)
             location += 2
-
             inv["frequency"] = self.aps_int(data, location) / 10
             location += 2
-
             inv["temperature"] = self.aps_int(data, location) - 100
             location += 2
-
             inv["signal"] = signal.get(inverter_uid, 0)
 
             # the first 3 digits determine the type of inverter
@@ -358,113 +325,85 @@ class APSystemsSocket:
 
         power = []
         voltages = []
-
         power.append(self.aps_int(data, location))
         location += 2
-
         voltages.append(self.aps_int(data, location))
         location += 2
-
         power.append(self.aps_int(data, location))
         location += 2
-        
         voltages.append(self.aps_int(data, location))
         location += 2
-
         power.append(self.aps_int(data, location))
         location += 2
-        
         voltages.append(self.aps_int(data, location))
         location += 2
-
         power.append(self.aps_int(data, location))
         location += 2
-
         output = {
             "model" : "YC1000",
             "channel_qty" : 4,
             "power" : power,
             "voltage" : voltages
         }
-
         return (output, location)
 
     
     def process_qs1(self, data, location):
-
         power = []
         voltages = []
-
         power.append(self.aps_int(data, location))
         location += 2
-
         voltage = self.aps_int(data, location)
         location += 2
-
         power.append(self.aps_int(data, location))
         location += 2
-
         power.append(self.aps_int(data, location))
         location += 2
-
         power.append(self.aps_int(data, location))
         location += 2
-
         voltages.append(voltage)
-
         output = {
             "model" : "QS1",
             "channel_qty" : 4,
             "power" : power,
             "voltage" : voltages
         }
-
         return (output, location)
-
 
     def process_yc600(self, data, location):
         power = []
         voltages = []
-
         for i in range(0, 2):
             power.append(self.aps_int(data, location))
             location += 2
-
             voltages.append(self.aps_int(data, location))
             location += 2
-
         output = {
             "model" : "YC600",
             "channel_qty" : 2,
             "power" : power,
             "voltage" : voltages,
         }
-
         return (output, location)
     
     def process_ds3(self, data, location):
         power = []
         voltages = []
-
         for i in range(0, 2):
             power.append(self.aps_int(data, location))
             location += 2
-
             voltages.append(self.aps_int(data, location))
             location += 2
-
         output = {
             "model" : "DS3",
             "channel_qty" : 2,
             "power" : power,
             "voltage" : voltages,
         }
-
         return (output, location)
 
     def add_error(self, error):
         timestamp = datetime.datetime.now()
-
         self.errors.append(f"[{timestamp}] {error}")
 
     def dump_data(self):
@@ -484,5 +423,3 @@ class APSystemsSocket:
             "errors" : self.errors,
             "inverters" : self.inverters
         }
-
-

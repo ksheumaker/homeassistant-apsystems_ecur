@@ -82,17 +82,13 @@ class APSystemsSocket:
 
     def read_from_socket(self):
         self.read_buffer = b''
-        end_data = None
-        while end_data != self.recv_suffix:
-            data = self.sock.recv(self.recv_size)
-            if data == b'':
-                break
-            self.read_buffer += data
-            size = len(self.read_buffer)
-            end_data = self.read_buffer[size-4:]
+        self.sock.settimeout(self.timeout)
+        while self.read_buffer.find(self.recv_suffix) == -1:
+            self.read_buffer += self.sock.recv(self.recv_size)
         return self.read_buffer
 
     def send_read_from_socket(self, cmd):
+        self.sock.settimeout(self.timeout)
         try:
             self.sock.sendall(cmd.encode('utf-8'))
             return self.read_from_socket()

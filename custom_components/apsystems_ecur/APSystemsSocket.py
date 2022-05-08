@@ -101,7 +101,7 @@ class APSystemsSocket:
             self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
             self.socket_open = False
-            time.sleep(socket_sleep_time)
+            time.sleep(self.socket_sleep_time)
 
     def open_socket(self):
         self.socket_open = False

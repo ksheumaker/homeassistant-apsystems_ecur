@@ -37,7 +37,7 @@ class APSystemsSocket:
         self.recv_size = 4096
 
         # how long to wait between socket open/closes
-        self.socket_sleep_time = 1.0
+        self.socket_sleep_time = 5
 
         # should we close and re-open the socket between each command
         self.reopen_socket = False
@@ -101,6 +101,7 @@ class APSystemsSocket:
             self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
             self.socket_open = False
+            time.sleep(socket_sleep_time)
 
     def open_socket(self):
         self.socket_open = False

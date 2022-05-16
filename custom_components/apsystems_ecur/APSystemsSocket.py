@@ -28,7 +28,7 @@ class APSystemsSocket:
         self.recv_suffix = b'END\n'
 
         # how long to wait on socket commands until we get our recv_suffix
-        self.timeout = 5
+        self.timeout = 10
 
         # how many times do we try the same command in a single update before failing
         self.cmd_attempts = 3
@@ -88,21 +88,30 @@ class APSystemsSocket:
         return self.read_buffer
 
     def send_read_from_socket(self, cmd):
-        self.sock.settimeout(self.timeout)
         try:
+            self.sock.settimeout(self.timeout)
+            self.errstring = "send data error"
             self.sock.sendall(cmd.encode('utf-8'))
+            self.errstring = "read data error"
+            time.sleep(self.socket_sleep_time)
             return self.read_from_socket()
         except Exception as err:
+            _LOGGER.warning (f"{self.errstring} at step: {self.step} with error: {err}")
             self.close_socket()
             raise
 
     def close_socket(self):
-        if self.socket_open:
-            self.sock.shutdown(socket.SHUT_RDWR)
-            self.sock.close()
-            self.socket_open = False
-            time.sleep(self.socket_sleep_time)
-
+        try:
+            if self.socket_open:
+                self.sock.shutdown(socket.SHUT_RDWR)
+                self.sock.settimeout(self.timeout)
+                data = self.sock.recv(self.recv_size) #flush incoming/outgoing data after shutdown request before actually closing the socket
+                self.sock.close()
+                self.socket_open = False
+        except Exception as err:
+            _LOGGER.warning (f"close socket error: {err} at step: {self.step}")
+            raise
+            
     def open_socket(self):
         self.socket_open = False
         try:
@@ -111,33 +120,38 @@ class APSystemsSocket:
             self.sock.connect((self.ipaddr, self.port))
             self.socket_open = True
         except Exception as err:
+            _LOGGER.warning (f"open socket error: {err} at step: {self.step}")
             raise
 
     def query_ecu(self):
-        _LOGGER.debug(f"Connecting to ECU on {self.ipaddr} {self.port}")
+        self.step = "Query ECU"
         self.open_socket()
         cmd = self.ecu_query
-        _LOGGER.debug(f"Sending ECU query to socket {cmd}")
         self.ecu_raw_data = self.send_read_from_socket(cmd)
         self.close_socket()
-        
         try:
             self.process_ecu_data()
         except APSystemsInvalidData as err:
+            _LOGGER.warning (" process ecu data error")
             raise
         if self.lifetime_energy == 0:
             error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
             self.add_error(error)
             raise APSystemsInvalidData(error)
 
+        # Some ECUs likes the socket to be closed and re-opened between commands
+        self.step = "Query Inverters"
         self.open_socket()
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = self.send_read_from_socket(cmd)
         self.close_socket()
-                
+        
+        # Some ECUs likes the socket to be closed and re-opened between commands
+        self.step = "Query Signal Strength"
         self.open_socket()
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = self.send_read_from_socket(cmd)
+
         self.close_socket()
 
         data = self.process_inverter_data()

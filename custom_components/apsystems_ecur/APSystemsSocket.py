@@ -45,7 +45,7 @@ class APSystemsSocket:
         self.qs1_ids = [ "802", "801", "804", "805", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
-        self.ds3_ids = [ "703", "704" ]
+        self.ds3_ids = [ "703", "704", "705" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix

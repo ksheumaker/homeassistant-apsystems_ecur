@@ -45,7 +45,7 @@ class APSystemsSocket:
         self.qs1_ids = [ "802", "801", "804", "805", "806" ]
         self.yc600_ids = [ "406", "407", "408", "409" ]
         self.yc1000_ids = [ "501", "502", "503", "504" ]
-        self.ds3_ids = [ "703", "704" ]
+        self.ds3_ids = [ "703", "704", "705", "706" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
@@ -90,13 +90,10 @@ class APSystemsSocket:
     def send_read_from_socket(self, cmd):
         try:
             self.sock.settimeout(self.timeout)
-            self.errstring = "send data error"
             self.sock.sendall(cmd.encode('utf-8'))
-            self.errstring = "read data error"
             time.sleep(self.socket_sleep_time)
             return self.read_from_socket()
         except Exception as err:
-            _LOGGER.warning (f"{self.errstring} at step: {self.step} with error: {err}")
             self.close_socket()
             raise
 
@@ -109,7 +106,6 @@ class APSystemsSocket:
                 self.sock.close()
                 self.socket_open = False
         except Exception as err:
-            _LOGGER.warning (f"close socket error: {err} at step: {self.step}")
             raise
             
     def open_socket(self):
@@ -120,11 +116,9 @@ class APSystemsSocket:
             self.sock.connect((self.ipaddr, self.port))
             self.socket_open = True
         except Exception as err:
-            _LOGGER.warning (f"open socket error: {err} at step: {self.step}")
             raise
 
     def query_ecu(self):
-        self.step = "Query ECU"
         self.open_socket()
         cmd = self.ecu_query
         self.ecu_raw_data = self.send_read_from_socket(cmd)
@@ -132,7 +126,6 @@ class APSystemsSocket:
         try:
             self.process_ecu_data()
         except APSystemsInvalidData as err:
-            _LOGGER.warning (" process ecu data error")
             raise
         if self.lifetime_energy == 0:
             error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
@@ -140,14 +133,12 @@ class APSystemsSocket:
             raise APSystemsInvalidData(error)
 
         # Some ECUs likes the socket to be closed and re-opened between commands
-        self.step = "Query Inverters"
         self.open_socket()
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = self.send_read_from_socket(cmd)
         self.close_socket()
         
         # Some ECUs likes the socket to be closed and re-opened between commands
-        self.step = "Query Signal Strength"
         self.open_socket()
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = self.send_read_from_socket(cmd)

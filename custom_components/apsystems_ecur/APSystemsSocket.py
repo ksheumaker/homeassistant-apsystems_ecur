@@ -42,10 +42,11 @@ class APSystemsSocket:
         # should we close and re-open the socket between each command
         self.reopen_socket = False
 
-        self.qs1_ids = [ "802", "801", "804", "805", "806" ]
-        self.yc600_ids = [ "406", "407", "408", "409" ]
-        self.yc1000_ids = [ "501", "502", "503", "504" ]
-        self.ds3_ids = [ "703", "704", "705", "706" ]
+        self.qs1_ids = [ "80" ]
+        self.yc600_ids = [ "40" ]
+        self.yc1000_ids = [ "50" ]
+        self.ds3_ids = [ "70" ]
+        self.all_ids = [ "40", "50", "70", "80" ]
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
@@ -278,6 +279,9 @@ class APSystemsSocket:
         for i in range(0, inverter_qty):
             inv={}
             inverter_uid = self.aps_uid(data, location)
+            if not inverter_uid[0:2] in self.all_ids:
+                break
+                
             inv["uid"] = inverter_uid
             location += 6
             inv["online"] = self.aps_bool(data, location)
@@ -290,8 +294,8 @@ class APSystemsSocket:
             location += 2
             inv["signal"] = signal.get(inverter_uid, 0)
 
-            # the first 3 digits determine the type of inverter
-            inverter_type = inverter_uid[0:3]
+            # the first 2 digits determine the type of inverter
+            inverter_type = inverter_uid[0:2]
             if inverter_type in self.yc600_ids:
                 (channel_data, location) = self.process_yc600(data, location)
                 inv.update(channel_data)    
@@ -308,10 +312,10 @@ class APSystemsSocket:
                 (channel_data, location) = self.process_ds3(data, location)
                 inv.update(channel_data)    
 
-            else:
-                error = f"Unsupported inverter type {inverter_type} please create GitHub issue."
-                self.add_error(error)
-                raise APSystemsInvalidData(error)
+            #else:
+            #    error = f"Unsupported inverter type {inverter_type} please create GitHub issue."
+            #    self.add_error(error)
+            #    raise APSystemsInvalidData(error)
 
             inverters[inverter_uid] = inv
 

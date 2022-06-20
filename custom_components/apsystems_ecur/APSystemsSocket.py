@@ -231,6 +231,7 @@ class APSystemsSocket:
     def process_ecu_data(self, data=None):
         if not data:
             data = self.ecu_raw_data
+        #_LOGGER.warning(binascii.b2a_hex(data))
         self.check_ecu_checksum(data, "ECU Query")
         self.ecu_id = self.aps_str(data, 13, 12)
         self.qty_of_inverters = self.aps_int(data, 46)
@@ -247,6 +248,7 @@ class APSystemsSocket:
         signal_data = {}
         if not data:
             data = self.inverter_raw_signal
+        #_LOGGER.warning(binascii.b2a_hex(data))
         self.check_ecu_checksum(data, "Signal Query")
         if not self.qty_of_inverters:
             return signal_data
@@ -263,6 +265,7 @@ class APSystemsSocket:
     def process_inverter_data(self, data=None):
         if not data:
             data = self.inverter_raw_data
+        #_LOGGER.warning(binascii.b2a_hex(data))
         self.check_ecu_checksum(data, "Inverter data")
         output = {}
         timestamp = self.aps_timestamp(data, 19, 14)

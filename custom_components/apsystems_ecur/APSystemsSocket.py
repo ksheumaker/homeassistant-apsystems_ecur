@@ -292,62 +292,59 @@ class APSystemsSocket:
                         istr = self.aps_str(data, cnt2 + 7, 2)
                         inv["signal"] = signal.get(inverter_uid, 0)
                         if istr == '01':
-                            if self.aps_short(data, cnt2 + 6) == 1:
-                                power = []
-                                voltages = []
-                                inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
-                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
-                                power.append(self.aps_int(data, cnt2 + 13))
-                                voltages.append(self.aps_int(data, cnt2 + 15))
-                                power.append(self.aps_int(data, cnt2 + 17))
-                                voltages.append(self.aps_int(data, cnt2 + 19))
-                                output = {
-                                "model" : "YC600/DS3",
-                                "channel_qty" : 2,
-                                "power" : power,
-                                "voltage" : voltages
-                                }
-                                inv.update(output)
+                            power = []
+                            voltages = []
+                            inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                            inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                            power.append(self.aps_int(data, cnt2 + 13))
+                            voltages.append(self.aps_int(data, cnt2 + 15))
+                            power.append(self.aps_int(data, cnt2 + 17))
+                            voltages.append(self.aps_int(data, cnt2 + 19))
+                            output = {
+                            "model" : "YC600/DS3",
+                            "channel_qty" : 2,
+                            "power" : power,
+                            "voltage" : voltages
+                            }
+                            inv.update(output)
                             cnt2 = cnt2 + 21
                         elif istr == '02':
-                            if self.aps_short(data, cnt2 + 6) == 1:
-                                power = []
-                                voltages = []
-                                inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
-                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
-                                power.append(self.aps_int(data, cnt2 + 13))
-                                voltages.append(self.aps_int(data, cnt2 + 15))
-                                power.append(self.aps_int(data, cnt2 + 17))
-                                voltages.append(self.aps_int(data, cnt2 + 19))
-                                power.append(self.aps_int(data, cnt2 + 21))
-                                voltages.append(self.aps_int(data, cnt2 + 23))
-                                power.append(self.aps_int(data, cnt2 + 25))
-                                output = {
-                                "model" : "YC1000",
-                                "channel_qty" : 4,
-                                "power" : power,
-                                "voltage" : voltages
-                                }
-                                inv.update(output)
+                            power = []
+                            voltages = []
+                            inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                            inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                            power.append(self.aps_int(data, cnt2 + 13))
+                            voltages.append(self.aps_int(data, cnt2 + 15))
+                            power.append(self.aps_int(data, cnt2 + 17))
+                            voltages.append(self.aps_int(data, cnt2 + 19))
+                            power.append(self.aps_int(data, cnt2 + 21))
+                            voltages.append(self.aps_int(data, cnt2 + 23))
+                            power.append(self.aps_int(data, cnt2 + 25))
+                            output = {
+                            "model" : "YC1000",
+                            "channel_qty" : 4,
+                            "power" : power,
+                            "voltage" : voltages
+                            }
+                            inv.update(output)
                             cnt2 = cnt2 + 27
                         elif istr == '03':
-                            if self.aps_short(data, cnt2 + 6) == 1:
-                                power = []
-                                voltages = []
-                                inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
-                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
-                                power.append(self.aps_int(data, cnt2 + 13))
-                                voltages.append(self.aps_int(data, cnt2 + 15))
-                                power.append(self.aps_int(data, cnt2 + 17))
-                                power.append(self.aps_int(data, cnt2 + 19))
-                                power.append(self.aps_int(data, cnt2 + 21))
-                                output = {
-                                "model" : "QS1",
-                                "channel_qty" : 4,
-                                "power" : power,
-                                "voltage" : voltages
-                                }
-                                inv.update(output)
+                            power = []
+                            voltages = []
+                            inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                            inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                            power.append(self.aps_int(data, cnt2 + 13))
+                            voltages.append(self.aps_int(data, cnt2 + 15))
+                            power.append(self.aps_int(data, cnt2 + 17))
+                            power.append(self.aps_int(data, cnt2 + 19))
+                            power.append(self.aps_int(data, cnt2 + 21))
+                            output = {
+                            "model" : "QS1",
+                            "channel_qty" : 4,
+                            "power" : power,
+                            "voltage" : voltages
+                            }
+                            inv.update(output)
                             cnt2 = cnt2 + 9
                         else:
                             cnt2 = cnt2 + 9

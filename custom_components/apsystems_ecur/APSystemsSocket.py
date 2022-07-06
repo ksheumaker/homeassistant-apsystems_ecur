@@ -263,69 +263,99 @@ class APSystemsSocket:
         return signal_data
 
     def process_inverter_data(self, data=None):
-        if not data:
-            data = self.inverter_raw_data
-        #_LOGGER.warning(binascii.b2a_hex(data))
-        self.check_ecu_checksum(data, "Inverter data")
+
         output = {}
-        timestamp = self.aps_timestamp(data, 19, 14)
-        inverter_qty = self.aps_int(data, 17)
-        self.last_update = timestamp
-        output["timestamp"] = timestamp
-        output["inverter_qty"] = inverter_qty
-        output["inverters"] = {}
-
-        # this is the start of the loop of inverters
-        location = self.inverter_byte_start
-        signal = self.process_signal_data()
-        inverters = {}
-        for i in range(0, inverter_qty):
-            inv={}
-            inverter_uid = self.aps_uid(data, location)
-            if not inverter_uid[0:2] in self.all_ids:
-                break
+        
+        if self.inverter_raw_data != '' and (self.aps_str(self.inverter_raw_data,9,4)) == '0002':
+            data = self.inverter_raw_data
+            #_LOGGER.warning(binascii.b2a_hex(data)) # for debug purposes only. Uncomment only the first # at the beginning
+            self.check_ecu_checksum(data, "Inverter data")
+            istr = ''
+            cnt1 = 0
+            cnt2 = 26
+            if self.aps_str(data, 14, 2) == '00':
+                timestamp = self.aps_timestamp(data, 19, 14)
+                inverter_qty = self.aps_int(data, 17) 
+                self.last_update = timestamp
+                output["timestamp"] = timestamp
+                output["inverter_qty"] = inverter_qty
+                output["inverters"] = {}
+                signal = self.process_signal_data()
+                inverters = {}
                 
-            inv["uid"] = inverter_uid
-            location += 6
-            inv["online"] = self.aps_bool(data, location)
-            location += 1
-            inv["unknown"] = self.aps_str(data, location, 2)
-            location += 2
-            inv["frequency"] = self.aps_int(data, location) / 10
-            location += 2
-            inv["temperature"] = self.aps_int(data, location) - 100
-            location += 2
-            inv["signal"] = signal.get(inverter_uid, 0)
-
-            # the first 2 digits determine the type of inverter
-            inverter_type = inverter_uid[0:2]
-            if inverter_type in self.yc600_ids:
-                (channel_data, location) = self.process_yc600(data, location)
-                inv.update(channel_data)    
-
-            elif inverter_type in self.qs1_ids:
-                (channel_data, location) = self.process_qs1(data, location)
-                inv.update(channel_data)
-            
-            elif inverter_type in self.yc1000_ids:
-                (channel_data, location) = self.process_yc1000(data, location)
-                inv.update(channel_data)
-                
-            elif inverter_type in self.ds3_ids:
-                (channel_data, location) = self.process_ds3(data, location)
-                inv.update(channel_data)    
-
-            #else:
-            #    error = f"Unsupported inverter type {inverter_type} please create GitHub issue."
-            #    self.add_error(error)
-            #    raise APSystemsInvalidData(error)
-
-            inverters[inverter_uid] = inv
-
-        self.inverters = inverters
-
-        output["inverters"] = inverters
-        return (output)
+                while cnt1 < inverter_qty:
+                    inv={}
+                    if self.aps_str(data, 15, 2) == '01':
+                        inverter_uid = self.aps_uid(data, cnt2)
+                        inv["uid"] = inverter_uid
+                        inv["online"] = self.aps_bool(data, cnt2 + 6)
+                        istr = self.aps_str(data, cnt2 + 7, 2)
+                        inv["signal"] = signal.get(inverter_uid, 0)
+                        if istr == '01':
+                            if self.aps_short(data, cnt2 + 6) == 1:
+                                power = []
+                                voltages = []
+                                inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                                power.append(self.aps_int(data, cnt2 + 13))
+                                voltages.append(self.aps_int(data, cnt2 + 15))
+                                power.append(self.aps_int(data, cnt2 + 17))
+                                voltages.append(self.aps_int(data, cnt2 + 19))
+                                output = {
+                                "model" : "YC600/DS3",
+                                "channel_qty" : 2,
+                                "power" : power,
+                                "voltage" : voltages
+                                }
+                                inv.update(output)
+                            cnt2 = cnt2 + 21
+                        elif istr == '02':
+                            if self.aps_short(data, cnt2 + 6) == 1:
+                                power = []
+                                voltages = []
+                                inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                                power.append(self.aps_int(data, cnt2 + 13))
+                                voltages.append(self.aps_int(data, cnt2 + 15))
+                                power.append(self.aps_int(data, cnt2 + 17))
+                                voltages.append(self.aps_int(data, cnt2 + 19))
+                                power.append(self.aps_int(data, cnt2 + 21))
+                                voltages.append(self.aps_int(data, cnt2 + 23))
+                                power.append(self.aps_int(data, cnt2 + 25))
+                                output = {
+                                "model" : "YC1000",
+                                "channel_qty" : 4,
+                                "power" : power,
+                                "voltage" : voltages
+                                }
+                                inv.update(output)
+                            cnt2 = cnt2 + 27
+                        elif istr == '03':
+                            if self.aps_short(data, cnt2 + 6) == 1:
+                                power = []
+                                voltages = []
+                                inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                                power.append(self.aps_int(data, cnt2 + 13))
+                                voltages.append(self.aps_int(data, cnt2 + 15))
+                                power.append(self.aps_int(data, cnt2 + 17))
+                                power.append(self.aps_int(data, cnt2 + 19))
+                                power.append(self.aps_int(data, cnt2 + 21))
+                                output = {
+                                "model" : "QS1",
+                                "channel_qty" : 4,
+                                "power" : power,
+                                "voltage" : voltages
+                                }
+                                inv.update(output)
+                            cnt2 = cnt2 + 9
+                        else:
+                            cnt2 = cnt2 + 9
+                        inverters[inverter_uid] = inv
+                    cnt1 = cnt1 + 1
+                self.inverters = inverters
+                output["inverters"] = inverters
+                return (output)
     
     def process_yc1000(self, data, location):
 

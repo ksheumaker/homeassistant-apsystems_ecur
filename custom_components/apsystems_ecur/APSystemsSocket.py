@@ -229,38 +229,44 @@ class APSystemsSocket:
         return True
 
     def process_ecu_data(self, data=None):
-        if not data:
+        if self.ecu_raw_data != '' and (self.aps_str(self.ecu_raw_data,9,4)) == '0001':
             data = self.ecu_raw_data
-        #_LOGGER.warning(binascii.b2a_hex(data))
-        self.check_ecu_checksum(data, "ECU Query")
-        self.ecu_id = self.aps_str(data, 13, 12)
-        self.qty_of_inverters = self.aps_int(data, 46)
-        self.qty_of_online_inverters = self.aps_int(data, 48)
-        self.vsl = int(self.aps_str(data, 52, 3))
-        self.firmware = self.aps_str(data, 55, self.vsl)
-        self.tsl = int(self.aps_str(data, 55 + self.vsl, 3))
-        self.timezone = self.aps_str(data, 58 + self.vsl, self.tsl)
-        self.lifetime_energy = self.aps_double(data, 27) / 10
-        self.today_energy = self.aps_double(data, 35) / 100
-        self.current_power = self.aps_double(data, 31)
+            #_LOGGER.warning(binascii.b2a_hex(data))  # for debug purposes only. Uncomment only the first # at the beginning
+            self.check_ecu_checksum(data, "ECU Query")
+            self.ecu_id = self.aps_str(data, 13, 12)
+            self.lifetime_energy = self.aps_double(data, 27) / 10
+            self.current_power = self.aps_double(data, 31)
+            self.today_energy = self.aps_double(data, 35) / 100
+            if self.aps_str(data,25,2) == "01":
+                self.qty_of_inverters = self.aps_int(data, 46)
+                self.qty_of_online_inverters = self.aps_int(data, 48)
+                self.vsl = int(self.aps_str(data, 52, 3))
+                self.firmware = self.aps_str(data, 55, self.vsl)
+                self.tsl = int(self.aps_str(data, 55 + self.vsl, 3))
+                self.timezone = self.aps_str(data, 58 + self.vsl, self.tsl)
+            elif self.aps_str(data,25,2) == "02":
+                self.qty_of_inverters = self.aps_int(data, 39)
+                self.qty_of_online_inverters = self.aps_int(data, 41)
+                self.vsl = int(self.aps_str(data, 49, 3))
+                self.firmware = self.aps_str(data, 52, self.vsl)
 
     def process_signal_data(self, data=None):
         signal_data = {}
-        if not data:
+        if self.inverter_raw_signal != '' and (self.aps_str(self.inverter_raw_signal,9,4)) == '0030':
             data = self.inverter_raw_signal
-        #_LOGGER.warning(binascii.b2a_hex(data))
-        self.check_ecu_checksum(data, "Signal Query")
-        if not self.qty_of_inverters:
+            #_LOGGER.warning(binascii.b2a_hex(data)) # for debug purposes only. Uncomment only the first # at the beginning
+            self.check_ecu_checksum(data, "Signal Query")
+            if not self.qty_of_inverters:
+                return signal_data
+            location = 15
+            for i in range(0, self.qty_of_inverters):
+                uid = self.aps_uid(data, location)
+                location += 6
+                strength = data[location]
+                location += 1
+                strength = int((strength / 255) * 100)
+                signal_data[uid] = strength
             return signal_data
-        location = 15
-        for i in range(0, self.qty_of_inverters):
-            uid = self.aps_uid(data, location)
-            location += 6
-            strength = data[location]
-            location += 1
-            strength = int((strength / 255) * 100)
-            signal_data[uid] = strength
-        return signal_data
 
     def process_inverter_data(self, data=None):
 

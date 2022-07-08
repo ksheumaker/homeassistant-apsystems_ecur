@@ -269,9 +269,7 @@ class APSystemsSocket:
             return signal_data
 
     def process_inverter_data(self, data=None):
-
         output = {}
-        
         if self.inverter_raw_data != '' and (self.aps_str(self.inverter_raw_data,9,4)) == '0002':
             data = self.inverter_raw_data
             #_LOGGER.warning(binascii.b2a_hex(data)) # for debug purposes only. Uncomment only the first # at the beginning
@@ -359,106 +357,7 @@ class APSystemsSocket:
                 self.inverters = inverters
                 output["inverters"] = inverters
                 return (output)
-    
-    def process_yc1000(self, data, location):
-
-        power = []
-        voltages = []
-        power.append(self.aps_int(data, location))
-        location += 2
-        voltages.append(self.aps_int(data, location))
-        location += 2
-        power.append(self.aps_int(data, location))
-        location += 2
-        voltages.append(self.aps_int(data, location))
-        location += 2
-        power.append(self.aps_int(data, location))
-        location += 2
-        voltages.append(self.aps_int(data, location))
-        location += 2
-        power.append(self.aps_int(data, location))
-        location += 2
-        output = {
-            "model" : "YC1000",
-            "channel_qty" : 4,
-            "power" : power,
-            "voltage" : voltages
-        }
-        return (output, location)
-
-    
-    def process_qs1(self, data, location):
-        power = []
-        voltages = []
-        power.append(self.aps_int(data, location))
-        location += 2
-        voltage = self.aps_int(data, location)
-        location += 2
-        power.append(self.aps_int(data, location))
-        location += 2
-        power.append(self.aps_int(data, location))
-        location += 2
-        power.append(self.aps_int(data, location))
-        location += 2
-        voltages.append(voltage)
-        output = {
-            "model" : "QS1",
-            "channel_qty" : 4,
-            "power" : power,
-            "voltage" : voltages
-        }
-        return (output, location)
-
-    def process_yc600(self, data, location):
-        power = []
-        voltages = []
-        for i in range(0, 2):
-            power.append(self.aps_int(data, location))
-            location += 2
-            voltages.append(self.aps_int(data, location))
-            location += 2
-        output = {
-            "model" : "YC600",
-            "channel_qty" : 2,
-            "power" : power,
-            "voltage" : voltages,
-        }
-        return (output, location)
-    
-    def process_ds3(self, data, location):
-        power = []
-        voltages = []
-        for i in range(0, 2):
-            power.append(self.aps_int(data, location))
-            location += 2
-            voltages.append(self.aps_int(data, location))
-            location += 2
-        output = {
-            "model" : "DS3",
-            "channel_qty" : 2,
-            "power" : power,
-            "voltage" : voltages,
-        }
-        return (output, location)
 
     def add_error(self, error):
         timestamp = datetime.datetime.now()
         self.errors.append(f"[{timestamp}] {error}")
-
-    def dump_data(self):
-        return {
-            "ecu_id" : self.ecu_id,
-            "qty_of_inverters" : self.qty_of_inverters,
-            "qty_of_online_inverters" : self.qty_of_online_inverters,
-            "lifetime_energy" : self.lifetime_energy,
-            "current_power" : self.current_power,
-            "today_energy" : self.today_energy,
-            "firmware" : self.firmware,
-            "timezone" : self.timezone,
-            "lastupdate" : self.last_update,
-            "ecu_raw_data" : str(binascii.b2a_hex(self.ecu_raw_data)),
-            "inverter_raw_data" : str(binascii.b2a_hex(self.inverter_raw_data)),
-            "inverter_raw_signal" : str(binascii.b2a_hex(self.inverter_raw_signal)),
-            "errors" : self.errors,
-            "inverters" : self.inverters
-        }

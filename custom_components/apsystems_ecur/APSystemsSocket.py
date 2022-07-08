@@ -30,34 +30,19 @@ class APSystemsSocket:
         # how long to wait on socket commands until we get our recv_suffix
         self.timeout = 10
 
-        # how many times do we try the same command in a single update before failing
-        self.cmd_attempts = 3
-
         # how big of a buffer to read at a time from the socket
         self.recv_size = 4096
 
         # how long to wait between socket open/closes
         self.socket_sleep_time = 5
 
-        # should we close and re-open the socket between each command
-        self.reopen_socket = False
-
-        self.qs1_ids = [ "80" ]
-        self.yc600_ids = [ "40" ]
-        self.yc1000_ids = [ "50" ]
-        self.ds3_ids = [ "70" ]
-        self.all_ids = [ "40", "50", "70", "80" ]
-
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
         self.inverter_query_prefix = "APS1100280002"
         self.inverter_query_suffix = self.cmd_suffix
-
         self.inverter_signal_prefix = "APS1100280030"
         self.inverter_signal_suffix = self.cmd_suffix
-
         self.inverter_byte_start = 26
-
         self.ecu_id = None
         self.qty_of_inverters = 0
         self.qty_of_online_inverters = 0
@@ -70,7 +55,6 @@ class APSystemsSocket:
         self.last_update = None
         self.vsl = 0
         self.tsl = 0
-
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
         self.inverter_raw_signal = None

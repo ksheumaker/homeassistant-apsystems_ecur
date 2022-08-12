@@ -4,9 +4,10 @@
       "user": {
         "data": {
           "host": "ECU IP-adres (moet het WiFi IP-adres zijn voor ECU-R eigenaren)",
-          "query_method" : "Selecteer een methode om de ECU uit te lezen. ECU_R en ECU_B type kies socket, ECU_R_PRO and ECU_C typen kies http",
-          "scan_interval" : "Uitvraag minimaal 60 sec. kleinere interval niet aanbevolen"
-        }
+          "query_method" : "Welke methode voor de ECU uitvraag. ECU_R moet socket zijn, ECU_R_PRO en ECU_C gebruik http",
+          "scan_interval" : "Uitvraag interval. Minimaal 300 sec. kleinere interval niet aanbevolen"
+        },
+        "title": "APsystems ECU Configuratie"
       }
     },
     "error": {
@@ -18,6 +19,17 @@
     "abort": {
       "Reeds geconfigureerd": "[%key:common::config_flow::abort::already_configured_device%]"
     }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "ECU IP adres (moet het WiFi IP-adres zijn voor de ECU-R eigenaren)",
+          "query_method" : "Welke methode voor de ECU uitvraag. ECU_R moet socket zijn, ECU_R_PRO en ECU_C gebruik http",
+          "scan_interval" : "Uitvraag interval. Minimaal 300 sec. kleinere interval niet aanbevolen"
+        },
+        "title": "APsystems ECU Opties"
+      }
+    }
   }
 }
-

@@ -283,7 +283,9 @@ class APSystemsSocket:
                             power = []
                             voltages = []
                             inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
-                            inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                            inv["temperature"]=0
+                            if inv["online"]:
+                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
                             power.append(self.aps_int(data, cnt2 + 13))
                             voltages.append(self.aps_int(data, cnt2 + 15))
                             power.append(self.aps_int(data, cnt2 + 17))
@@ -300,7 +302,9 @@ class APSystemsSocket:
                             power = []
                             voltages = []
                             inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
-                            inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                            inv["temperature"]=0
+                            if inv["online"]:
+                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
                             power.append(self.aps_int(data, cnt2 + 13))
                             voltages.append(self.aps_int(data, cnt2 + 15))
                             power.append(self.aps_int(data, cnt2 + 17))
@@ -320,7 +324,9 @@ class APSystemsSocket:
                             power = []
                             voltages = []
                             inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
-                            inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
+                            inv["temperature"]=0
+                            if inv["online"]:
+                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
                             power.append(self.aps_int(data, cnt2 + 13))
                             voltages.append(self.aps_int(data, cnt2 + 15))
                             power.append(self.aps_int(data, cnt2 + 17))

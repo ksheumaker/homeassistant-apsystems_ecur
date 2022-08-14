@@ -1,6 +1,6 @@
-# Home-Assistant APSystems ECU-R (non SunSpec) and ECU-B Integration
+# Home-Assistant APsystems ECU-R and ECU-B Integration
 This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
-Note: For later ECU-R models (SunSpec logo on the back) and ECU-C owners this integration is not suitable resulting in ECU outage over time!
+Note: For later ECU-R models (SunSpec logo on the back and ECU-ID starting with 2162xxxxxx) and ECU-C owners this integration is not suitable resulting in ECU outage over time!
 
 
 ## Background & acknowledgement

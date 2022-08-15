@@ -276,7 +276,7 @@ class APSystemsSocket:
                     if self.aps_str(data, 15, 2) == '01':
                         inverter_uid = self.aps_uid(data, cnt2)
                         inv["uid"] = inverter_uid
-                        inv["online"] = self.aps_bool(data, cnt2 + 6)
+                        inv["online"] = bool(self.aps_short(data, cnt2 + 6))
                         istr = self.aps_str(data, cnt2 + 7, 2)
                         inv["signal"] = signal.get(inverter_uid, 0)
                         if istr == '01':

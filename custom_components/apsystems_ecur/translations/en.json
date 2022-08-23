@@ -5,8 +5,9 @@
         "data": {
           "host": "ECU IP address (must be wifi for ECU-R)",
           "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
-          "scan_interval" : "Query every X seconds, ECU only updates data every 300 seconds, choosing shorter interval not recommended."
-        }
+          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)"
+        },
+        "title": "APsystems ECU Config"
       }
     },
     "error": {
@@ -17,6 +18,18 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "options": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "ECU IP address (must be wifi for ECU-R)",
+          "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
+          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)"
+        },
+        "title": "APsystems ECU Options"
+      }
     }
   }
 }

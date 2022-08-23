@@ -1,6 +1,7 @@
-# Home-Assistant APSystems ECU-R, ECU-B and ECU-C Integration
+# Home-Assistant APsystems ECU-R and ECU-B Integration
 This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
-Note for later ECU-R (SunSpec logo on the back) and ECU-C owners: there might still be a problem with compatibility issues that must be solved, read on for more important info on this!
+
+Note: For later ECU-R models (SunSpec logo on the back and ECU-ID starting with 2162xxxxxx) and ECU-C owners this integration is not suitable resulting in ECU outage over time!
 
 
 ## Background & acknowledgement
@@ -64,9 +65,7 @@ v1.0.8 - fix HA version in hacs.json file
 ```
 
 ## Setup
-Option 1:
-Easiest option, install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
-
+Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
 
 ## Configuration
 choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the WIFI IP-address from the ECU, and set the update interval (300 seconds is the default).

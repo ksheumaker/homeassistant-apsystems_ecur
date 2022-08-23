@@ -336,7 +336,7 @@ class APSystemsSocket:
                             "voltage" : voltages
                             }
                             inv.update(output)
-                            cnt2 = cnt2 + 9
+                            cnt2 = cnt2 + 23
                         else:
                             cnt2 = cnt2 + 9
                         inverters[inverter_uid] = inv

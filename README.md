@@ -13,6 +13,9 @@ This couldn't have been done without the hardwork of @checking12 and @HAEdwin on
 You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter.
 This component only works if the ECU is attached to your network by Wifi. To enable and configure WiFi on the ECU, use the ECUapp (downloadable via Appstore or Google Play) and temporarily enable the ECU's accesspoint by pressing the button on the side of the ECU. Then connect your phone's WiFi to the ECU's accesspoint to enable the ECUapp to connect and configure the ECU. Although there's no need to also attach the ECU by ethernet cable (for the ECU-B LAN ports are disabled), feel free to do so if you like but alway connect this integration to the ECU's WiFi enabled IP-Address.
 
+## Beta program
+If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
+
 ## Release notes
 ### v1.2.15 (beta)
 * Bugfixed inverter jump for QS1 inverters

@@ -17,62 +17,7 @@ This component only works if the ECU is attached to your network by Wifi. To ena
 If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
 
 ## Release notes
-### v1.2.15 (beta)
-* Bugfixed inverter jump for QS1 inverters
-
-### v1.2.14 (beta)
-* Removed the need for adding different inverter types
-* Added support for reconfiguration after installation
-
-### v1.2.13
-* Corrected one flaw where the socket was left open when an exeption occured
-* Bug fix calling the function to capture an exception when returned data=b''
-
-### v1.2.12
-* Added better handling of the socket for ECU-R (later models with SunSpec logo on the back) and ECU-C
-
-### v1.2.11
-* Remove async socket code and refactor some code to support the coming soon HTTP method for ECU_R_PRO (and possibly ECU-C).
-* Removed the multiple retries if we get bad data from the ECU, just use cache, and hope next iteration is fine in attempt to provide more stability to the ECU
-
-### v1.2.9 (beta)
-* Remove async socket code from APSystemsECUR revert to using standard socket calls and using homeassistant's `async_add_executor_job` functionality
-* Add QS1 type 805
-
-### v1.2.2 (beta)
-* Fix some other issues in error handling and caching
-
-### v1.2.0 (beta)
-New features
-* Remove `apsystems_ecur.start_query` and `apsystems_ecu.end_query` service, now there is a switch on the ECU called `switch.ecu_query_device` if the switch is on, will query the device, if off it will read from cache.  Can be used with an automation to turn on/off querying when the sun has set or risen
-* Add support for the download diagnostics button the on the devices - hopefully will help debugging when there are problems
-* Add 2 additional sensors `sensor.ecu_inverters` and `sensor.ecu_inverters_online` to show you how man inverters have been configured in your ECU and how many are currently reporting data
-
-Bug fixes
-* Change code to always close socket between commands to ECU (before this was only done on the ECU-C and ECU_R_PRO)
-* Change the socket code to be a little more simplified and hopefully work better
-* Add more exception handling and detect error conditions
-
-### v1.1.2
-Make ECU-C devices behave like ECU_R_PRO devices and close the socket down between each query.  Add support for new ds3 inverter type 704
-
-### v1.1.1
-Added support to setup the integration in the new config flow GUI.  Fixed a caching issue when the ECU is down on startup leading to creation of sensor entries.  Once you install this update all configuration is done via the GUI.
-
-### Old release notes
-```
-v1.0.0 First release
-v1.0.1 Revised the readme, added support for YC1000 and added versioning to the manifest
-v1.0.2 Added support for QS1A
-v1.0.3 Added support for 2021.8.0 (including energy panel), fixed some issues with ECU_R_PRO
-v1.0.4 Added optional scan_interval to config
-v1.0.5 Fixed energy dashboard and added HACS setup option description in readme.md
-v1.0.6 Replaces deprecated device_state_attributes, added ECU-B compatibility
-2022.1.0 Improved configuration notes, applied CalVer, cleanup code, improvements on ECU data
-2022.1.0 - [update] Attempt to fix issues with ECU_R_PRO, detect 0 from lifetime energy to prevent issues in energy dashboard
-v1.0.7 - provide stateclass for current_power and today_energy and start git tagging version number
-v1.0.8 - fix HA version in hacs.json file
-```
+Release notes and details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
 
 ## Setup
 Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.

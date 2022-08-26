@@ -30,10 +30,8 @@ Although you can query the ECU 24/7, it is an option to stop the query after sun
 
 Reason for this are the maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. During this period the ECU does not provide data which results in error messages in the log if the integration tries to query for data. During maintenance, the ECU is checking whether all data to the EMA website has been updated, clearing cached data and the ECU is looking for software updates, updating the ECU firmware when applicable. Besides the log entries no harm is done if you query the ECU 24/7.
 
-## Data available
-The component supports getting data from the PV array as a whole as well as each individual inverter.
-
-### Exposed devices and entities
+## Data exposed devices and entities
+The integration supports getting data from the PV array as a whole as well as each individual inverter in detail.
 ECU and inverters will be exposed in Home Assistant. As a result the following sensors and switch can be used.
 
 ### ECU Sensors

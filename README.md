@@ -1,7 +1,7 @@
 # Home-Assistant APsystems ECU-R and ECU-B Integration
 This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
 
-Note: For later ECU-R models (SunSpec logo on the back and ECU-ID starting with 2162xxxxxx) and ECU-C owners this integration is not suitable resulting in ECU outage over time!
+Note: For later ECU-R models (SunSpec logo/ECU-ID starting with 2162xxxxxx) and ECU-C owners this integration is not suitable resulting in ECU outage over time!
 
 
 ## Background & acknowledgement
@@ -17,7 +17,7 @@ This component only works if the ECU is attached to your network by Wifi. To ena
 If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
 
 ## Release notes
-Release notes and details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
+Release notes, assets and further details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
 
 ## Setup
 Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
@@ -33,24 +33,27 @@ Reason for this are the maintenance tasks that take place on the ECU around 02.4
 ## Data available
 The component supports getting data from the PV array as a whole as well as each individual inverter.
 
-### Array Level Sensors
+### Exposed devices and entities
+ECU and inverters will be exposed in Home Assistant. As a result the following sensors and switch can be used.
 
-These sensors will show up under an `ECU [ID]` device, where [ID] is the unique ID of your ECU
-
+### ECU Sensors
 * sensor.ecu_current_power - total amount of power (in W) being generated right now
+* sensor.ecu_inverters - total number of configured inverters in the ECU
+* sensor.ecu_inverters_online - total number of configured online inverters in the ECU 
 * sensor.ecu_today_energy - total amount of energy (in kWh) generated today now
 * sensor.ecu_lifetime_energy - total amount of energy (in kWh) generated from the lifetime of the array
 
-### Inverter Level Sensors
-
-A new device will be created for each inverter called `Inverter [UID]` where [UID] is the unique ID of the Inverter
-
+### Inverter Level Sensors (Array)
+A new device will be created for each inverter called `Inverter_[UID]` where [UID] is the unique ID of the Inverter
 * sensor.inverter_[UID]_frequency - the AC power frequency in Hz
 * sensor.inverter_[UID]_voltage - the AC voltage in V
 * sensor.inverter_[UID]_temperature - the temperature of the invertor in your local unit (C or F)
 * sensor.inverter_[UID]_signal - the signal strength of the zigbee connection
 * sensor.inverter_[UID]_power_ch_[1-4] - the current power generation (in W) of each channel of the invertor - number of channels will depend on inverter model
+* binary_sensor.ecu_using_cached_data - indicates the usage of cached data
+
+### Switch
+* switch.ecu_query_device - switch will turn off in the sixth step using cached data
 
 ## TODO
-1. Code cleanup - it probably needs some work
-2. Improve ECU-R-PRO firmware compatibility and ECU-C compatibility. If you can contribute in bugfixing/testing you're invited to help
+Code cleanup - it probably needs some work

@@ -91,9 +91,6 @@ class ECUR():
                 data = self.use_cached_data(msg)
 
         except APSystemsInvalidData as err:
-
-            msg = f"Using cached data from last successful communication from ECU. Error: {err}"
-            _LOGGER.warning(msg)
             data = self.use_cached_data(msg)
 
         except Exception as err:

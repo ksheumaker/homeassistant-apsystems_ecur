@@ -96,8 +96,8 @@ class ECUR():
             data = self.use_cached_data(msg)
 
         except Exception as err:
-            if err != 'timed out':
-                msg = f"Using cached data from last successful communication from ECU. Exception error: {err}"
+            msg = f"Using cached data from last successful communication from ECU. Exception error: {err}"
+            if err.args[0] != 'timed out':
                 _LOGGER.warning(msg)
             data = self.use_cached_data(msg)
 

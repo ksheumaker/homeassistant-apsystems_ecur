@@ -20,7 +20,7 @@ If you're having trouble with the integration, consider joining the beta program
 Release notes, assets and further details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
 
 ## Setup
-Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. After installing, restart Home Assistant.
+Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. After installing, restart Home Assistant by going to Settings > System and select [restart] in the upper right corner.
 
 ## Configuration
 choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the WIFI IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).

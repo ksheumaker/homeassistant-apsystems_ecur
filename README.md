@@ -20,11 +20,11 @@ If you're having trouble with the integration, consider joining the beta program
 Release notes, assets and further details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
 
 ## Setup
-Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration.
+Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. After installing, restart Home Assistant.
 
 ## Configuration
-choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the WIFI IP-address from the ECU, and set the update interval (300 seconds is the recommended default).
-_Warning_ the ECU device isn't the most powerful querying it more frequently could lead to stability issues with the ECU and require a power cycle. It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often.
+choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the WIFI IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
+_It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often_
 
 Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise. You can do this by adding automations and by triggering the ECU Query Device switch entity.  
 

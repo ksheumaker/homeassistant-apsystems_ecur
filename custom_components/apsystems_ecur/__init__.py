@@ -34,7 +34,6 @@ class ECUR():
         self.cache_max = 5
         self.data_from_cache = False
         self.querying = True
-        self.error_messge = ""
         self.cached_data = {}
 
     def stop_query(self):
@@ -49,9 +48,10 @@ class ECUR():
         self.cache_count += 1
         self.data_from_cache = True
 
-        if self.cache_count > self.cache_max:
-            raise UpdateFailed(f"Error using cached data more than {self.cache_max} times. See log, and try power cycling the ECU.")
-
+        if self.cache_count == self.cache_max:
+            _LOGGER.warning(f"Communication with the ECU fails after {self.cache_max} repeated attempts. Try power cycling or reset the ECU. Querying is stopped automatically.")
+            self.querying = False
+            
         if self.cached_data.get("ecu_id", None) == None:
             _LOGGER.debug(f"Cached data {self.cached_data}")
             raise UpdateFailed(f"Unable to get correct data from ECU, and no cached data. See log for details, and try power cycling the ECU.")
@@ -92,12 +92,13 @@ class ECUR():
 
         except APSystemsInvalidData as err:
             msg = f"Using cached data from last successful communication from ECU. Invalid data error: {err}"
-            _LOGGER.warning(msg)
+            if str(err) != 'timed out':
+                _LOGGER.warning(msg)
             data = self.use_cached_data(msg)
 
         except Exception as err:
             msg = f"Using cached data from last successful communication from ECU. Exception error: {err}"
-            if err.args[0] != 'timed out':
+            if str(err) != 'timed out':
                 _LOGGER.warning(msg)
             data = self.use_cached_data(msg)
 

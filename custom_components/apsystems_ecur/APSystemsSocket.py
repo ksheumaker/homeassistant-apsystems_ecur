@@ -65,7 +65,7 @@ class APSystemsSocket:
         self.socket_open = False
         self.errors = []
 
-   def send_read_from_socket(self, cmd):
+    def send_read_from_socket(self, cmd):
         try:
             self.sock.settimeout(self.timeout)
             self.sock.sendall(cmd.encode('utf-8'))

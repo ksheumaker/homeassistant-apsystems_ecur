@@ -41,7 +41,7 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
         self._icon = icon
 
         self._name = f"ECU {self._label}"
-        self._state = None
+        self._state = True
 
     @property
     def unique_id(self):
@@ -72,12 +72,12 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
     def is_on(self):
         return self._ecu.querying
 
-    async def async_turn_off(self, **kwargs):
+    def turn_off(self, **kwargs):
         self._ecu.stop_query()
-        await self.coordinator.async_request_refresh()
-
-    async def async_turn_on(self, **kwargs):
+        self._state = False
+        self.schedule_update_ha_state()
+    
+    def turn_on(self, **kwargs):
         self._ecu.start_query()
-        await self.coordinator.async_request_refresh()
-
-
+        self._state = True
+        self.schedule_update_ha_state()

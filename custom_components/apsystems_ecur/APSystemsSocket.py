@@ -65,22 +65,19 @@ class APSystemsSocket:
         self.socket_open = False
         self.errors = []
 
-    def read_from_socket(self):
-        self.read_buffer = b''
-        self.sock.settimeout(self.timeout)
-        while self.read_buffer.find(self.recv_suffix) == -1:
-            self.read_buffer += self.sock.recv(self.recv_size)
-        return self.read_buffer
-
-    def send_read_from_socket(self, cmd):
+   def send_read_from_socket(self, cmd):
         try:
             self.sock.settimeout(self.timeout)
             self.sock.sendall(cmd.encode('utf-8'))
             time.sleep(self.socket_sleep_time)
-            return self.read_from_socket()
+            self.read_buffer = b''
+            self.sock.settimeout(self.timeout)
+            while self.read_buffer.find(self.recv_suffix) == -1:
+                self.read_buffer += self.sock.recv(self.recv_size)
+            return self.read_buffer
         except Exception as err:
             self.close_socket()
-            raise
+            raise APSystemsInvalidData(err)
 
     def close_socket(self):
         try:
@@ -91,7 +88,7 @@ class APSystemsSocket:
                 self.sock.close()
                 self.socket_open = False
         except Exception as err:
-            raise
+            raise APSystemsInvalidData(err)
             
     def open_socket(self):
         self.socket_open = False
@@ -101,7 +98,7 @@ class APSystemsSocket:
             self.sock.connect((self.ipaddr, self.port))
             self.socket_open = True
         except Exception as err:
-            raise
+            raise APSystemsInvalidData(err)
 
     def query_ecu(self):
         self.open_socket()

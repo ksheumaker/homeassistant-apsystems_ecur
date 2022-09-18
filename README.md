@@ -60,7 +60,7 @@ condition:
         entity_id: binary_sensor.ecu_using_cached_data
         state: "on"
 action:
-  - service: shell_command.reset_ecu
+  - service: shell_command.reboot_ecu
     data: {}
   - delay:
       hours: 0
@@ -76,7 +76,7 @@ mode: single
 In configuration.yaml (don't forget to replace <ip-address> with the ECU IP-Address):
 ```
 shell_command:
-  reset_ecu: '/usr/bin/curl "http://<ip-address>/index.php/management/set_wlan_ap" -H "X-Requested-With: XMLHttpRequest" --data-raw "SSID=ECU-WIFI_local&channel=0&method=0&psk_wep=&psk_wpa=" --compressed --insecure '
+  reboot_ecu: '/usr/bin/curl "http://<ip-address>/index.php/management/set_wlan_ap" -H "X-Requested-With: XMLHttpRequest" --data-raw "SSID=ECU-WIFI_local&channel=0&method=0&psk_wep=&psk_wpa=" --compressed --insecure '
 ```
 
 ## Using the ECU Query Device switch

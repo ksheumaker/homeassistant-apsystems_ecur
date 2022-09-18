@@ -1,6 +1,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![hacs_badge](https://img.shields.io/maintenance/yes/2022)](https://github.com/ksheumaker/homeassistant-apsystems_ecur)
-[![hacs_badge](https://img.shields.io/github/v/release/ksheumaker/homeassistant-apsystems_ecur?include_prereleases&label=Pre-release)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
+[![hacs_badge](https://img.shields.io/github/v/release/ksheumaker/homeassistant-apsystems_ecur?include_prereleases&label=Pre-release)](https://github.com/ksheumaker/homeassistant-apsystems_ecur#beta-program)
 # Home-Assistant APsystems ECU Integration
 This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
 
@@ -19,7 +19,7 @@ Wireless | ECU-R (2160xxxxxxxx series) and ECU-B
 Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) 
 Wired | ECU-C
 
-## Beta program
+## Pre-release/Beta program
 If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
 
 ## Release notes

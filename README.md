@@ -75,8 +75,7 @@ mode: single
 ```
 In configuration.yaml (don't forget to specify your ECU IP-Address):
 ```
-shell_command:
-  reset_ecu: "curl 'http://<ip-address>/index.php/management/set_wlan_ap' -H 'X-Requested-With: XMLHttpRequest' --data-raw 'SSID=ECU-WIFI_local&channel=0&method=0&psk_wep=&psk_wpa='"
+shell_reboot_ecu: '/usr/bin/curl "http://192.168.0.70/index.php/management/set_wlan_ap" -H "X-Requested-With: XMLHttpRequest" --data-raw "SSID=ECU-WIFI_local&channel=0&method=0&psk_wep=&psk_wpa=" --compressed --insecure'
 ```
 
 ## Using the ECU Query Device switch

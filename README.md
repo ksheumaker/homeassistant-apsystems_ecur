@@ -11,7 +11,7 @@ Note: This integration was initially written for the older ECU-R (2160xxxxxxxx s
 This integration queries the ECU with a set interval for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array. This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1). Thanks goes out to @12christiaan for providing an automated solution to reset the ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models.
 
 ## Prerequisites
-You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter. Your ECU is connected to your LAN and Home Assistant has free access to it.
+You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured and Home Assistant has free access to it.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
 Connection | ECU Model
 --- | ---

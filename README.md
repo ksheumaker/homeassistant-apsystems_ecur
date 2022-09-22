@@ -13,11 +13,11 @@ This integration queries the ECU with a set interval for new data. This was done
 ## Prerequisites
 You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured and Home Assistant has free access to it.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
-Connection | ECU Model
---- | ---
-Wireless | ECU-R (2160xxxxxxxx series) and ECU-B
-Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) 
-Wired | ECU-C
+Connection | ECU Model | Reboot Automation Needed
+--- | --- | ---
+Wireless | ECU-R (2160xxxxxxxx series) and ECU-B | No
+Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
+Wired | ECU-C | Yes
 
 ## Pre-release/Beta program
 If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
@@ -40,7 +40,7 @@ The integration uses caching. The reason for this is that the ECU does not alway
 
 The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is. You can use the automation to automatically reset the ECU.
 
-## Automation
+## Reboot Automation
 For ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models the use of this integration causes the ECU to get stuck. This is an ECU firmware issue and can be solved by the automation provided by @12christiaan.
 
 In automations.yaml

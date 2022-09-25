@@ -32,8 +32,6 @@ Install the custom component using HACS by searching for "APSystems ECU-R". If y
 choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
 _It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often_
 
-Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise. You can do this by adding automations and by triggering the ECU Query Device switch entity.  
-
 ## Data caching
 The integration uses caching. The reason for this is that the ECU does not always respond to data requests. For example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. In most cases a 'time out' occurs, these are suppressed in the homeassistant.log. Practice shows that it is then best to use the old data until the ECU responds again to the next query. 
 ![APSystems ECU integration cache](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/integration_cache.jpg)
@@ -80,7 +78,8 @@ shell_command:
 ```
 
 ## Using the ECU Query Device switch
-If you prefer to stop querying the ECU after sunset and start again at sunrise, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. The switch is automatically turned off if the cache had to be used five times in a row and queries are stopped. In this case there may be something wrong with the ECU, it must be restarted by automation or given powercycle manually.
+Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise.
+If you prefer to stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. The switch is automatically turned off if the cache had to be used five times in a row and queries are stopped. In this case there may be something wrong with the ECU, it must be restarted by automation or given powercycle manually.
 
 ## Data exposed devices and entities
 The integration supports getting data from the PV array as a whole as well as each individual inverter in detail.

@@ -31,7 +31,8 @@ class APSystemsSocket:
         self.timeout = 10
 
         # how big of a buffer to read at a time from the socket
-        self.recv_size = 4096
+        # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/108
+        self.recv_size = 1024
 
         # how long to wait between socket open/closes
         self.socket_sleep_time = 5

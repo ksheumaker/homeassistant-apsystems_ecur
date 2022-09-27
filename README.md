@@ -4,14 +4,14 @@
 # Home-Assistant APsystems ECU Integration
 This is a custom component for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
 
-Note: This integration was initially written for the older ECU-R (2160xxxxxxxx series) and is fully compatible with the ECU-B. For later ECU-R models (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) and ECU-C owners, usage of this integration results in ECU outage over time. You can use the automation which is described below to automatically reboot the ECU.
+Note: This integration was initially written for the older ECU-R (2160xxxxxxxx series) and is fully compatible with the ECU-B. For later ECU-R models (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) and ECU-C owners, usage of this integration results in ECU outage over time. You can then use the automation which is described below to automatically reboot the ECU if it fails. Unfortunately this is a firmware issue which can't be solved by the integration.
 
 
 ## Background & acknowledgement
 This integration queries the ECU with a set interval for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array. This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1). Thanks goes out to @12christiaan for providing an automated solution to reset the ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models.
 
 ## Prerequisites
-You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured and Home Assistant has free access to it.
+You own an APSystems ECU and any combination of YC600, YC1000, DS3 or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
 Connection | ECU Model | Reboot Automation Needed
 --- | --- | ---
@@ -26,11 +26,11 @@ If you're having trouble with the integration, consider joining the beta program
 Release notes, assets and further details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
 
 ## Setup
-Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. After installing, restart Home Assistant by going to Settings > System and select [restart] in the upper right corner.
+Install the custom component using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane, select Integrations. In the top pane right from the word Integrations you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. After the installation, restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.
 
 ## Configuration
-choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
-_It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often_
+Choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
+_It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often._ After selecting [Submit] the integration will setup the entities in around 12 seconds.
 
 ## Data caching
 The integration uses caching. The reason for this is that the ECU does not always respond to data requests. For example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. In most cases a 'time out' occurs, these are suppressed in the homeassistant.log. Practice shows that it is then best to use the old data until the ECU responds again to the next query. 

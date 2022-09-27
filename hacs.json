@@ -1,6 +1,5 @@
 {
-  "domains": ["sensor,binary_sensor"],
-  "name": "APSystems ECU-R",
+  "name": "APSystems ECU Reader",
   "render_readme": true,
   "homeassistant": "2021.12.0"
 }

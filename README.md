@@ -36,7 +36,7 @@ _It's good to know that the ECU only contains new data once every 5 minutes so a
 The integration uses caching. The reason for this is that the ECU does not always respond to data requests. For example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. In most cases a 'time out' occurs, these are suppressed in the homeassistant.log. Practice shows that it is then best to use the old data until the ECU responds again to the next query. 
 ![APSystems ECU integration cache](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/integration_cache.jpg)
 
-The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is. You can use the automation to automatically reset the ECU.
+The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is. You can use the automation to automatically reboot the ECU.
 
 ## Reboot Automation
 For ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models the use of this integration causes the ECU to get stuck. This is an ECU firmware issue and can be solved by the automation provided by @12christiaan.

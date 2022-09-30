@@ -44,21 +44,21 @@ For ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models the 
 
 In automations.yaml
 ```
-- id: '1661155335281'
+- id: '1661333377702'
   alias: Reboot ECU if unavailable readings
-  description: ""
+  description: ''
   trigger:
   - platform: state
     entity_id:
-      - switch.ecu_query_device
-    to: "off"
-condition:
+    - switch.ecu_query_device
+    to: 'off'
+  condition:
   - condition: and
     conditions:
-      - condition: state
-        entity_id: binary_sensor.ecu_using_cached_data
-        state: "on"
-action:
+    - condition: state
+      entity_id: binary_sensor.ecu_using_cached_data
+      state: 'on'
+  action:
   - service: shell_command.reboot_ecu
     data: {}
   - delay:
@@ -70,7 +70,7 @@ action:
     data: {}
     target:
       entity_id: switch.ecu_query_device
-mode: single
+  mode: single
 ```
 In configuration.yaml (don't forget to fill in the ECU IP-Address):
 ```

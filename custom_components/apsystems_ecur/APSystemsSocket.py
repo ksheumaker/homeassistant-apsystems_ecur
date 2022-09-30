@@ -110,10 +110,6 @@ class APSystemsSocket:
             self.process_ecu_data()
         except APSystemsInvalidData as err:
             raise
-        if self.lifetime_energy == 0:
-            error = f"ECU returned 0 for lifetime energy, raw data={self.ecu_raw_data}"
-            self.add_error(error)
-            raise APSystemsInvalidData(error)
 
         # Some ECUs likes the socket to be closed and re-opened between commands
         self.open_socket()

@@ -45,9 +45,9 @@ For ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models the 
 In automations.yaml
 ```
 - id: '1661155335281'
-alias: Reboot ECU if unavailable readings
-description: ""
-trigger:
+  alias: Reboot ECU if unavailable readings
+  description: ""
+  trigger:
   - platform: state
     entity_id:
       - switch.ecu_query_device

@@ -52,7 +52,7 @@ class ECUR():
 
         if self.cache_count == self.cache_max:
             _LOGGER.warning(f"Communication with the ECU failed after {self.cache_max} repeated attempts.")
-            # determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
+            # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
             if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
                 url = 'http://' + str(self.ipaddr) + '/index.php/management/set_wlan_ap'
                 headers = {'X-Requested-With': 'XMLHttpRequest',}
@@ -64,8 +64,8 @@ class ECUR():
                     _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")
                     self.querying = False
             else:
-                #Older ECU-R models starting with 2160
-                _LOGGER.warning(f"Communication with the ECU fails after {self.cache_max} repeated attempts. Try manually power cycling or reset the ECU. Querying is stopped automatically.")
+                # Older ECU-R models starting with 2160
+                _LOGGER.warning("Try manually power cycling the ECU. Querying is stopped automatically.")
                 self.querying = False
             
         if self.cached_data.get("ecu_id", None) == None:

@@ -1,4 +1,5 @@
 import logging
+import requests
 
 import voluptuous as vol
 import traceback
@@ -30,6 +31,7 @@ class ECUR():
 
     def __init__(self, ipaddr):
         self.ecu = APSystemsSocket(ipaddr)
+        self.ipaddr = ipaddr
         self.cache_count = 0
         self.cache_max = 5
         self.data_from_cache = False
@@ -49,8 +51,22 @@ class ECUR():
         self.data_from_cache = True
 
         if self.cache_count == self.cache_max:
-            _LOGGER.warning(f"Communication with the ECU fails after {self.cache_max} repeated attempts. Try power cycling or reset the ECU. Querying is stopped automatically.")
-            self.querying = False
+            _LOGGER.warning(f"Communication with the ECU failed after {self.cache_max} repeated attempts.")
+            # determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
+            if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
+                url = 'http://' + str(self.ipaddr) + '/index.php/management/set_wlan_ap'
+                headers = {'X-Requested-With': 'XMLHttpRequest',}
+                data = {'SSID': 'ECU-WIFI_local'}
+                try:
+                    get_url = requests.post(url, headers=headers, data=data)
+                    _LOGGER.warning(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
+                except Exception as err:
+                    _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")
+                    self.querying = False
+            else:
+                #Older ECU-R models starting with 2160
+                _LOGGER.warning(f"Communication with the ECU fails after {self.cache_max} repeated attempts. Try manually power cycling or reset the ECU. Querying is stopped automatically.")
+                self.querying = False
             
         if self.cached_data.get("ecu_id", None) == None:
             _LOGGER.debug(f"Cached data {self.cached_data}")

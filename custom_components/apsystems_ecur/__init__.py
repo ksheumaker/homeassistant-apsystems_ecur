@@ -55,7 +55,7 @@ class ECUR():
             # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
             if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
                 url = 'http://' + str(self.ipaddr) + '/index.php/management/set_wlan_ap'
-                headers = {'X-Requested-With': 'XMLHttpRequest',}
+                headers = {'X-Requested-With': 'XMLHttpRequest'}
                 data = {'SSID': 'ECU-WIFI_local'}
                 try:
                     get_url = requests.post(url, headers=headers, data=data)

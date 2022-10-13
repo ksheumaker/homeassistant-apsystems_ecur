@@ -12,7 +12,8 @@ from homeassistant.helpers.update_coordinator import (
 from .const import (
     DOMAIN,
     RELOAD_ICON,
-    CACHE_ICON
+    CACHE_ICON,
+    RESTART_ICON
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,7 +25,9 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     sensors = [
         APSystemsECUBinarySensor(coordinator, ecu, "data_from_cache", 
-            label="Using Cached Data", icon=CACHE_ICON)
+            label="Using Cached Data", icon=CACHE_ICON),
+        APSystemsECUBinarySensor(coordinator, ecu, "restart_ecu",
+            label="Restart", icon=RESTART_ICON)
     ]
     add_entities(sensors)
 

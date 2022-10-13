@@ -36,6 +36,7 @@ class ECUR():
         self.cache_max = 5
         self.data_from_cache = False
         self.querying = True
+        self.ecu_restarting = False
         self.cached_data = {}
 
     def stop_query(self):
@@ -60,6 +61,7 @@ class ECUR():
                 try:
                     get_url = requests.post(url, headers=headers, data=data)
                     _LOGGER.warning(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
+                    self.ecu_restarting = True
                 except Exception as err:
                     _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")
                     self.querying = False
@@ -100,6 +102,7 @@ class ECUR():
                 self.cached_data = data
                 self.cache_count = 0
                 self.data_from_cache = False
+                self.ecu_restarting = False
                 self.error_message = ""
             else:
                 msg = f"Using cached data from last successful communication from ECU. Error: no ecu_id returned"
@@ -119,6 +122,7 @@ class ECUR():
 
         data["data_from_cache"] = self.data_from_cache
         data["querying"] = self.querying
+        data["restart_ecu"] = self.ecu_restarting
         _LOGGER.debug(f"Returning {data}")
 
         if data.get("ecu_id", None) == None:

@@ -109,8 +109,7 @@ class APSystemsSocket:
         try:
             self.process_ecu_data()
         except APSystemsInvalidData as err:
-            raise
-
+        
         # Some ECUs likes the socket to be closed and re-opened between commands
         self.open_socket()
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix

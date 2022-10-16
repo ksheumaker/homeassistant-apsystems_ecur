@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "data": {
-          "host": "ECU IP address (must be wifi for ECU-R)",
+          "host": "ECU IP address (follow connection method table in readme)",
           "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
           "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)"
         },
@@ -24,7 +24,7 @@
     "step": {
       "user": {
         "data": {
-          "host": "ECU IP address (must be wifi for ECU-R)",
+          "host": "ECU IP address (follow connection method table in readme)",
           "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
           "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)"
         },

@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "data": {
-          "host": "ECU IP-adres (moet het WiFi IP-adres zijn voor ECU-R eigenaren)",
+          "host": "ECU IP-adres (zie connection tabel in readme)",
           "query_method" : "Welke methode voor de ECU uitvraag. ECU_R moet socket zijn, ECU_R_PRO en ECU_C gebruik http",
           "scan_interval" : "Uitvraag interval. Minimaal 300 sec. kleinere interval niet aanbevolen"
         },
@@ -24,7 +24,7 @@
     "step": {
       "user": {
         "data": {
-          "host": "ECU IP adres (moet het WiFi IP-adres zijn voor de ECU-R eigenaren)",
+          "host": "ECU IP adres (zie connection tabel in readme)",
           "query_method" : "Welke methode voor de ECU uitvraag. ECU_R moet socket zijn, ECU_R_PRO en ECU_C gebruik http",
           "scan_interval" : "Uitvraag interval. Minimaal 300 sec. kleinere interval niet aanbevolen"
         },

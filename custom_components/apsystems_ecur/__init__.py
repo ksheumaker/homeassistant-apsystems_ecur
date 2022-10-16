@@ -60,7 +60,8 @@ class ECUR():
                 data = {'SSID': 'ECU-WIFI_local'}
                 try:
                     get_url = requests.post(url, headers=headers, data=data)
-                    _LOGGER.warning(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
+                    # For debugging purposes, remove # from the beginning of the next line
+                    #_LOGGER.warning(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
                     self.ecu_restarting = True
                 except Exception as err:
                     _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")

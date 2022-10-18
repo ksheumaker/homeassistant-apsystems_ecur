@@ -108,8 +108,8 @@ class APSystemsSocket:
         self.close_socket()
         try:
             self.process_ecu_data()
-        except APSystemsInvalidData as err:
-            raise
+        except Exception as err:
+            raise APSystemsInvalidData(err)
         
         # Some ECUs likes the socket to be closed and re-opened between commands
         self.open_socket()

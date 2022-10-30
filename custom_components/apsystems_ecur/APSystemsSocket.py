@@ -73,8 +73,10 @@ class APSystemsSocket:
             time.sleep(self.socket_sleep_time)
             self.read_buffer = b''
             self.sock.settimeout(self.timeout)
-            while self.read_buffer.find(self.recv_suffix) == -1:
-                self.read_buffer += self.sock.recv(self.recv_size)
+            # An infinite loop was causing the integration to block
+            # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/115
+            # Solution might cause a new issue when large solar array's applies
+            self.read_buffer = self.sock.recv(self.recv_size)
             return self.read_buffer
         except Exception as err:
             self.close_socket()

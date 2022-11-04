@@ -44,7 +44,7 @@ The integration uses the cache 5 times in a row, after which it is assumed that 
 
 ## Using the ECU Query Device switch
 Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise.
-If you prefer to stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. 
+If you prefer to stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. When the cache is used 5 times in a row and there is no automated restart or restart fails the switch will turn off and can be used to signal an issue with the ECU.
 
 ## Data exposed devices and entities
 The integration supports getting data from the PV array as a whole as well as each individual inverter in detail.

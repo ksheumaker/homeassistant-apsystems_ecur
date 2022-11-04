@@ -1,7 +1,7 @@
 {
-  "config": {
+  "options": {
     "step": {
-      "user": {
+      "init": {
         "data": {
           "host": "ECU IP address (follow connection method table in readme)",
           "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
@@ -11,16 +11,16 @@
       }
     },
     "error": {
-      "cannot_connect": "Can't connect to ECU, check log",
+      "cannot_connect": "Can't find ECU at this IP-Address",
       "inverter": "Unknown inverter type, check log",
-      "no_ecuid": "No ECU ID returned from ECU-R",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "no_ecuid": "No ECU ID returned from ECU",
+      "unknown": "Unknown error, see log for details"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   },
-  "options": {
+  "config": {
     "step": {
       "user": {
         "data": {
@@ -30,7 +30,15 @@
         },
         "title": "APsystems ECU Options"
       }
+    },
+    "error": {
+      "cannot_connect": "Can't find ECU at this IP-Address",
+      "inverter": "Unknown inverter type, check log",
+      "no_ecuid": "No ECU ID returned from ECU",
+      "unknown": "Unknown error, see log for details"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   }
 }
-

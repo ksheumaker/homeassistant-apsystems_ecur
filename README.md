@@ -47,7 +47,7 @@ Although you can query the ECU 24/7, it is an option to stop the query after sun
 If you prefer to stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. When the cache is used 5 times in a row and there is no automated restart or restart fails the switch will turn off and can be used to signal an issue with the ECU.
 
 ## The temperature sensors
-When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updates during the offline periods. This causes a non-numeric error message for the gauge if you use that as temperature indicator. In that case you can use this template part which converts the value to zero:
+When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part which converts the value to zero:
 ```
 temperature_non_numeric_408xxxxxxxxx:
         value_template: "{{ states('sensor.inverter_408xxxxxxxxx_temperature')|float(0) }}"

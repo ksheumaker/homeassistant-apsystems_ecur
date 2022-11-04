@@ -1,35 +1,40 @@
 {
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "host": "ECU IP-adres (volg de connectie methode tabel in de readme)",
+          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)"
+        },
+        "title": "APsystems ECU Config"
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan de ECU niet vinden op dit IP-adres",
+      "no_ecuid": "Geen ECU ID ontvangen",
+      "unknown": "Onbekende fout, zie het log for details"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
   "config": {
     "step": {
       "user": {
         "data": {
-          "host": "ECU IP-adres (zie connection tabel in readme)",
-          "query_method" : "Welke methode voor de ECU uitvraag. ECU_R moet socket zijn, ECU_R_PRO en ECU_C gebruik http",
-          "scan_interval" : "Uitvraag interval. Minimaal 300 sec. kleinere interval niet aanbevolen"
+          "host": "ECU IP-adres (volg de connectie methode tabel in de readme)",
+          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)"
         },
-        "title": "APsystems ECU Configuratie"
+        "title": "APsystems ECU Options"
       }
     },
     "error": {
-      "cannot_connect": "Kon geen verbinding opzetten met de ECU, controleer het logbestand",
-      "inverter": "Onbekend inverter model, controleer het logbestand",
-      "no_ecuid": "Geen ECU-ID ontvangen van de ECU",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
+      "cannot_connect": "Kan de ECU niet vinden op dit IP-adres",
+      "no_ecuid": "Geen ECU ID ontvangen",
+      "unknown": "Onbekende fout, zie het log voor details"
     },
     "abort": {
-      "Reeds geconfigureerd": "[%key:common::config_flow::abort::already_configured_device%]"
-    }
-  },
-  "options": {
-    "step": {
-      "user": {
-        "data": {
-          "host": "ECU IP adres (zie connection tabel in readme)",
-          "query_method" : "Welke methode voor de ECU uitvraag. ECU_R moet socket zijn, ECU_R_PRO en ECU_C gebruik http",
-          "scan_interval" : "Uitvraag interval. Minimaal 300 sec. kleinere interval niet aanbevolen"
-        },
-        "title": "APsystems ECU Opties"
-      }
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   }
 }

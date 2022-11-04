@@ -5,7 +5,7 @@ import voluptuous as vol
 import traceback
 from datetime import timedelta
 
-from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData, APSystemsInvalidInverter
+from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import load_platform
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
@@ -130,39 +130,6 @@ class ECUR():
             raise UpdateFailed(f"Somehow data doesn't contain a valid ecu_id")
             
         return data
-
-async def async_setup(hass, config):
-
-    # the integration has already moved to config flow
-    if config.get(DOMAIN) is None:
-        return True
-
-    config_file_host = config[DOMAIN].get(CONF_HOST, None)
-    config_file_scan_interval = config[DOMAIN].get(CONF_SCAN_INTERVAL, 60)
-
-    _LOGGER.debug(f"Config: {config[DOMAIN]}")
-
-    # a host hasn't been defined in the config file
-    if not config_file_host:
-        return False
-
-    for entry in hass.config_entries.async_entries(DOMAIN):
-        if entry.source == config_entries.SOURCE_IMPORT:
-            _LOGGER.error("apsystems_ecur already imported config, remove it from configuration.yaml")
-            return True
-
-    import_config = { CONF_HOST : config_file_host, CONF_SCAN_INTERVAL : config_file_scan_interval }
-    _LOGGER.debug(f"Importing config from configuration.yaml {import_config}")
-
-    hass.async_create_task(
-        hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_IMPORT}, data=import_config
-        )
-    )
-
-    _LOGGER.debug(f"Task spawned")
-    return True
-
 
 async def async_setup_entry(hass, config):
     """ Setup the APsystems platform """

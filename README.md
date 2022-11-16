@@ -15,7 +15,7 @@ This integration queries the ECU with a set interval for new data. This was done
 ## Prerequisites
 You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000, DS3/DS3D or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
-Connection | ECU Model | Automated Restart
+Connection | ECU Model | Automated Restart*
 --- | --- | ---
 Wireless | ECU-R (2160xxxxxxxx series) and ECU-B | No
 Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
@@ -40,7 +40,7 @@ _It's good to know that the ECU only contains new data once every 5 minutes so a
 ## Data caching
 The integration uses caching. The reason for this is that the ECU does not always respond to data requests. For example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. In most cases a 'time out' occurs, these are suppressed in the homeassistant.log. Practice shows that it is then best to use the old data until the ECU responds again to the next query interval. 
 
-The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is - the integration will restart your ECU automatically if this happens. If that fails the ECU Query Device switch will disable querying. Because an automated restart is not available on the older ECU model the switch will disable querying immediately. You can use an automation to send a notify if this happens.
+*The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is - the integration will restart your ECU automatically if this happens. If that fails the ECU Query Device switch will disable querying. Because an automated restart is not available on the older ECU model the switch will disable querying immediately. You can use an automation to send a notify if this happens.
 
 ## Using the ECU Query Device switch
 Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise.

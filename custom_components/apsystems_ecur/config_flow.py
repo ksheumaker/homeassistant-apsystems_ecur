@@ -8,6 +8,11 @@ from homeassistant import config_entries, exceptions
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 import homeassistant.helpers.config_validation as cv
 
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+    DataUpdateCoordinator,
+    UpdateFailed,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,6 +87,25 @@ class APSsystemsOptionsFlowHandler(config_entries.OptionsFlow):
                     self.hass.config_entries.async_update_entry(
                     self.config_entry, data=user_input, options=self.config_entry.options
                     )
+                    
+                    
+                    
+                    
+                                        
+                    update_interval = timedelta(seconds=self.config_entry.data.get(CONF_SCAN_INTERVAL))
+                         
+                    coordinator = DataUpdateCoordinator(
+                        self.hass,
+                        _LOGGER,
+                        name=DOMAIN,
+                        # Name of the data. For logging purposes.
+                        update_interval=timedelta(seconds=self.config_entry.data.get(CONF_SCAN_INTERVAL))
+                    )
+                    await coordinator.async_request_refresh()     
+                    
+                    
+                    
+                    
                     return self.async_create_entry(title=f"ECU: {ecu_id}", data={})
                 else:
                     errors["host"] = "no_ecuid"

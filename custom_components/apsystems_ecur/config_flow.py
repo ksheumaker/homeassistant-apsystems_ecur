@@ -89,7 +89,6 @@ class APSsystemsOptionsFlowHandler(config_entries.OptionsFlow):
                     )
                     coordinator = self.hass.data[DOMAIN].get("coordinator")
                     coordinator.update_interval = timedelta(seconds=self.config_entry.data.get(CONF_SCAN_INTERVAL))
-                    coordinator.async_refresh()    
                     return self.async_create_entry(title=f"ECU: {ecu_id}", data={})
                 else:
                     errors["host"] = "no_ecuid"

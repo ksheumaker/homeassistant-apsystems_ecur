@@ -18,7 +18,7 @@ You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC60
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
 Connection | ECU Model | Automated Restart*
 --- | --- | ---
-Wireless | ECU-R (2160xxxxxxxx series) and ECU-B | No
+Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B | No
 Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
 Wired | ECU-C | Yes
 

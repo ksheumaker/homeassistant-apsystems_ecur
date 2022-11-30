@@ -8,12 +8,6 @@ from homeassistant import config_entries, exceptions
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 import homeassistant.helpers.config_validation as cv
 
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed,
-)
-
 _LOGGER = logging.getLogger(__name__)
 
 from .const import DOMAIN

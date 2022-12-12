@@ -4,15 +4,16 @@
       "init": {
         "data": {
           "host": "ECU IP address (follow connection method table in readme)",
-          "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
-          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)"
+          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)",
+          "CACHE" : "Retries when ECU fails (range between 1 - 5 recommended)",
+          "SSID" : "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
+          "WPA-PSK" : "Specify password (For ECU-R (sunspec) and ECU-C models only)"
         },
         "title": "APsystems ECU Config"
       }
     },
     "error": {
       "cannot_connect": "Can't find ECU at this IP-Address",
-      "inverter": "Unknown inverter type, check log",
       "no_ecuid": "No ECU ID returned from ECU",
       "unknown": "Unknown error, see log for details"
     },
@@ -25,15 +26,16 @@
       "user": {
         "data": {
           "host": "ECU IP address (follow connection method table in readme)",
-          "query_method" : "Which method to query the ECU. ECU_R should choose socket, ECU_R_PRO and ECU_C should choose http",
-          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)"
+          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)",
+          "CACHE" : "Retries when ECU fails (range between 1 - 5 recommended)",
+          "SSID" : "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
+          "WPA-PSK" : "Specify password (For ECU-R (sunspec) and ECU-C models only)"
         },
         "title": "APsystems ECU Options"
       }
     },
     "error": {
       "cannot_connect": "Can't find ECU at this IP-Address",
-      "inverter": "Unknown inverter type, check log",
       "no_ecuid": "No ECU ID returned from ECU",
       "unknown": "Unknown error, see log for details"
     },

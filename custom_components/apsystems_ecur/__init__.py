@@ -10,10 +10,8 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import load_platform
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle
 from homeassistant import config_entries, exceptions
 from homeassistant.helpers import device_registry as dr
-
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -22,22 +20,35 @@ from homeassistant.helpers.update_coordinator import (
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN, CONF_REOPEN_SOCKET, CONF_QUERY_METHOD
+from .const import DOMAIN, CONF_SSID, CONF_WPA_PSK, CONF_CACHE
 
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
-## handle all the communications with the ECUR class and deal with our need for caching, etc
-class ECUR():
+# handle all the communications with the ECUR class and deal with our need for caching, etc
 
-    def __init__(self, ipaddr):
+class WiFiSet():
+    SSID = ""
+    WPA = ""
+    CACHE = 5
+U_WiFiSet = WiFiSet()    
+
+class ECUR():
+#class ECUR(config_entries.OptionsFlow):
+
+    def __init__(self, ipaddr, ssid, wpa, cache):
         self.ecu = APSystemsSocket(ipaddr)
         self.ipaddr = ipaddr
+        self.ssid = ssid
+        self.wpa = wpa
+        self.cache = cache
         self.cache_count = 0
-        self.cache_max = 5
         self.data_from_cache = False
         self.querying = True
         self.ecu_restarting = False
         self.cached_data = {}
+        U_WiFiSet.SSID = self.ssid
+        U_WiFiSet.WPA = self.wpa
+        U_WiFiSet.CACHE = self.cache
 
     def stop_query(self):
         self.querying = False
@@ -51,24 +62,24 @@ class ECUR():
         self.cache_count += 1
         self.data_from_cache = True
 
-        if self.cache_count == self.cache_max:
-            _LOGGER.warning(f"Communication with the ECU failed after {self.cache_max} repeated attempts.")
+        if self.cache_count == U_WiFiSet.CACHE - 1:
+            _LOGGER.debug(f"Communication with the ECU failed after {U_WiFiSet.CACHE} repeated attempts.")
+            data = {'SSID': 'U_WiFiSet.SSID', 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': 'U_WiFiSet.WPA'}
+            _LOGGER.debug(f"Data sent with URL: {data}")
             # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
             if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
                 url = 'http://' + str(self.ipaddr) + '/index.php/management/set_wlan_ap'
                 headers = {'X-Requested-With': 'XMLHttpRequest'}
-                data = {'SSID': 'ECU-WIFI_local'}
                 try:
                     get_url = requests.post(url, headers=headers, data=data)
-                    # For debugging purposes, remove # from the beginning of the next line
-                    #_LOGGER.warning(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
+                    _LOGGER.debug(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
                     self.ecu_restarting = True
                 except Exception as err:
                     _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")
                     self.querying = False
             else:
                 # Older ECU-R models starting with 2160
-                _LOGGER.warning("Try manually power cycling the ECU. Querying is stopped automatically.")
+                _LOGGER.warning("Try manually power cycling the ECU. Querying is stopped automatically, turn switch back on after restart of ECU.")
                 self.querying = False
             
         if self.cached_data.get("ecu_id", None) == None:
@@ -79,11 +90,10 @@ class ECUR():
 
     def update(self):
         data = {}
-
+        
         # if we aren't actively quering data, pull data form the cache
         # this is so we can stop querying after sunset
         if not self.querying:
-
             _LOGGER.debug("Not querying ECU due to query=False")
             data = self.cached_data
             self.data_from_cache = True
@@ -131,17 +141,27 @@ class ECUR():
             
         return data
 
-async def async_setup_entry(hass, config):
-    """ Setup the APsystems platform """
-    
-    _LOGGER.debug(f"config={config.data}")
+async def update_listener(hass, config):
 
+    # Handle options update being triggered by config entry options updates
+    _LOGGER.debug(f"Configuration updated: {config.as_dict()}")
+    host = config.data[CONF_HOST]
+    ssid = config.data[CONF_SSID]
+    wpa = config.data[CONF_WPA_PSK]
+    cache = config.data[CONF_CACHE]
+    ecu = ECUR(host, ssid, wpa, cache)
+    ecu.__init__(host, ssid, wpa, cache)
+
+async def async_setup_entry(hass, config):
+    # Setup the APsystems platform """
     hass.data.setdefault(DOMAIN, {})
 
     host = config.data[CONF_HOST]
+    ssid = config.data[CONF_SSID]
+    wpa = config.data[CONF_WPA_PSK]
+    cache = config.data[CONF_CACHE]
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
-
-    ecu = ECUR(host)
+    ecu = ECUR(host, ssid, wpa, cache)
 
     async def do_ecu_update():
         return await hass.async_add_executor_job(ecu.update)
@@ -183,19 +203,15 @@ async def async_setup_entry(hass, config):
             name=f"Inverter {uid}",
             model=inv_data.get("model")
         )
-
     hass.config_entries.async_setup_platforms(config, PLATFORMS)
-
+    config.async_on_unload(config.add_update_listener(update_listener))
     return True
 
 async def async_unload_entry(hass, config):
     unload_ok = await hass.config_entries.async_unload_platforms(config, PLATFORMS)
     coordinator = hass.data[DOMAIN].get("coordinator")
     ecu = hass.data[DOMAIN].get("ecu")
-
     ecu.stop_query()
-
     if unload_ok:
         hass.data[DOMAIN].pop(config.entry_id)
-
     return unload_ok

@@ -10,7 +10,7 @@ import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_SSID, CONF_WPA_PSK, CONF_CACHE
 
 @config_entries.HANDLERS.register(DOMAIN)
 class APSsystemsFlowHandler(config_entries.ConfigFlow):
@@ -51,8 +51,10 @@ class APSsystemsFlowHandler(config_entries.ConfigFlow):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST): str,
-                    vol.Optional(CONF_SCAN_INTERVAL, default=300): int,
-                    
+                    vol.Required(CONF_SCAN_INTERVAL, default=300): int,
+                    vol.Optional(CONF_CACHE, default=5): int,
+                    vol.Optional(CONF_SSID, default=ECU-WIFI_local): str,
+                    vol.Optional(CONF_WPA_PSK, default=default): str,
                 }
             )
         )
@@ -65,6 +67,7 @@ class APSsystemsFlowHandler(config_entries.ConfigFlow):
     @callback
     def async_get_options_flow(config_entry):
         return APSsystemsOptionsFlowHandler(config_entry)
+
 
 class APSsystemsOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry):
@@ -99,6 +102,9 @@ class APSsystemsOptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(CONF_HOST, default=self.config_entry.data.get(CONF_HOST)): str,
                     vol.Optional(CONF_SCAN_INTERVAL, default=self.config_entry.data.get(CONF_SCAN_INTERVAL)): int,
+                    vol.Optional(CONF_CACHE, default=self.config_entry.data.get(CONF_CACHE)): int,
+                    vol.Optional(CONF_SSID, default=self.config_entry.data.get(CONF_SSID)): str,
+                    vol.Optional(CONF_WPA_PSK, default=self.config_entry.data.get(CONF_WPA_PSK)): str,
                 }
             )
         )

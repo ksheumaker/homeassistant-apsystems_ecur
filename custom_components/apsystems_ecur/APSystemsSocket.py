@@ -104,6 +104,7 @@ class APSystemsSocket:
             raise APSystemsInvalidData(err)
 
     def query_ecu(self):
+        _LOGGER.debug("Querying ECU...")
         self.open_socket()
         cmd = self.ecu_query
         self.ecu_raw_data = self.send_read_from_socket(cmd)
@@ -218,7 +219,7 @@ class APSystemsSocket:
     def process_ecu_data(self, data=None):
         if self.ecu_raw_data != '' and (self.aps_str(self.ecu_raw_data,9,4)) == '0001':
             data = self.ecu_raw_data
-            #_LOGGER.warning(binascii.b2a_hex(data))  # for debug purposes only. Uncomment only the first # at the beginning
+            _LOGGER.debug(binascii.b2a_hex(data))
             self.check_ecu_checksum(data, "ECU Query")
             self.ecu_id = self.aps_str(data, 13, 12)
             self.lifetime_energy = self.aps_double(data, 27) / 10
@@ -241,7 +242,7 @@ class APSystemsSocket:
         signal_data = {}
         if self.inverter_raw_signal != '' and (self.aps_str(self.inverter_raw_signal,9,4)) == '0030':
             data = self.inverter_raw_signal
-            #_LOGGER.warning(binascii.b2a_hex(data)) # for debug purposes only. Uncomment only the first # at the beginning
+            _LOGGER.debug(binascii.b2a_hex(data))
             self.check_ecu_checksum(data, "Signal Query")
             if not self.qty_of_inverters:
                 return signal_data
@@ -259,7 +260,7 @@ class APSystemsSocket:
         output = {}
         if self.inverter_raw_data != '' and (self.aps_str(self.inverter_raw_data,9,4)) == '0002':
             data = self.inverter_raw_data
-            #_LOGGER.warning(binascii.b2a_hex(data)) # for debug purposes only. Uncomment only the first # at the beginning
+            _LOGGER.debug(binascii.b2a_hex(data))
             self.check_ecu_checksum(data, "Inverter data")
             istr = ''
             cnt1 = 0

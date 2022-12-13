@@ -104,7 +104,6 @@ class APSystemsSocket:
             raise APSystemsInvalidData(err)
 
     def query_ecu(self):
-        _LOGGER.debug("Querying ECU...")
         self.open_socket()
         cmd = self.ecu_query
         self.ecu_raw_data = self.send_read_from_socket(cmd)

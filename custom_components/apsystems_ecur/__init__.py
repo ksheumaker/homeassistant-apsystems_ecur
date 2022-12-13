@@ -102,7 +102,7 @@ class ECUR():
             data["querying"] = self.querying
             return self.cached_data
 
-        _LOGGER.debug("Querying ECU")
+        _LOGGER.debug("Querying ECU...")
         try:
             data = self.ecu.query_ecu()
             _LOGGER.debug("Got data from ECU")

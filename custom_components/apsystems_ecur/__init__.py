@@ -63,7 +63,7 @@ class ECUR():
         self.data_from_cache = True
 
         if self.cache_count == U_WiFiSet.CACHE - 1:
-            _LOGGER.debug(f"Communication with the ECU failed after {U_WiFiSet.CACHE} repeated attempts.")
+            _LOGGER.warning(f"Communication with the ECU failed after {U_WiFiSet.CACHE} repeated attempts.")
             data = {'SSID': 'U_WiFiSet.SSID', 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': 'U_WiFiSet.WPA'}
             _LOGGER.debug(f"Data sent with URL: {data}")
             # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)

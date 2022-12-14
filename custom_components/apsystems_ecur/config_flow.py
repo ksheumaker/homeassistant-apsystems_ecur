@@ -99,12 +99,17 @@ class APSsystemsOptionsFlowHandler(config_entries.OptionsFlow):
             step_id="init",
             errors=errors,
             data_schema=vol.Schema(
+                data_schema=vol.Schema(
                 {
                     vol.Required(CONF_HOST, default=self.config_entry.data.get(CONF_HOST)): str,
-                    vol.Optional(CONF_SCAN_INTERVAL, default=self.config_entry.data.get(CONF_SCAN_INTERVAL)): int,
-                    vol.Optional(CONF_CACHE, default=self.config_entry.data.get(CONF_CACHE)): int,
-                    vol.Optional(CONF_SSID, default=self.config_entry.data.get(CONF_SSID)): str,
-                    vol.Optional(CONF_WPA_PSK, default=self.config_entry.data.get(CONF_WPA_PSK)): str,
+                    vol.Optional(CONF_SCAN_INTERVAL, default=300, 
+                        description={"suggested_value": self.config_entry.data.get(CONF_SCAN_INTERVAL)}): int,
+                    vol.Optional(CONF_CACHE, default=5, 
+                        description={"suggested_value": self.config_entry.data.get(CONF_CACHE)}): int,
+                    vol.Optional(CONF_SSID, default="ECU-WiFi_SSID", 
+                        description={"suggested_value": self.config_entry.data.get(CONF_SSID)}): str,
+                    vol.Optional(CONF_WPA_PSK, default="myWiFipassword", 
+                    description={"suggested_value": self.config_entry.data.get(CONF_WPA_PSK)}): str,
                 }
             )
         )

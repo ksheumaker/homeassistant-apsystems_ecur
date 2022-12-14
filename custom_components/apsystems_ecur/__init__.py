@@ -161,6 +161,15 @@ async def async_setup_entry(hass, config):
     wpa = config.data[CONF_WPA_PSK]
     cache = config.data[CONF_CACHE]
     interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
+    # Default new parameters that haven't been set yet from previous integration versions
+    try:
+        cache = config.data[CONF_CACHE]
+        ssid = config.data[CONF_SSID]
+        wpa = config.data[CONF_WPA_PSK]
+    except:
+        cache = 5
+        ssid = "ECU-WiFi_SSID"
+        wpa = "myWiFipassword"
     ecu = ECUR(host, ssid, wpa, cache)
 
     async def do_ecu_update():

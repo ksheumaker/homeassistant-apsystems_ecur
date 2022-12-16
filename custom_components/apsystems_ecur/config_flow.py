@@ -109,7 +109,7 @@ class APSsystemsOptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Optional(CONF_SSID, default="ECU-WiFi_SSID", 
                         description={"suggested_value": self.config_entry.data.get(CONF_SSID)}): str,
                     vol.Optional(CONF_WPA_PSK, default="myWiFipassword", 
-                    description={"suggested_value": self.config_entry.data.get(CONF_WPA_PSK)}): str,
+                        description={"suggested_value": self.config_entry.data.get(CONF_WPA_PSK)}): str,
                 }
             )
         )

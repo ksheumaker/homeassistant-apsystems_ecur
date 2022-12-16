@@ -62,7 +62,7 @@ class ECUR():
         self.cache_count += 1
         self.data_from_cache = True
 
-        if self.cache_count == U_WiFiSet.CACHE - 1:
+        if self.cache_count == U_WiFiSet.CACHE:
             _LOGGER.warning(f"Communication with the ECU failed after {U_WiFiSet.CACHE} repeated attempts.")
             data = {'SSID': 'U_WiFiSet.SSID', 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': 'U_WiFiSet.WPA'}
             _LOGGER.debug(f"Data sent with URL: {data}")

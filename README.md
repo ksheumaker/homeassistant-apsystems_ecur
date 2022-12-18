@@ -24,6 +24,7 @@ Wired | ECU-C | Yes
 
 ### Test your connection
 Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this by openening the terminal and using the Netcat command, follow the example below.
+![Home Assistant Dashboard](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/netcat.jpg)
 
 
 ## Pre-release/Beta program

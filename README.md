@@ -22,6 +22,10 @@ Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B |
 Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
 Wired | ECU-C | Yes
 
+### Test your connection
+Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this by openening the terminal and using the Netcat command, follow the example below.
+
+
 ## Pre-release/Beta program
 If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
 

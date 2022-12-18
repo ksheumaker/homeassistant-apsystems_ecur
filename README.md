@@ -23,8 +23,14 @@ Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
 Wired | ECU-C | Yes
 
 ### Test your connection
-Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this by openening the terminal and using the Netcat command, follow the example below.
-![Home Assistant Dashboard](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/netcat.jpg)
+Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this by openening the terminal and using the Netcat command, follow the example below. If you see it saying connected, then type in the command APS1100160001END if you get a response your ready to install the integration.
+```
+[core-ssh .storage]$ nc -v 172.16.0.4 8899
+172.16.0.4 (172.16.0.4:8899) open
+APS1100160001END
+APS11009400012160000xxxxxxxz%10012ECU_R_1.2.22009Etc/GMT-8
+```
+
 
 
 ## Pre-release/Beta program

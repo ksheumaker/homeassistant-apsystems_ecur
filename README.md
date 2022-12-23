@@ -5,7 +5,7 @@
 [![Validate with Hassfest](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml/badge.svg)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml)
 ![Home Assistant Dashboard](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/dashboard.jpg)
 # Home-Assistant APsystems ECU Integration
-This is an integration for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
+This is an integration for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail. It currently supports one ECU (one instance of the integration).
 
 Note: This integration was initially written for the older ECU-R (2160xxxxxxxx series) and is fully compatible with the ECU-B. For later ECU-R models (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) and ECU-C owners, usage of this integration results in ECU outage over time. From version 1.2.21 the integration will restart the ECU automatically. This can be monitored by the "binary_sensor.restart_ecu". Unfortunately this is a firmware issue which can't be solved by the integration.
 

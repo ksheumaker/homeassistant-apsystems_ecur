@@ -40,8 +40,8 @@ Release notes, assets and further details can be found [here](https://github.com
 ## Installation resources in other languages
 German: https://smart-home-assistant.de/ap-systems-ecu-b-einbinden
 
-## Setup Integration
-This is not a Home Assistant Add-On, it's a custom component/integration. Install the integration using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane. In the top pane you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. Choose ADD-button and then click on the repository (with the wastbasket behind it). The homepage of the integration will open and in the lower right down corner you will find the Download-button. Choose the version and click Download. Now restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.
+## Install Integration
+This is not a Home Assistant Add-On, it's a custom component/integration. Install the integration using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane. In the top pane you can find the overflow menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. Choose ADD-button and then click on the repository (with the wastbasket behind it). The homepage of the integration will open and in the lower right corner you will find the Download-button. Choose the version and click Download. Now restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.
 
 ## Configuration
 Choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
@@ -54,7 +54,7 @@ The integration uses caching. The reason for this is that the ECU does not alway
 
 ## Using the ECU Query Device switch
 Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise.
-If you prefer to stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. When the cache is used 5 times in a row and there is no automated restart or restart fails the switch will turn off and can be used to signal an issue with the ECU.
+If you prefer to temporary stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next intervals until an automation flips the switch on again. 
 
 ## The temperature sensors
 When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part which converts the value to zero:

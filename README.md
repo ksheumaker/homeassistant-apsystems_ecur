@@ -86,7 +86,7 @@ A new device will be created for each inverter called `Inverter_[UID]` where [UI
 * sensor.inverter_[UID]\_power_ch_[1-4] - the current power generation (in W) of each channel (model depentent) of the inverter
 
 ### Switch
-* switch.ecu_query_device - switch will turn off in the fifth step using cached data
+* switch.ecu_query_device - switch will turn off after the user configured number of intervals if cached data is used.
 
 ## TODO
 Code cleanup - it probably needs some work

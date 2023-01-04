@@ -5,7 +5,7 @@
 [![Validate with Hassfest](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml/badge.svg)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml)
 ![Home Assistant Dashboard](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/dashboard.jpg)
 # Home-Assistant APsystems ECU Integration
-This is an integration for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail.
+This is an integration for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail. It currently supports one ECU (one instance of the integration) but a work-around is available https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/142
 
 Note: This integration was initially written for the older ECU-R (2160xxxxxxxx series) and is fully compatible with the ECU-B. For later ECU-R models (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) and ECU-C owners, usage of this integration results in ECU outage over time. From version 1.2.21 the integration will restart the ECU automatically. This can be monitored by the "binary_sensor.restart_ecu". Unfortunately this is a firmware issue which can't be solved by the integration.
 
@@ -22,6 +22,15 @@ Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B |
 Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
 Wired | ECU-C | Yes
 
+### Test your connection
+Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this from the terminal using the Netcat command, follow the example below. If connected you'll see line 2, then type in the command APS1100160001END if you get a response you are ready to install the integration.
+```
+[core-ssh .storage]$ nc -v 172.16.0.4 8899
+172.16.0.4 (172.16.0.4:8899) open
+APS1100160001END
+APS11009400012160000xxxxxxxz%10012ECU_R_1.2.22009Etc/GMT-8
+```
+
 ## Pre-release/Beta program
 If you're having trouble with the integration, consider joining the beta program. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.
 
@@ -31,8 +40,8 @@ Release notes, assets and further details can be found [here](https://github.com
 ## Installation resources in other languages
 German: https://smart-home-assistant.de/ap-systems-ecu-b-einbinden
 
-## Setup Integration
-Install the integration using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane. In the top pane you can find the menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. Choose ADD-button and then click on the repository (with the wastbasket behind it). The homepage of the integration will open and in the lower right down corner you will find the Download-button. Choose the version and click Download. Now restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.
+## Install Integration
+This is not a Home Assistant Add-On, it's a custom component/integration. Install the integration using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane. In the top pane you can find the overflow menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. Choose ADD-button and then click on the repository (with the wastbasket behind it). The homepage of the integration will open and in the lower right corner you will find the Download-button. Choose the version and click Download. Now restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.
 
 ## Configuration
 Choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
@@ -45,7 +54,7 @@ The integration uses caching. The reason for this is that the ECU does not alway
 
 ## Using the ECU Query Device switch
 Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise.
-If you prefer to stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next interval. When the cache is used 5 times in a row and there is no automated restart or restart fails the switch will turn off and can be used to signal an issue with the ECU.
+If you prefer to temporary stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next intervals until an automation flips the switch on again. 
 
 ## The temperature sensors
 When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part which converts the value to zero:

@@ -62,7 +62,7 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     inverters = coordinator.data.get("inverters", {})
     for uid,inv_data in inverters.items():
-        #_LOGGER.warning(f"Inverter {uid} {inv_data.get('channel_qty')}")
+        _LOGGER.debug(f"Inverter {uid} {inv_data.get('channel_qty')}")
         # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/110
         if inv_data.get("channel_qty") != None:
             sensors.extend([
@@ -129,11 +129,11 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def state(self):
-        #_LOGGER.warning(f"State called for {self._field}")
+        _LOGGER.debug(f"State called for {self._field}")
         if self._field == "voltage":
             return self.coordinator.data.get("inverters", {}).get(self._uid, {}).get("voltage", [])[0]
         elif self._field == "power":
-            #_LOGGER.warning(f"POWER  {self._uid} {self._index}")
+            _LOGGER.debug(f"POWER  {self._uid} {self._index}")
             return self.coordinator.data.get("inverters", {}).get(self._uid, {}).get("power", [])[self._index]
         else:
             return self.coordinator.data.get("inverters", {}).get(self._uid, {}).get(self._field)
@@ -206,7 +206,7 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def state(self):
-        #_LOGGER.warning(f"State called for {self._field}")
+        _LOGGER.debug(f"State called for {self._field}")
         return self.coordinator.data.get(self._field)
 
     @property
@@ -230,7 +230,7 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def state_class(self):
-        #_LOGGER.debug(f"State class {self._stateclass} - {self._field}")
+        _LOGGER.debug(f"State class {self._stateclass} - {self._field}")
         return self._stateclass
 
     @property
@@ -245,5 +245,3 @@ class APSystemsECUSensor(CoordinatorEntity, SensorEntity):
     @property
     def entity_category(self):
         return self._entity_category
-
-

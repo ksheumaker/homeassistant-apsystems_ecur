@@ -8,6 +8,7 @@
   "name": "APSystems PV solar ECU",
   "integration_type": "hub",
   "iot_class": "local_polling",
-  "version": "v1.2.25",
-  "requirements": []
+  "version": "v1.2.26",
+  "requirements": [],
+  "loggers": ["custom_components.apsystems_ecur"]
 }

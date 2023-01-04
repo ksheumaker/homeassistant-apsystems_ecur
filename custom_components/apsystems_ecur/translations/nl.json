@@ -4,9 +4,12 @@
       "init": {
         "data": {
           "host": "ECU IP-adres (volg de connectie methode tabel in de readme)",
-          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)"
+          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)",
+          "CACHE" : "Pogingen als de ECU niet reageert (tussen 1 - 5 aanbevolen)",
+          "SSID" : "Specificeer SSID (Alleen voor ECU-R (sunspec) en ECU-C modellen)",
+          "WPA-PSK" : "Specificeer wachtwoord (voor ECU-R (sunspec) en ECU-C modellen)"
         },
-        "title": "APsystems ECU Config"
+        "title": "APsystems ECU Configuratie"
       }
     },
     "error": {
@@ -23,9 +26,12 @@
       "user": {
         "data": {
           "host": "ECU IP-adres (volg de connectie methode tabel in de readme)",
-          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)"
+          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)",
+          "CACHE" : "Pogingen als de ECU niet reageert (tussen 1 - 5 aanbevolen)",
+          "SSID" : "Specificeer SSID (Alleen voor ECU-R (sunspec) en ECU-C modellen)",
+          "WPA-PSK" : "Specificeer wachtwoord (voor ECU-R (sunspec) en ECU-C modellen)"
         },
-        "title": "APsystems ECU Options"
+        "title": "APsystems ECU Opties"
       }
     },
     "error": {

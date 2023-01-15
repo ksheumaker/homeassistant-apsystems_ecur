@@ -1,5 +1,5 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![hacs_badge](https://img.shields.io/maintenance/yes/2022)](https://github.com/ksheumaker/homeassistant-apsystems_ecur)
+[![hacs_badge](https://img.shields.io/maintenance/yes/2023)](https://github.com/ksheumaker/homeassistant-apsystems_ecur)
 [![hacs_badge](https://img.shields.io/github/v/release/ksheumaker/homeassistant-apsystems_ecur)](https://github.com/ksheumaker/homeassistant-apsystems_ecur)
 [![hacs_badge](https://img.shields.io/github/v/release/ksheumaker/homeassistant-apsystems_ecur?include_prereleases&label=pre-release)](https://github.com/ksheumaker/homeassistant-apsystems_ecur)
 [![Validate with Hassfest](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml/badge.svg)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml)

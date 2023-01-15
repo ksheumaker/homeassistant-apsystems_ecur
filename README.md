@@ -23,7 +23,7 @@ Wired or Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
 Wired | ECU-C | Yes
 
 ### Test your connection
-Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this from the terminal using the Netcat command, follow the example below. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration.
+Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this from the terminal using the Netcat command, follow the example below. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration. If not power cycle your ECU wait for it to get started and try again.
 ```
 [core-ssh .storage]$ nc -v 172.16.0.4 8899
 172.16.0.4 (172.16.0.4:8899) open
@@ -37,8 +37,9 @@ If you're having trouble with the integration, consider joining the beta program
 ## Release notes
 Release notes, assets and further details can be found [here](https://github.com/ksheumaker/homeassistant-apsystems_ecur/releases)
 
-## Installation resources in other languages
+## Other languages
 German: https://smart-home-assistant.de/ap-systems-ecu-b-einbinden
+Feel free to participate by adding your language to the integration but remember to reload the page, labels might be invisable due to browser caching.
 
 ## Install Integration
 This is not a Home Assistant Add-On, it's a custom component/integration. Install the integration using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane. In the top pane you can find the overflow menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. Choose ADD-button and then click on the repository (with the wastbasket behind it). The homepage of the integration will open and in the lower right corner you will find the Download-button. Choose the version and click Download. Now restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.

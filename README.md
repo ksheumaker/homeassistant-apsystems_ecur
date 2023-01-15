@@ -39,7 +39,7 @@ Release notes, assets and further details can be found [here](https://github.com
 
 ## Other languages
 German: https://smart-home-assistant.de/ap-systems-ecu-b-einbinden
-Feel free to participate by adding your language to the integration but remember to reload the page, labels might be invisable due to browser caching.
+Feel free to participate by adding your language to the integration but remember to reload the page, labels might be invisible due to browser caching.
 
 ## Install Integration
 This is not a Home Assistant Add-On, it's a custom component/integration. Install the integration using HACS by searching for "APSystems ECU-R". If you are unable to find the integration in HACS, select HACS in left pane. In the top pane you can find the overflow menu (three dots above eachother). Select Custom Repositories and add the URL: https://github.com/ksheumaker/homeassistant-apsystems_ecur below that select category Integration. Choose ADD-button and then click on the repository (with the wastbasket behind it). The homepage of the integration will open and in the lower right corner you will find the Download-button. Choose the version and click Download. Now restart Home Assistant by going to [Settings] > [System] and select [restart] in the upper right corner. After restart, next step will be the configuration.

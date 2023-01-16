@@ -33,8 +33,6 @@ class WiFiSet():
 U_WiFiSet = WiFiSet()    
 
 class ECUR():
-#class ECUR(config_entries.OptionsFlow):
-
     def __init__(self, ipaddr, ssid, wpa, cache):
         self.ecu = APSystemsSocket(ipaddr)
         self.ipaddr = ipaddr

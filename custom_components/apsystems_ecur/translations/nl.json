@@ -13,7 +13,7 @@
       }
     },
     "error": {
-      "cannot_connect": "Kan de ECU niet vinden op dit IP-adres",
+      "cannot_connect": "Kan de ECU niet vinden op dit IP-adres of life-time energy is nul",
       "no_ecuid": "Geen ECU ID ontvangen",
       "unknown": "Onbekende fout, zie het log for details"
     },
@@ -35,7 +35,7 @@
       }
     },
     "error": {
-      "cannot_connect": "Kan de ECU niet vinden op dit IP-adres",
+      "cannot_connect": "Kan de ECU niet vinden op dit IP-adres of life-time energy is nul",
       "no_ecuid": "Geen ECU ID ontvangen",
       "unknown": "Onbekende fout, zie het log voor details"
     },

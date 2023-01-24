@@ -13,7 +13,7 @@
       }
     },
     "error": {
-      "cannot_connect": "Can't find ECU at this IP-Address",
+      "cannot_connect": "Can't find ECU at this IP-Address or life-time energy is zero",
       "no_ecuid": "No ECU ID returned from ECU",
       "unknown": "Unknown error, see log for details"
     },
@@ -35,7 +35,7 @@
       }
     },
     "error": {
-      "cannot_connect": "Can't find ECU at this IP-Address",
+      "cannot_connect": "Can't find ECU at this IP-Address or life-time energy is zero",
       "no_ecuid": "No ECU ID returned from ECU",
       "unknown": "Unknown error, see log for details"
     },

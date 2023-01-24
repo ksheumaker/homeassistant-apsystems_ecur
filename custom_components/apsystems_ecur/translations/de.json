@@ -4,17 +4,16 @@
       "init": {
         "data": {
           "host": "ECU IP-Adresse (bitte Verbindungstabelle in der readme prüfen).",
-          "query_method" : "Abfragemethode für die ECU. ECU_R via socket, ECU_R_PRO und ECU_C via http abfragen.",
           "scan_interval" : "ECU Abfrage Frequenz in Sekunden (minimum 300 empfohlen).",
-          "CACHE" : "Retries when ECU fails (range between 1 - 5 recommended)",
-          "SSID" : "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
-          "WPA-PSK" : "Specify password (For ECU-R (sunspec) and ECU-C models only)"
+          "CACHE" : "Wiederholungen, wenn ECU ausfällt (Bereich zwischen 1 - 5 empfohlen)",
+          "SSID" : "SSID angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
+          "WPA-PSK" : "Kennwort angeben (nur für Modelle ECU-R (sunspec) und ECU-C)"
         },
         "title": "APsystems ECU Konfiguration"
       }
     },
     "error": {
-      "cannot_connect": "Es wurde keine ECU unter dieser IP-Adresse gefunden.",
+      "cannot_connect": "Es wurde keine ECU unter dieser IP-Adresse gefunden oder life-time energy ist Null.",
       "inverter": "Unbekannter Wechselrichter Typ, bitte Logs überprüfen.",
       "no_ecuid": "Es wurde keine ECU ID von der ECU zurückgegeben.",
       "unknown": "Unbekannter Fehler, bitte Logs überprüfen."
@@ -28,17 +27,16 @@
       "user": {
         "data": {
           "host": "ECU IP-Adresse (bitte Verbindungstabelle in der readme prüfen).",
-          "query_method" : "Abfragemethode für die ECU. ECU_R via socket, ECU_R_PRO und ECU_C via http abfragen.",
           "scan_interval" : "ECU Abfrage Frequenz in Sekunden (minimum 300 empfohlen).",
-          "CACHE" : "Retries when ECU fails (range between 1 - 5 recommended)",
-          "SSID" : "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
-          "WPA-PSK" : "Specify password (For ECU-R (sunspec) and ECU-C models only)"
+          "CACHE" : "Wiederholungen, wenn ECU ausfällt (Bereich zwischen 1 - 5 empfohlen)",
+          "SSID" : "SSID angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
+          "WPA-PSK" : "Kennwort angeben (nur für Modelle ECU-R (sunspec) und ECU-C)"
         },
         "title": "APsystems ECU Optionen"
       }
     },
     "error": {
-      "cannot_connect": "Es wurde keine ECU unter dieser IP-Adresse gefunden.",
+      "cannot_connect": "Es wurde keine ECU unter dieser IP-Adresse gefunden oder life-time energy ist Null.",
       "inverter": "Unbekannter Wechselrichter Typ, bitte Logs überprüfen.",
       "no_ecuid": "Es wurde keine ECU ID von der ECU zurückgegeben.",
       "unknown": "Unbekannter Fehler, bitte Logs überprüfen."

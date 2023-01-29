@@ -90,8 +90,8 @@ A new device will be created for each inverter called `Inverter_[UID]` where [UI
 * switch.ecu_query_device - switch will turn off after the user configured number of intervals if cached data is used.
 
 ### How to derive new sensors from excisting sensors
-Total power for each inverter: Settings > Devices and Services > Helpers (top of the screen) > +Create Helper > +/- Combine the state of several sensors
-Show the total_energy_yesterday: https://community.home-assistant.io/t/statistic-sensor-reset-clear-at-midnight-for-daily-min-max-temperature/501688/8
+* Total power for each inverter: Settings > Devices and Services > Helpers (top of the screen) > +Create Helper > +/- Combine the state of several sensors
+* Show the total_energy_yesterday: https://community.home-assistant.io/t/statistic-sensor-reset-clear-at-midnight-for-daily-min-max-temperature/501688/8
 
 ## TODO
 Code cleanup - it probably needs some work

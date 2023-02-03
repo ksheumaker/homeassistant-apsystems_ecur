@@ -207,7 +207,7 @@ async def async_setup_entry(hass, config):
             name=f"Inverter {uid}",
             model=inv_data.get("model")
         )
-    hass.config_entries.async_setup_platforms(config, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(config, PLATFORMS)
     config.async_on_unload(config.add_update_listener(update_listener))
     return True
 

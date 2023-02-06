@@ -1,0 +1,45 @@
+{
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "host": "Adresse IP ECU (Suivre la méthode connexion dans le fichier readme)",
+          "scan_interval" : "Intervalle des requêtes sur l'ECU en secondes (minimum de 300 secondes recommendées)",
+          "CACHE" : "Nombre de tentatives en cas d'échec de communication (Plage entre 1 et 5 recommendée)",
+          "SSID" : "Spécifier le SSID (Pour les modèles ECU-R (sunspec) et ECU-C seulement)",
+          "WPA-PSK" : "Spécifier le mot de passe (Pour les modèles ECU-R (sunspec) et ECU-C seulement)"
+        },
+        "title": "Configuration ECU APsystems"
+      }
+    },
+    "error": {
+      "cannot_connect": "Ne trouve pas d'ECU à cet adresse ou délai d'attente dépassé",
+      "no_ecuid": "Pas d'ID ECU retouné pour cet ECU",
+      "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails."
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "Adresse IP ECU (Suivre la méthode connexion dans le fichier readme)",
+          "scan_interval" : "Intervalle des requêtes sur l'ECU en secondes (minimum de 300 secondes recommendées)",
+          "CACHE" : "Nombre de tentatives en cas d'échec de communication (Plage entre 1 et 5 recommendée)",
+          "SSID" : "Spécifier le SSID (Pour les modèles ECU-R (sunspec) et ECU-C seulement)",
+          "WPA-PSK" : "Spécifier le mot de passe (Pour les modèles ECU-R (sunspec) et ECU-C seulement)"
+        },
+        "title": "Options ECU APsystems"
+      }
+    },
+    "error": {
+      "cannot_connect": "Ne trouve pas d'ECU à cet adresse ou délai d'attente dépassé",
+      "no_ecuid": "Pas d'ID ECU retouné pour cet ECU",
+      "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails."
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }

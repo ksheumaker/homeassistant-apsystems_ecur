@@ -3,19 +3,20 @@
     "step": {
       "init": {
         "data": {
-          "host": "Adresse IP ECU (Suivre la méthode connexion dans le fichier readme)",
-          "scan_interval" : "Intervalle des requêtes sur l'ECU en secondes (minimum de 300 secondes recommendées)",
-          "CACHE" : "Nombre de tentatives en cas d'échec de communication (Plage entre 1 et 5 recommendée)",
-          "SSID" : "Spécifier le SSID (Pour les modèles ECU-R (sunspec) et ECU-C seulement)",
-          "WPA-PSK" : "Spécifier le mot de passe (Pour les modèles ECU-R (sunspec) et ECU-C seulement)"
+          "host": "Adresse IP ECU (Voir “Prerequisites” dans le fichier Readme)",
+          "scan_interval" : "Intervalle des requêtes sur l'ECU en secondes (Min de 300 secondes recommandées)",
+          "CACHE" : "Nombre de tentatives en cas d'échec de communication (Entre 1 et 5 recommandée)",
+          "SSID" : "Spécifier le SSID (Pour les modèles ECU-R (Sunspec) et ECU-C seulement)",
+          "WPA-PSK" : "Spécifier le mot de passe (Pour les modèles ECU-R (Sunspec) et ECU-C seulement)"
         },
         "title": "Configuration ECU APsystems"
       }
     },
     "error": {
-      "cannot_connect": "Ne trouve pas d'ECU à cet adresse ou délai d'attente dépassé",
-      "no_ecuid": "Pas d'ID ECU retouné pour cet ECU",
-      "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails."
+      "cannot_connect": "Ne trouve pas d'ECU à cette adresse IP ou énergie totale produite nulle",
+      "inverter": "Type d'onduleur inconnu, veuillez vérifier les journaux",
+      "no_ecuid": "Pas d'ID ECU retourné pour cet ECU",
+      "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
@@ -25,21 +26,23 @@
     "step": {
       "user": {
         "data": {
-          "host": "Adresse IP ECU (Suivre la méthode connexion dans le fichier readme)",
-          "scan_interval" : "Intervalle des requêtes sur l'ECU en secondes (minimum de 300 secondes recommendées)",
-          "CACHE" : "Nombre de tentatives en cas d'échec de communication (Plage entre 1 et 5 recommendée)",
-          "SSID" : "Spécifier le SSID (Pour les modèles ECU-R (sunspec) et ECU-C seulement)",
-          "WPA-PSK" : "Spécifier le mot de passe (Pour les modèles ECU-R (sunspec) et ECU-C seulement)"
+          "host": "Adresse IP ECU (Voir “Prerequisites” dans le fichier Readme)",
+          "scan_interval" : "Intervalle des requêtes sur l'ECU en secondes (Min de 300 secondes recommandées)",
+          "CACHE" : "Nombre de tentatives en cas d'échec de communication (Entre 1 et 5 recommandée)",
+          "SSID" : "Spécifier le SSID (Pour les modèles ECU-R (Sunspec) et ECU-C seulement)",
+          "WPA-PSK" : "Spécifier le mot de passe (Pour les modèles ECU-R (Sunspec) et ECU-C seulement)"
         },
         "title": "Options ECU APsystems"
       }
     },
     "error": {
-      "cannot_connect": "Ne trouve pas d'ECU à cet adresse ou délai d'attente dépassé",
-      "no_ecuid": "Pas d'ID ECU retouné pour cet ECU",
-      "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails."
+      "cannot_connect": "Ne trouve pas d'ECU à cette adresse IP ou énergie totale produite nulle",
+      "inverter": "Type d'onduleur inconnu, veuillez vérifier les journaux",
+      "no_ecuid": "Pas d'ID ECU retourné pour cet ECU",
+      "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails"
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
   }
+}

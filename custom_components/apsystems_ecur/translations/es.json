@@ -1,0 +1,46 @@
+{
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "host": "Dirección IP de la ECU (Sigue el método para conectarse en la tabla del archivo readme)",
+          "scan_interval": "Intervalo de conexión a la ECU en segundos (Mínimo 300 recomendado)",
+          "CACHE": "Reintentos cuando la ECU falla (Rango entre 1 - 5 recomendado)",
+          "SSID": "Introduce SSID (Solo para modelos ECU-R (sunspec) and ECU-C)",
+          "WPA-PSK": "Introduce contraseña (Solo para modelos ECU-R (sunspec) and ECU-C)"
+        },
+        "title": "Configuración APsystems ECU"
+      }
+    },
+    "error": {
+      "cannot_connect": "No puedo encontrar la ECU en esta dirección IP o la energía life-time es cero",
+      "no_ecuid": "La ECU no ha devuelto ningún ECU ID",
+      "unknown": "Error desconocido, lee el log para mas detalles"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "host": "Dirección IP de la ECU (Sigue el método para conectarse en la tabla del archivo readme)",
+          "scan_interval": "Intervalo de conexión a la ECU en segundos (Mínimo 300 recomendado)",
+          "CACHE": "Reintentos cuando la ECU falla (Rango entre 1 - 5 recomendado)",
+          "SSID": "Introduce SSID (Solo para modelos ECU-R (sunspec) and ECU-C)",
+          "WPA-PSK": "Introduce contraseña (Solo para modelos ECU-R (sunspec) and ECU-C)"
+        },
+        "title": "Configuración APsystems ECU"
+      }
+    },
+    "error": {
+      "cannot_connect": "No puedo encontrar la ECU en esta dirección IP o la energía life-time es cero",
+      "no_ecuid": "La ECU no ha devuelto ningún ECU ID",
+      "unknown": "Error desconocido, lee el log para mas detalles"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}

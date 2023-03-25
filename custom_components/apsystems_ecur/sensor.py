@@ -67,17 +67,17 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
         if inv_data.get("channel_qty") != None:
             sensors.extend([
                     APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                        "temperature", label="Temperature", native_unit_of_measurement=TEMP_CELSIUS,
+                        "temperature", label="Temperature", unit=TEMP_CELSIUS,
                         devclass=DEVICE_CLASS_TEMPERATURE, stateclass=STATE_CLASS_MEASUREMENT, 
                         entity_category=EntityCategory.DIAGNOSTIC),
                     APSystemsECUInverterSensor(coordinator, ecu, uid, 
                         "frequency", label="Frequency", unit=FREQUENCY_HERTZ, stateclass=STATE_CLASS_MEASUREMENT, 
-                        devclass=FREQUENCY, icon=FREQ_ICON, entity_category=EntityCategory.DIAGNOSTIC),
+                        devclass=DEVICE_CLASS_FREQUENCY, icon=FREQ_ICON, entity_category=EntityCategory.DIAGNOSTIC),
                     APSystemsECUInverterSensor(coordinator, ecu, uid, 
                         "voltage", label="Voltage", unit=ELECTRIC_POTENTIAL_VOLT, stateclass=STATE_CLASS_MEASUREMENT, 
                         devclass=DEVICE_CLASS_VOLTAGE, entity_category=EntityCategory.DIAGNOSTIC),
                     APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                        "signal", label="Signal", unit=PERCENTAGE, 
+                        "signal", label="Signal", unit=PERCENTAGE, stateclass=STATE_CLASS_MEASUREMENT, 
                         icon=SIGNAL_ICON, entity_category=EntityCategory.DIAGNOSTIC)
 
             ])
@@ -85,13 +85,13 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
                 sensors.append(
                     APSystemsECUInverterSensor(coordinator, ecu, uid, f"power", 
                         index=i, label=f"Power Ch {i+1}", unit=POWER_WATT, 
-                        devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON)
+                        devclass=DEVICE_CLASS_POWER, stateclass=STATE_CLASS_MEASUREMENT, icon=SOLAR_ICON)
                 )
     add_entities(sensors)
 
 
 class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator, ecu, uid, field, index=0, label=None, icon=None, unit=None, devclass=None, entity_category=None):
+    def __init__(self, coordinator, ecu, uid, field, index=0, label=None, icon=None, unit=None, devclass=None, stateclass=None, entity_category=None):
 
         super().__init__(coordinator)
 
@@ -107,6 +107,7 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
             self._label = field
         self._icon = icon
         self._unit = unit
+        self._stateclass = stateclass
         self._entity_category = entity_category
 
         self._name = f"Inverter {self._uid} {self._label}"
@@ -156,6 +157,10 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
         }
         return attrs
 
+    @property
+    def state_class(self):
+        _LOGGER.debug(f"State class {self._stateclass} - {self._field}")
+        return self._stateclass
 
     @property
     def device_info(self):

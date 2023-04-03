@@ -11,8 +11,8 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from homeassistant.components.sensor import (
-    STATE_CLASS_MEASUREMENT,
-    STATE_CLASS_TOTAL_INCREASING
+    SensorDeviceClass,
+    SensorStateClass,
 )
 
 from .const import (
@@ -23,17 +23,12 @@ from .const import (
 )
 
 from homeassistant.const import (
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_POWER,
-    DEVICE_CLASS_ENERGY,
-    DEVICE_CLASS_VOLTAGE,
-    DEVICE_CLASS_FREQUENCY,
-    ENERGY_KILO_WATT_HOUR,
-    POWER_WATT,
-    ELECTRIC_POTENTIAL_VOLT,
-    TEMP_CELSIUS,
-    PERCENTAGE,
-    FREQUENCY_HERTZ
+    UnitOfPower,
+    UnitOfEnergy,
+    UnitOfTemperature,
+    UnitOfElectricPotential,
+    UnitOfFrequency,
+    PERCENTAGE
 )
 
 
@@ -46,18 +41,36 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     sensors = [
         APSystemsECUSensor(coordinator, ecu, "current_power", 
-            label="Current Power", unit=POWER_WATT, 
-            devclass=DEVICE_CLASS_POWER, icon=SOLAR_ICON, stateclass=STATE_CLASS_MEASUREMENT),
+            label="Current Power",
+            unit=UnitOfPower.WATT,
+            devclass=SensorDeviceClass.POWER,
+            icon=SOLAR_ICON,
+            stateclass=SensorStateClass.MEASUREMENT
+        ),
         APSystemsECUSensor(coordinator, ecu, "today_energy", 
-            label="Today Energy", unit=ENERGY_KILO_WATT_HOUR, 
-            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
+            label="Today Energy",
+            unit=UnitOfEnergy.KILO_WATT_HOUR,
+            devclass=SensorDeviceClass.ENERGY,
+            icon=SOLAR_ICON,
+            stateclass=SensorStateClass.TOTAL
+        ),
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
-            label="Lifetime Energy", unit=ENERGY_KILO_WATT_HOUR, 
-            devclass=DEVICE_CLASS_ENERGY, icon=SOLAR_ICON, stateclass=STATE_CLASS_TOTAL_INCREASING),
+            label="Lifetime Energy",
+            unit=UnitOfEnergy.KILO_WATT_HOUR,
+            devclass=SensorDeviceClass.ENERGY,
+            icon=SOLAR_ICON,
+            stateclass=SensorStateClass.TOTAL_INCREASING
+        ),
         APSystemsECUSensor(coordinator, ecu, "qty_of_inverters", 
-            label="Inverters", icon=SOLAR_ICON, entity_category=EntityCategory.DIAGNOSTIC),
+            label="Inverters",
+            icon=SOLAR_ICON,
+            entity_category=EntityCategory.DIAGNOSTIC
+        ),
         APSystemsECUSensor(coordinator, ecu, "qty_of_online_inverters", 
-            label="Inverters Online", icon=SOLAR_ICON, entity_category=EntityCategory.DIAGNOSTIC),
+            label="Inverters Online",
+            icon=SOLAR_ICON,
+            entity_category=EntityCategory.DIAGNOSTIC
+        ),
     ]
 
     inverters = coordinator.data.get("inverters", {})
@@ -66,26 +79,45 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
         # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/110
         if inv_data.get("channel_qty") != None:
             sensors.extend([
-                    APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                        "temperature", label="Temperature", unit=TEMP_CELSIUS,
-                        devclass=DEVICE_CLASS_TEMPERATURE, stateclass=STATE_CLASS_MEASUREMENT, 
-                        entity_category=EntityCategory.DIAGNOSTIC),
-                    APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                        "frequency", label="Frequency", unit=FREQUENCY_HERTZ, stateclass=STATE_CLASS_MEASUREMENT, 
-                        devclass=DEVICE_CLASS_FREQUENCY, icon=FREQ_ICON, entity_category=EntityCategory.DIAGNOSTIC),
-                    APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                        "voltage", label="Voltage", unit=ELECTRIC_POTENTIAL_VOLT, stateclass=STATE_CLASS_MEASUREMENT, 
-                        devclass=DEVICE_CLASS_VOLTAGE, entity_category=EntityCategory.DIAGNOSTIC),
-                    APSystemsECUInverterSensor(coordinator, ecu, uid, 
-                        "signal", label="Signal", unit=PERCENTAGE, stateclass=STATE_CLASS_MEASUREMENT, 
-                        icon=SIGNAL_ICON, entity_category=EntityCategory.DIAGNOSTIC)
-
+                    APSystemsECUInverterSensor(coordinator, ecu, uid, "temperature",
+                        label="Temperature",
+                        unit=UnitOfTemperature.CELSIUS,
+                        devclass=SensorDeviceClass.TEMPERATURE,
+                        stateclass=SensorStateClass.MEASUREMENT,
+                        entity_category=EntityCategory.DIAGNOSTIC
+                    ),
+                    APSystemsECUInverterSensor(coordinator, ecu, uid, "frequency",
+                        label="Frequency",
+                        unit=UnitOfFrequency.HERTZ,
+                        stateclass=SensorStateClass.MEASUREMENT,
+                        devclass=SensorDeviceClass.FREQUENCY,
+                        icon=FREQ_ICON,
+                        entity_category=EntityCategory.DIAGNOSTIC
+                    ),
+                    APSystemsECUInverterSensor(coordinator, ecu, uid, "voltage",
+                        label="Voltage",
+                        unit=UnitOfElectricPotential.VOLT,
+                        stateclass=SensorStateClass.MEASUREMENT,
+                        devclass=SensorDeviceClass.VOLTAGE, entity_category=EntityCategory.DIAGNOSTIC
+                    ),
+                    APSystemsECUInverterSensor(coordinator, ecu, uid, "signal",
+                        label="Signal",
+                        unit=PERCENTAGE,
+                        stateclass=SensorStateClass.MEASUREMENT,
+                        devclass=SensorDeviceClass.SIGNAL_STRENGTH,
+                        icon=SIGNAL_ICON,
+                        entity_category=EntityCategory.DIAGNOSTIC
+                    )
             ])
             for i in range(0, inv_data.get("channel_qty", 0)):
                 sensors.append(
                     APSystemsECUInverterSensor(coordinator, ecu, uid, f"power", 
-                        index=i, label=f"Power Ch {i+1}", unit=POWER_WATT, 
-                        devclass=DEVICE_CLASS_POWER, stateclass=STATE_CLASS_MEASUREMENT, icon=SOLAR_ICON)
+                        index=i, label=f"Power Ch {i+1}",
+                        unit=UnitOfPower.WATT,
+                        devclass=SensorDeviceClass.POWER,
+                        icon=SOLAR_ICON,
+                        stateclass=SensorStateClass.MEASUREMENT
+                    )
                 )
     add_entities(sensors)
 

@@ -52,7 +52,7 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
             unit=UnitOfEnergy.KILO_WATT_HOUR,
             devclass=SensorDeviceClass.ENERGY,
             icon=SOLAR_ICON,
-            stateclass=SensorStateClass.TOTAL
+            stateclass=SensorStateClass.TOTAL_INCREASING
         ),
         APSystemsECUSensor(coordinator, ecu, "lifetime_energy", 
             label="Lifetime Energy",

@@ -25,9 +25,9 @@ Wired | ECU-C | Yes
 ### Test your connection
 Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this from the terminal using the Netcat command, follow the example below. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration. If not, power cycle your ECU wait for it to get started and try again.
 ```
-[core-ssh .storage]$ nc -v 172.16.0.4 8899
+[core-ssh .storage]$ nc -v 172.16.0.4 8899 <┘
 172.16.0.4 (172.16.0.4:8899) open
-APS1100160001END
+APS1100160001END <┘
 APS11009400012160000xxxxxxxz%10012ECU_R_1.2.22009Etc/GMT-8
 ```
 

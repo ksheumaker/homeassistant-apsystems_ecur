@@ -314,7 +314,7 @@ class APSystemsSocket:
                             voltages.append(self.aps_int(data, cnt2 + 23))
                             power.append(self.aps_int(data, cnt2 + 25))
                             output = {
-                            "model" : "YC1000",
+                            "model" : "YC1000/QT2",
                             "channel_qty" : 4,
                             "power" : power,
                             "voltage" : voltages

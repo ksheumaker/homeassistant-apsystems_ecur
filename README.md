@@ -14,7 +14,7 @@ Note: This integration was initially written for the older ECU-R (2160xxxxxxxx s
 This integration queries the ECU with a set interval for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array. This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1). Thanks goes out to @12christiaan and @ViperRNMC for providing an automated solution to restart the ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models.
 
 ## Prerequisites
-You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000, DS3/DS3D or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
+You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000/QT2, DS3/DS3D or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
 Connection | ECU Model | Automated Restart*
 --- | --- | ---
@@ -54,8 +54,7 @@ The integration uses caching. The reason for this is that the ECU does not alway
 *The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is - the integration will restart your ECU automatically if this happens. If that fails the ECU Query Device switch will disable querying. Because an automated restart is not available on the older ECU model the switch will disable querying immediately. You can use an automation to send a notify if this happens.
 
 ## Using the ECU Query Device switch
-Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise.
-If you prefer to temporary stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next intervals until an automation flips the switch on again. 
+Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise. This is especially useful if too many query errors occur after sunset or during ECU maintenance. If you prefer to temporary stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next intervals until an automation flips the switch on again. 
 
 ## The temperature sensors
 When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part which converts the value to zero:

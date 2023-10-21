@@ -269,7 +269,7 @@ class APSystemsSocket:
                 inverter_qty = self.aps_int(data, 17) 
                 self.last_update = timestamp
                 output["timestamp"] = timestamp
-                output["inverter_qty"] = inverter_qty
+                #output["inverter_qty"] = inverter_qty
                 output["inverters"] = {}
                 signal = self.process_signal_data()
                 inverters = {}

@@ -1,5 +1,4 @@
 {
-  "domains": ["sensor"],
   "name": "APSystems ECU-R",
   "render_readme": true,
   "homeassistant": "2021.12.0"

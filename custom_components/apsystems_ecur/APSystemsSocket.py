@@ -292,13 +292,13 @@ class APSystemsSocket:
                             voltages.append(self.aps_int(data, cnt2 + 15))
                             power.append(self.aps_int(data, cnt2 + 17))
                             voltages.append(self.aps_int(data, cnt2 + 19))
-                            output = {
+                            inv_details = {
                             "model" : "YC600/DS3/DS3D-L/DS3-H",
                             "channel_qty" : 2,
                             "power" : power,
                             "voltage" : voltages
                             }
-                            inv.update(output)
+                            inv.update(inv_details)
                             cnt2 = cnt2 + 21
                         elif istr == '02':
                             power = []
@@ -313,13 +313,13 @@ class APSystemsSocket:
                             power.append(self.aps_int(data, cnt2 + 21))
                             voltages.append(self.aps_int(data, cnt2 + 23))
                             power.append(self.aps_int(data, cnt2 + 25))
-                            output = {
+                            inv_details = {
                             "model" : "YC1000/QT2",
                             "channel_qty" : 4,
                             "power" : power,
                             "voltage" : voltages
                             }
-                            inv.update(output)
+                            inv.update(inv_details)
                             cnt2 = cnt2 + 27
                         elif istr == '03':
                             power = []
@@ -332,13 +332,13 @@ class APSystemsSocket:
                             power.append(self.aps_int(data, cnt2 + 17))
                             power.append(self.aps_int(data, cnt2 + 19))
                             power.append(self.aps_int(data, cnt2 + 21))
-                            output = {
+                            inv_details = {
                             "model" : "QS1",
                             "channel_qty" : 4,
                             "power" : power,
                             "voltage" : voltages
                             }
-                            inv.update(output)
+                            inv.update(inv_details)
                             cnt2 = cnt2 + 23
                         else:
                             cnt2 = cnt2 + 9

@@ -50,6 +50,7 @@ _It's good to know that the ECU only contains new data once every 5 minutes so a
 
 ## Data caching
 The integration uses caching. The reason for this is that the ECU does not always respond to data requests. For example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. In most cases a 'time out' occurs, these are suppressed in the homeassistant.log. Practice shows that it is then best to use the old data until the ECU responds again to the next query interval. 
+![Integration data caching](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/integration_cache.jpg)
 
 *The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is - the integration will restart your ECU automatically if this happens. If that fails the ECU Query Device switch will disable querying. Because an automated restart is not available on the older ECU model the switch will disable querying immediately. You can use an automation to send a notify if this happens.
 

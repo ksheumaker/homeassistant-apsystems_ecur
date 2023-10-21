@@ -14,7 +14,7 @@ Note: This integration was initially written for the older ECU-R (2160xxxxxxxx s
 This integration queries the ECU with a set interval for new data. This was done without a public API, and by listening to and interpreting the protocol the APSystems ECU phone app (ECUapp) uses when setting up the PV array. This couldn't have been done without the hardwork of @checking12 and @HAEdwin on the home assistant forum, and all the other people from this forum (https://gathering.tweakers.net/forum/list_messages/2032302/1). Thanks goes out to @12christiaan and @ViperRNMC for providing an automated solution to restart the ECU-C and ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) models.
 
 ## Prerequisites
-You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000/QT2, DS3/DS3D or QS1/QS1A inverter. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
+You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000/QT2, DS3/DS3D, DS3-H or QS1/QS1A inverter. If your inverter is not supported, please raise an issue. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
 Connection | ECU Model | Automated Restart*
 --- | --- | ---
@@ -23,7 +23,7 @@ Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
 Wired | ECU-C | Yes
 
 ### Test your connection
-Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this from the terminal using the Netcat command, follow the example below. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration. If not, power cycle your ECU wait for it to get started and try again.
+Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. You can do this from the terminal using the Netcat command, follow the example below but use the correct IP address of your ECU. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration. If not, power cycle your ECU wait for it to get started and try again.
 ```
 [core-ssh .storage]$ nc -v 172.16.0.4 8899 <┘
 172.16.0.4 (172.16.0.4:8899) open
@@ -50,6 +50,7 @@ _It's good to know that the ECU only contains new data once every 5 minutes so a
 
 ## Data caching
 The integration uses caching. The reason for this is that the ECU does not always respond to data requests. For example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time. In most cases a 'time out' occurs, these are suppressed in the homeassistant.log. Practice shows that it is then best to use the old data until the ECU responds again to the next query interval. 
+![Integration data caching](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/integration_cache.jpg)
 
 *The integration uses the cache 5 times in a row, after which it is assumed that something else is going on, such as a stuck ECU. On the older ECU-R models (UID 2160xxxxx) and ECU-B this is not very common, on ECU-C and ECU-R (UID 2162xxxxx) models it is - the integration will restart your ECU automatically if this happens. If that fails the ECU Query Device switch will disable querying. Because an automated restart is not available on the older ECU model the switch will disable querying immediately. You can use an automation to send a notify if this happens.
 

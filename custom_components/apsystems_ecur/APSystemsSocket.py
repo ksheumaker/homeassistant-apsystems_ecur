@@ -282,7 +282,7 @@ class APSystemsSocket:
                         inv["online"] = bool(self.aps_short(data, cnt2 + 6))
                         istr = self.aps_str(data, cnt2 + 7, 2)
                         inv["signal"] = signal.get(inverter_uid, 0)
-                        if istr == '01' or istr == '04':
+                        if istr in [ '01', '04', '05']:
                             power = []
                             voltages = []
                             inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
@@ -293,7 +293,7 @@ class APSystemsSocket:
                             power.append(self.aps_int(data, cnt2 + 17))
                             voltages.append(self.aps_int(data, cnt2 + 19))
                             inv_details = {
-                            "model" : "YC600/DS3/DS3D-L",
+                            "model" : "YC600/DS3/DS3D-L/DS3-H",
                             "channel_qty" : 2,
                             "power" : power,
                             "voltage" : voltages

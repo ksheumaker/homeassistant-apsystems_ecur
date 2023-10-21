@@ -1,5 +1,9 @@
 {
-  "domains": ["sensor,binary_sensor"],
+  "domains": [
+    "sensor",
+    "binary_sensor",
+    "switch"
+  ],
   "name": "APSystems ECU-R",
   "render_readme": true,
   "homeassistant": "2021.12.0"

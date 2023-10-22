@@ -16,9 +16,6 @@ from .const import DOMAIN, CONF_SSID, CONF_WPA_PSK, CONF_CACHE
 class APSsystemsFlowHandler(config_entries.ConfigFlow):
 
     VERSION = 1
-    #connection classes are deprecated since 2021.6.0
-    #CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
-
     def __init__(self):
         _LOGGER.debug("Starting config flow class...")
 

@@ -8,7 +8,6 @@ from datetime import timedelta
 from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import load_platform
-from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
 from homeassistant.helpers.entity import Entity
 from homeassistant import config_entries, exceptions
 from homeassistant.helpers import device_registry as dr
@@ -16,22 +15,12 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
-)
-
+    )
+from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
-
-from .const import DOMAIN, CONF_SSID, CONF_WPA_PSK, CONF_CACHE
-
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
 # handle all the communications with the ECUR class and deal with our need for caching, etc
-
-class WiFiSet():
-    SSID = ""
-    WPA = ""
-    CACHE = 5
-U_WiFiSet = WiFiSet()    
-
 class ECUR():
     def __init__(self, ipaddr, ssid, wpa, cache):
         self.ecu = APSystemsSocket(ipaddr)
@@ -44,9 +33,6 @@ class ECUR():
         self.querying = True
         self.ecu_restarting = False
         self.cached_data = {}
-        U_WiFiSet.SSID = self.ssid
-        U_WiFiSet.WPA = self.wpa
-        U_WiFiSet.CACHE = self.cache
 
     def stop_query(self):
         self.querying = False
@@ -60,9 +46,9 @@ class ECUR():
         self.cache_count += 1
         self.data_from_cache = True
 
-        if self.cache_count == U_WiFiSet.CACHE:
-            _LOGGER.warning(f"Communication with the ECU failed after {U_WiFiSet.CACHE} repeated attempts.")
-            data = {'SSID': U_WiFiSet.SSID, 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': U_WiFiSet.WPA}
+        if self.cache_count == self.cache:
+            _LOGGER.warning(f"Communication with the ECU failed after {self.cache} repeated attempts.")
+            data = {'SSID': self.ssid, 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': self.wpa}
             _LOGGER.debug(f"Data sent with URL: {data}")
             # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
             if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
@@ -70,7 +56,7 @@ class ECUR():
                 headers = {'X-Requested-With': 'XMLHttpRequest'}
                 try:
                     get_url = requests.post(url, headers=headers, data=data)
-                    _LOGGER.debug(f"Attempt to restart ECU gave as response: {str(get_url.status_code)}.")
+                    _LOGGER.debug(f"Response from ECU on restart: {str(get_url.status_code)}.")
                     self.ecu_restarting = True
                 except Exception as err:
                     _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")
@@ -143,24 +129,23 @@ async def update_listener(hass, config):
 
     # Handle options update being triggered by config entry options updates
     _LOGGER.debug(f"Configuration updated: {config.as_dict()}")
-    host = config.data[CONF_HOST]
-    ssid = config.data[CONF_SSID]
-    wpa = config.data[CONF_WPA_PSK]
-    cache = config.data[CONF_CACHE]
-    ecu = ECUR(host, ssid, wpa, cache)
-    ecu.__init__(host, ssid, wpa, cache)
+    ECUR(
+        config.data["host"],
+        config.data["SSID"],
+        config.data["WPA-PSK"],
+        config.data["CACHE"]
+        )
 
 async def async_setup_entry(hass, config):
     # Setup the APsystems platform """
     hass.data.setdefault(DOMAIN, {})
-
-    host = config.data[CONF_HOST]
-    interval = timedelta(seconds=config.data[CONF_SCAN_INTERVAL])
+    host = config.data["host"]
+    interval = timedelta(seconds=config.data["scan_interval"])
     # Default new parameters that haven't been set yet from previous integration versions
     try:
-        cache = config.data[CONF_CACHE]
-        ssid = config.data[CONF_SSID]
-        wpa = config.data[CONF_WPA_PSK]
+        cache = config.data["CACHE"]
+        ssid = config.data["SSID"]
+        wpa = config.data["WPA-PSK"]
     except:
         cache = 5
         ssid = "ECU-WiFi_SSID"

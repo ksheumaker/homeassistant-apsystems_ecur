@@ -85,8 +85,6 @@ class APSystemsSocket:
         try:
             if self.socket_open:
                 self.sock.shutdown(socket.SHUT_RDWR)
-                self.sock.settimeout(self.timeout)
-                data = self.sock.recv(self.recv_size) #flush incoming/outgoing data after shutdown request before actually closing the socket
                 self.sock.close()
                 self.socket_open = False
         except Exception as err:

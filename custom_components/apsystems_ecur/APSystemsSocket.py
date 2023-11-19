@@ -2,24 +2,16 @@
 
 import socket
 import binascii
-import datetime
-import json
 import logging
 import time
+from datetime import datetime
 
 _LOGGER = logging.getLogger(__name__)
-
-from pprint import pprint
 
 class APSystemsInvalidData(Exception):
     pass
 
-class APSystemsInvalidInverter(Exception):
-    pass
-
-
 class APSystemsSocket:
-
     def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None):
         self.ipaddr = ipaddr
         self.port = port
@@ -35,13 +27,15 @@ class APSystemsSocket:
         self.recv_size = 1024
 
         # how long to wait between socket open/closes
-        self.socket_sleep_time = 5
+        self.socket_sleep_time = 3
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
         self.inverter_query_prefix = "APS1100280002"
         self.inverter_query_suffix = self.cmd_suffix
         self.inverter_signal_prefix = "APS1100280030"
+        self.ecu_energy_history_prefix = "APS1100330004"
+        self.ecu_energy_history_suffix = "END00\n"
         self.inverter_signal_suffix = self.cmd_suffix
         self.inverter_byte_start = 26
         self.ecu_id = None
@@ -59,6 +53,7 @@ class APSystemsSocket:
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
         self.inverter_raw_signal = None
+        self.energy_history_raw_data = None
         self.read_buffer = b''
         self.reader = None
         self.writer = None
@@ -94,6 +89,7 @@ class APSystemsSocket:
         self.socket_open = False
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             self.sock.settimeout(self.timeout)
             self.sock.connect((self.ipaddr, self.port))
             self.socket_open = True
@@ -101,9 +97,9 @@ class APSystemsSocket:
             raise APSystemsInvalidData(err)
 
     def query_ecu(self):
+        #read ECU data
         self.open_socket()
-        cmd = self.ecu_query
-        self.ecu_raw_data = self.send_read_from_socket(cmd)
+        self.ecu_raw_data = self.send_read_from_socket(self.ecu_query)
         self.close_socket()
         try:
             self.process_ecu_data()
@@ -112,72 +108,62 @@ class APSystemsSocket:
             # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/113
             if self.lifetime_energy == 0:
                 error = f"ECU returned 0 for lifetime energy, this is either a glitch from the ECU or a brand new installed ECU. Raw Data={self.ecu_raw_data}"
-                self.add_error(error)
                 raise APSystemsInvalidData(error)
         except Exception as err:
             raise APSystemsInvalidData(err)
         
-        # Some ECUs likes the socket to be closed and re-opened between commands
+        #read inverter data
+        # Some ECUs like the socket to be closed and re-opened between commands
         self.open_socket()
         cmd = self.inverter_query_prefix + self.ecu_id + self.inverter_query_suffix
         self.inverter_raw_data = self.send_read_from_socket(cmd)
         self.close_socket()
         
+        #read signal data
         # Some ECUs likes the socket to be closed and re-opened between commands
         self.open_socket()
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = self.send_read_from_socket(cmd)
-
         self.close_socket()
-
+        
+        #read ECU energy history data
+        self.open_socket()
+        cmd = self.ecu_energy_history_prefix + self.ecu_id + self.ecu_energy_history_suffix
+        self.energy_history_raw_data = self.send_read_from_socket(cmd)
+        self.close_socket()
+        
         data = self.process_inverter_data()
+        history = self.process_history_data()
+        data["today_energy"] = history[str(datetime.today().date())] / 100
+        #data["today_energy"] = self.today_energy #kept for DIY rollback
         data["ecu_id"] = self.ecu_id
-        data["today_energy"] = self.today_energy
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
         data["qty_of_inverters"] = self.qty_of_inverters
         data["qty_of_online_inverters"] = self.qty_of_online_inverters
         return(data)
- 
-    def aps_int(self, codec, start):
+
+    def aps_int_from_bytes(self, codec: bytes, start: int, length: int) -> int:
         try:
-            return int(binascii.b2a_hex(codec[(start):(start+2)]), 16)
+            return int.from_bytes(codec[start:start+length], byteorder='big')
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
-            error = f"Unable to convert binary to int location={start} data={debugdata}"
-            self.add_error(error)
-            raise APSystemsInvalidData(error)
- 
-    def aps_short(self, codec, start):
-        try:
-            return int(binascii.b2a_hex(codec[(start):(start+1)]), 8)
-        except ValueError as err:
-            debugdata = binascii.b2a_hex(codec)
-            error = f"Unable to convert binary to short int location={start} data={debugdata}"
-            self.add_error(error)
+            error = f"Unable to convert binary to int with length={length} at location={start} with data={debugdata}"
             raise APSystemsInvalidData(error)
 
-    def aps_double(self, codec, start):
-        try:
-            return int (binascii.b2a_hex(codec[(start):(start+4)]), 16)
-        except ValueError as err:
-            debugdata = binascii.b2a_hex(codec)
-            error = f"Unable to convert binary to double location={start} data={debugdata}"
-            self.add_error(error)
-            raise APSystemsInvalidData(error)
-    
-    def aps_bool(self, codec, start):
-        return bool(binascii.b2a_hex(codec[(start):(start+2)]))
-    
     def aps_uid(self, codec, start):
         return str(binascii.b2a_hex(codec[(start):(start+12)]))[2:14]
     
     def aps_str(self, codec, start, amount):
         return str(codec[start:(start+amount)])[2:(amount+2)]
     
-    def aps_timestamp(self, codec, start, amount):
+    def aps_datetimestamp(self, codec, start, amount):
         timestr=str(binascii.b2a_hex(codec[start:(start+amount)]))[2:(amount+2)]
         return timestr[0:4]+"-"+timestr[4:6]+"-"+timestr[6:8]+" "+timestr[8:10]+":"+timestr[10:12]+":"+timestr[12:14]
+        
+    def aps_datestamp(self, codec, start, amount):
+        datestr=str(binascii.b2a_hex(codec[start:(start+amount)]))[2:(amount+2)]
+        return datestr[0:4]+"-"+datestr[4:6]+"-"+datestr[6:8]
 
     def check_ecu_checksum(self, data, cmd):
         datalen = len(data) - 1
@@ -186,13 +172,11 @@ class APSystemsSocket:
         except ValueError as err:
             debugdata = binascii.b2a_hex(data)
             error = f"could not extract checksum int from '{cmd}' data={debugdata}"
-            self.add_error(error)
             raise APSystemsInvalidData(error)
 
         if datalen != checksum:
             debugdata = binascii.b2a_hex(data)
             error = f"Checksum on '{cmd}' failed checksum={checksum} datalen={datalen} data={debugdata}"
-            self.add_error(error)
             raise APSystemsInvalidData(error)
 
         start_str = self.aps_str(data, 0, 3)
@@ -201,13 +185,11 @@ class APSystemsSocket:
         if start_str != 'APS':
             debugdata = binascii.b2a_hex(data)
             error = f"Result on '{cmd}' incorrect start signature '{start_str}' != APS data={debugdata}"
-            self.add_error(error)
             raise APSystemsInvalidData(error)
 
         if end_str != 'END':
             debugdata = binascii.b2a_hex(data)
             error = f"Result on '{cmd}' incorrect end signature '{end_str}' != END data={debugdata}"
-            self.add_error(error)
             raise APSystemsInvalidData(error)
 
         return True
@@ -218,21 +200,38 @@ class APSystemsSocket:
             _LOGGER.debug(binascii.b2a_hex(data))
             self.check_ecu_checksum(data, "ECU Query")
             self.ecu_id = self.aps_str(data, 13, 12)
-            self.lifetime_energy = self.aps_double(data, 27) / 10
-            self.current_power = self.aps_double(data, 31)
-            self.today_energy = self.aps_double(data, 35) / 100
+            self.lifetime_energy = self.aps_int_from_bytes(data, 27, 4) / 10
+            self.current_power = self.aps_int_from_bytes(data, 31, 4)
+            self.today_energy = self.aps_int_from_bytes(data, 35, 4) / 100
             if self.aps_str(data,25,2) == "01":
-                self.qty_of_inverters = self.aps_int(data, 46)
-                self.qty_of_online_inverters = self.aps_int(data, 48)
+                self.qty_of_inverters = self.aps_int_from_bytes(data, 46, 2)
+                self.qty_of_online_inverters = self.aps_int_from_bytes(data, 48, 2)
                 self.vsl = int(self.aps_str(data, 52, 3))
                 self.firmware = self.aps_str(data, 55, self.vsl)
                 self.tsl = int(self.aps_str(data, 55 + self.vsl, 3))
                 self.timezone = self.aps_str(data, 58 + self.vsl, self.tsl)
             elif self.aps_str(data,25,2) == "02":
-                self.qty_of_inverters = self.aps_int(data, 39)
-                self.qty_of_online_inverters = self.aps_int(data, 41)
+                self.qty_of_inverters = self.aps_int_from_bytes(data, 39, 2)
+                self.qty_of_online_inverters = self.aps_int_from_bytes(data, 41, 2)
                 self.vsl = int(self.aps_str(data, 49, 3))
                 self.firmware = self.aps_str(data, 52, self.vsl)
+
+    def process_history_data(self, data=None):
+        history_data = {}
+        data = self.energy_history_raw_data
+        self.check_ecu_checksum(data, "Energy History Query")
+        _LOGGER.debug(binascii.b2a_hex(data))
+        location = 17
+        for i in range(0, 7):
+            datestamp = self.aps_datestamp(data, location, 8)
+            location += 4
+            energy = int(self.aps_int_from_bytes(data, location, 4))
+            location += 4
+            if datestamp != '454e-44-0a':
+                history_data[datestamp] = energy
+            else:
+                history_data[str(datetime.today().date())] = 0
+        return history_data
 
     def process_signal_data(self, data=None):
         signal_data = {}
@@ -262,11 +261,10 @@ class APSystemsSocket:
             cnt1 = 0
             cnt2 = 26
             if self.aps_str(data, 14, 2) == '00':
-                timestamp = self.aps_timestamp(data, 19, 14)
-                inverter_qty = self.aps_int(data, 17) 
+                timestamp = self.aps_datetimestamp(data, 19, 14)
+                inverter_qty = self.aps_int_from_bytes(data, 17, 2)
                 self.last_update = timestamp
                 output["timestamp"] = timestamp
-                #output["inverter_qty"] = inverter_qty
                 output["inverters"] = {}
                 signal = self.process_signal_data()
                 inverters = {}
@@ -276,19 +274,20 @@ class APSystemsSocket:
                     if self.aps_str(data, 15, 2) == '01':
                         inverter_uid = self.aps_uid(data, cnt2)
                         inv["uid"] = inverter_uid
-                        inv["online"] = bool(self.aps_short(data, cnt2 + 6))
+                        inv["online"] = bool(self.aps_int_from_bytes(data, cnt2 + 6, 1))
                         istr = self.aps_str(data, cnt2 + 7, 2)
                         inv["signal"] = signal.get(inverter_uid, 0)
+                        # Distinguishes the different inverters from this point down
                         if istr in [ '01', '04', '05']:
                             power = []
                             voltages = []
-                            inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                            inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
                             if inv["online"]:
-                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
-                            power.append(self.aps_int(data, cnt2 + 13))
-                            voltages.append(self.aps_int(data, cnt2 + 15))
-                            power.append(self.aps_int(data, cnt2 + 17))
-                            voltages.append(self.aps_int(data, cnt2 + 19))
+                                inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
+                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
+                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
                             inv_details = {
                             "model" : "YC600/DS3/DS3D-L/DS3-H",
                             "channel_qty" : 2,
@@ -300,16 +299,16 @@ class APSystemsSocket:
                         elif istr == '02':
                             power = []
                             voltages = []
-                            inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                            inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
                             if inv["online"]:
-                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
-                            power.append(self.aps_int(data, cnt2 + 13))
-                            voltages.append(self.aps_int(data, cnt2 + 15))
-                            power.append(self.aps_int(data, cnt2 + 17))
-                            voltages.append(self.aps_int(data, cnt2 + 19))
-                            power.append(self.aps_int(data, cnt2 + 21))
-                            voltages.append(self.aps_int(data, cnt2 + 23))
-                            power.append(self.aps_int(data, cnt2 + 25))
+                                inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
+                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
+                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 21, 2))
+                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 23, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 25, 2))
                             inv_details = {
                             "model" : "YC1000/QT2",
                             "channel_qty" : 4,
@@ -321,14 +320,14 @@ class APSystemsSocket:
                         elif istr == '03':
                             power = []
                             voltages = []
-                            inv["frequency"] = self.aps_int(data, cnt2 + 9) / 10
+                            inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
                             if inv["online"]:
-                                inv["temperature"] = self.aps_int(data, cnt2 + 11) - 100
-                            power.append(self.aps_int(data, cnt2 + 13))
-                            voltages.append(self.aps_int(data, cnt2 + 15))
-                            power.append(self.aps_int(data, cnt2 + 17))
-                            power.append(self.aps_int(data, cnt2 + 19))
-                            power.append(self.aps_int(data, cnt2 + 21))
+                                inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
+                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
+                            power.append(self.aps_int_from_bytes(data, cnt2 + 21, 2))
                             inv_details = {
                             "model" : "QS1",
                             "channel_qty" : 4,
@@ -344,7 +343,3 @@ class APSystemsSocket:
                 self.inverters = inverters
                 output["inverters"] = inverters
                 return (output)
-
-    def add_error(self, error):
-        timestamp = datetime.datetime.now()
-        self.errors.append(f"[{timestamp}] {error}")

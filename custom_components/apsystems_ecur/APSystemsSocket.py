@@ -37,7 +37,6 @@ class APSystemsSocket:
         self.ecu_energy_history_prefix = "APS1100330004"
         self.ecu_energy_history_suffix = "END00END\n"
         self.inverter_signal_suffix = self.cmd_suffix
-        self.inverter_byte_start = 26
         self.ecu_id = None
         self.qty_of_inverters = 0
         self.qty_of_online_inverters = 0

@@ -35,7 +35,7 @@ class APSystemsSocket:
         self.inverter_query_suffix = self.cmd_suffix
         self.inverter_signal_prefix = "APS1100280030"
         self.ecu_energy_history_prefix = "APS1100330004"
-        self.ecu_energy_history_suffix = "END00\n"
+        self.ecu_energy_history_suffix = "END00END\n"
         self.inverter_signal_suffix = self.cmd_suffix
         self.inverter_byte_start = 26
         self.ecu_id = None

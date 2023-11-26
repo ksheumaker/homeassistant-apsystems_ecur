@@ -123,10 +123,10 @@ class ECUR():
 async def update_listener(hass, config):
     # Handle options update being triggered by config entry options updates
     _LOGGER.debug(f"Configuration updated: {config.as_dict()}")
-    host = config.data[CONF_HOST]
-    ssid = config.data[CONF_SSID]
-    wpa = config.data[CONF_WPA_PSK]
-    cache = config.data[CONF_CACHE]
+    host = config.data["host"]
+    ssid = config.data["SSID"]
+    wpa = config.data["WPA-PSK"]
+    cache = config.data["CACHE"]
     ecu = ECUR(host, ssid, wpa, cache)
     ecu.__init__(host, ssid, wpa, cache)
 

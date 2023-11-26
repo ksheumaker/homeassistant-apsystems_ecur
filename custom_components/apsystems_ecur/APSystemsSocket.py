@@ -27,15 +27,13 @@ class APSystemsSocket:
         self.recv_size = 1024
 
         # how long to wait between socket open/closes
-        self.socket_sleep_time = 3
+        self.socket_sleep_time = 5
 
         self.cmd_suffix = "END\n"
         self.ecu_query = "APS1100160001" + self.cmd_suffix
         self.inverter_query_prefix = "APS1100280002"
         self.inverter_query_suffix = self.cmd_suffix
         self.inverter_signal_prefix = "APS1100280030"
-        self.ecu_energy_history_prefix = "APS1100330004"
-        self.ecu_energy_history_suffix = "END00END\n"
         self.inverter_signal_suffix = self.cmd_suffix
         self.ecu_id = None
         self.qty_of_inverters = 0
@@ -52,7 +50,6 @@ class APSystemsSocket:
         self.ecu_raw_data = raw_ecu
         self.inverter_raw_data = raw_inverter
         self.inverter_raw_signal = None
-        self.energy_history_raw_data = None
         self.read_buffer = b''
         self.reader = None
         self.writer = None
@@ -119,22 +116,14 @@ class APSystemsSocket:
         self.close_socket()
         
         #read signal data
-        # Some ECUs likes the socket to be closed and re-opened between commands
+        # Some ECUs like the socket to be closed and re-opened between commands
         self.open_socket()
         cmd = self.inverter_signal_prefix + self.ecu_id + self.inverter_signal_suffix
         self.inverter_raw_signal = self.send_read_from_socket(cmd)
         self.close_socket()
         
-        #read ECU energy history data
-        self.open_socket()
-        cmd = self.ecu_energy_history_prefix + self.ecu_id + self.ecu_energy_history_suffix
-        self.energy_history_raw_data = self.send_read_from_socket(cmd)
-        self.close_socket()
-        
         data = self.process_inverter_data()
-        history = self.process_history_data()
-        data["today_energy"] = history[str(datetime.today().date())] / 100
-        #data["today_energy"] = self.today_energy #kept for DIY rollback
+        data["today_energy"] = self.today_energy
         data["ecu_id"] = self.ecu_id
         data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
@@ -159,10 +148,6 @@ class APSystemsSocket:
     def aps_datetimestamp(self, codec, start, amount):
         timestr=str(binascii.b2a_hex(codec[start:(start+amount)]))[2:(amount+2)]
         return timestr[0:4]+"-"+timestr[4:6]+"-"+timestr[6:8]+" "+timestr[8:10]+":"+timestr[10:12]+":"+timestr[12:14]
-        
-    def aps_datestamp(self, codec, start, amount):
-        datestr=str(binascii.b2a_hex(codec[start:(start+amount)]))[2:(amount+2)]
-        return datestr[0:4]+"-"+datestr[4:6]+"-"+datestr[6:8]
 
     def check_ecu_checksum(self, data, cmd):
         datalen = len(data) - 1
@@ -214,23 +199,6 @@ class APSystemsSocket:
                 self.qty_of_online_inverters = self.aps_int_from_bytes(data, 41, 2)
                 self.vsl = int(self.aps_str(data, 49, 3))
                 self.firmware = self.aps_str(data, 52, self.vsl)
-
-    def process_history_data(self, data=None):
-        history_data = {}
-        data = self.energy_history_raw_data
-        self.check_ecu_checksum(data, "Energy History Query")
-        _LOGGER.debug(binascii.b2a_hex(data))
-        location = 17
-        for i in range(0, 7):
-            datestamp = self.aps_datestamp(data, location, 8)
-            location += 4
-            energy = int(self.aps_int_from_bytes(data, location, 4))
-            location += 4
-            if datestamp != '454e-44-0a':
-                history_data[datestamp] = energy
-            else:
-                history_data[str(datetime.today().date())] = 0
-        return history_data
 
     def process_signal_data(self, data=None):
         signal_data = {}

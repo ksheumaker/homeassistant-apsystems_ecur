@@ -69,19 +69,16 @@ class ECUR():
         if self.cached_data.get("ecu_id", None) == None:
             _LOGGER.debug(f"Cached data {self.cached_data}")
             raise UpdateFailed(f"Unable to get correct data from ECU, and no cached data. See log for details, and try power cycling the ECU.")
-
         return self.cached_data
 
     def update(self):
         data = {}
-        
         # if we aren't actively quering data, pull data form the cache
         # this is so we can stop querying after sunset
         if not self.querying:
             _LOGGER.debug("Not querying ECU due to query=False")
             data = self.cached_data
             self.data_from_cache = True
-
             data["data_from_cache"] = self.data_from_cache
             data["querying"] = self.querying
             return self.cached_data
@@ -119,10 +116,8 @@ class ECUR():
         data["querying"] = self.querying
         data["restart_ecu"] = self.ecu_restarting
         _LOGGER.debug(f"Returning {data}")
-
         if data.get("ecu_id", None) == None:
             raise UpdateFailed(f"Somehow data doesn't contain a valid ecu_id")
-            
         return data
 
 async def update_listener(hass, config):

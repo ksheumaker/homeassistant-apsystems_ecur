@@ -257,7 +257,7 @@ class APSystemsSocket:
                             power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
                             voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
                             inv_details = {
-                            "model" : "YC600/DS3/DS3D-L/DS3-H",
+                            "model" : "YC600/DS3 series",
                             "channel_qty" : 2,
                             "power" : power,
                             "voltage" : voltages

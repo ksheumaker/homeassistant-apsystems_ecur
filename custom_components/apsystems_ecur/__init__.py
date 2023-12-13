@@ -31,7 +31,6 @@ WiFiSet = WiFiSet()
 class ECUR():
     def __init__(self, ipaddr, ssid, wpa, cache):
         self.ecu = APSystemsSocket(ipaddr)
-        self.ipaddr = ipaddr
         self.cache_count = 0
         self.data_from_cache = False
         self.querying = True

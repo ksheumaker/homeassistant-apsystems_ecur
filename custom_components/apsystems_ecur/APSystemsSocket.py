@@ -134,7 +134,7 @@ class APSystemsSocket:
 
     def aps_int_from_bytes(self, codec: bytes, start: int, length: int) -> int:
         try:
-            return int.from_bytes(codec[start:start+length], byteorder='big')
+            return int (binascii.b2a_hex(codec[(start):(start+length)]), 16)
         except ValueError as err:
             debugdata = binascii.b2a_hex(codec)
             error = f"Unable to convert binary to int with length={length} at location={start} with data={debugdata}"

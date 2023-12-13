@@ -195,6 +195,10 @@ async def async_setup_entry(hass, config):
     config.async_on_unload(config.add_update_listener(update_listener))
     return True
 
+async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
+    _LOGGER.warning (f"The following device was removed: {device_entry}")
+    return True
+
 async def async_unload_entry(hass, config):
     unload_ok = await hass.config_entries.async_unload_platforms(config, PLATFORMS)
     coordinator = hass.data[DOMAIN].get("coordinator")

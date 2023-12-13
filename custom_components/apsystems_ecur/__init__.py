@@ -20,19 +20,25 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
+class WiFiSet():
+    ssid = ""
+    wpa = ""
+    cache = 3
+WiFiSet = WiFiSet()
+
 # handle all the communications with the ECUR class and deal with our need for caching, etc
 class ECUR():
     def __init__(self, ipaddr, ssid, wpa, cache):
         self.ecu = APSystemsSocket(ipaddr)
         self.ipaddr = ipaddr
-        self.ssid = ssid
-        self.wpa = wpa
-        self.cache = cache
         self.cache_count = 0
         self.data_from_cache = False
         self.querying = True
         self.ecu_restarting = False
         self.cached_data = {}
+        WiFiSet.ssid = ssid
+        WiFiSet.wpa = wpa
+        WiFiSet.cache = cache
 
     def stop_query(self):
         self.querying = False
@@ -46,9 +52,9 @@ class ECUR():
         self.cache_count += 1
         self.data_from_cache = True
 
-        if self.cache_count == self.cache:
-            _LOGGER.warning(f"Communication with the ECU failed after {self.cache} repeated attempts.")
-            data = {'SSID': self.ssid, 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': self.wpa}
+        if self.cache_count == WiFiSet.cache:
+            _LOGGER.warning(f"Communication with the ECU failed after {WiFiSet.cache} repeated attempts.")
+            data = {'SSID': WiFiSet.ssid, 'channel': 0, 'method': 2, 'psk_wep': '', 'psk_wpa': WiFiSet.wpa}
             _LOGGER.debug(f"Data sent with URL: {data}")
             # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
             if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
@@ -88,8 +94,7 @@ class ECUR():
             data = self.ecu.query_ecu()
             _LOGGER.debug("Got data from ECU")
 
-            # we got good results, so we store it and set flags about our
-            # cache state
+            # we got good results, so we store it and set flags about our cache state
             if data["ecu_id"] != None:
                 self.cached_data = data
                 self.cache_count = 0
@@ -123,12 +128,11 @@ class ECUR():
 async def update_listener(hass, config):
     # Handle options update being triggered by config entry options updates
     _LOGGER.debug(f"Configuration updated: {config.as_dict()}")
-    host = config.data["host"]
-    ssid = config.data["SSID"]
-    wpa = config.data["WPA-PSK"]
-    cache = config.data["CACHE"]
-    ecu = ECUR(host, ssid, wpa, cache)
-    ecu.__init__(host, ssid, wpa, cache)
+    ecu = ECUR(config.data["host"],
+               config.data["SSID"],
+               config.data["WPA-PSK"],
+               config.data["CACHE"]
+              )
 
 async def async_setup_entry(hass, config):
     # Setup the APsystems platform """

@@ -21,6 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
 class WiFiSet():
+    ipaddr = ""
     ssid = ""
     wpa = ""
     cache = 3
@@ -36,6 +37,7 @@ class ECUR():
         self.querying = True
         self.ecu_restarting = False
         self.cached_data = {}
+        WiFiSet.ipaddr = ipaddr
         WiFiSet.ssid = ssid
         WiFiSet.wpa = wpa
         WiFiSet.cache = cache
@@ -58,7 +60,7 @@ class ECUR():
             _LOGGER.debug(f"Data sent with URL: {data}")
             # Determine ECU type to decide ECU restart (for ECU-C and ECU-R with sunspec only)
             if (self.cached_data.get("ecu_id", None)[0:3] == "215") or (self.cached_data.get("ecu_id", None)[0:4] == "2162"):
-                url = 'http://' + str(self.ipaddr) + '/index.php/management/set_wlan_ap'
+                url = 'http://' + str(WiFiSet.ipaddr) + '/index.php/management/set_wlan_ap'
                 headers = {'X-Requested-With': 'XMLHttpRequest'}
                 try:
                     get_url = requests.post(url, headers=headers, data=data)

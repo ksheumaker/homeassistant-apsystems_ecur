@@ -196,8 +196,15 @@ async def async_setup_entry(hass, config):
     return True
 
 async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
-    _LOGGER.warning (f"The following device was removed: {device_entry}")
-    return True
+    if device_entry is not None:
+        # Notify the user that the device has been removed
+        hass.components.persistent_notification.async_create(
+            f"The device {device_entry} has been removed from the system.",
+            title="Device Removed",
+        )
+        return True
+    else:
+        return False
 
 async def async_unload_entry(hass, config):
     unload_ok = await hass.config_entries.async_unload_platforms(config, PLATFORMS)

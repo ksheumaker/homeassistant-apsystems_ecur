@@ -195,6 +195,17 @@ async def async_setup_entry(hass, config):
     config.async_on_unload(config.add_update_listener(update_listener))
     return True
 
+async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
+    if device_entry is not None:
+        # Notify the user that the device has been removed
+        hass.components.persistent_notification.async_create(
+            f"The following device was removed from the system: {device_entry}",
+            title="Device Removed",
+        )
+        return True
+    else:
+        return False
+
 async def async_unload_entry(hass, config):
     unload_ok = await hass.config_entries.async_unload_platforms(config, PLATFORMS)
     coordinator = hass.data[DOMAIN].get("coordinator")

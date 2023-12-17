@@ -199,7 +199,7 @@ async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
     if device_entry is not None:
         # Notify the user that the device has been removed
         hass.components.persistent_notification.async_create(
-            f"The device {device_entry} has been removed from the system.",
+            f"The following device was removed from the system: {device_entry}",
             title="Device Removed",
         )
         return True

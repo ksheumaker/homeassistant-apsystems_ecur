@@ -38,7 +38,6 @@
     },
     "error": {
       "cannot_connect": "Es wurde keine ECU unter dieser IP-Adresse gefunden oder life-time energy ist Null.",
-      "inverter": "Unbekannter Wechselrichter Typ, bitte Logs überprüfen.",
       "no_ecuid": "Es wurde keine ECU ID von der ECU zurückgegeben.",
       "unknown": "Unbekannter Fehler, bitte Logs überprüfen."
     },

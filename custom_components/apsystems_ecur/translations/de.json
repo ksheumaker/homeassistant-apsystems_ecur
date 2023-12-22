@@ -4,17 +4,17 @@
       "init": {
         "data": {
           "host": "ECU IP-Adresse (bitte Verbindungstabelle in der readme prüfen).",
-          "scan_interval" : "ECU Abfrage Frequenz in Sekunden (minimum 300 empfohlen).",
-          "CACHE" : "Wiederholungen, wenn ECU ausfällt (Bereich zwischen 1 - 5 empfohlen)",
-          "SSID" : "SSID angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
-          "WPA-PSK" : "Kennwort angeben (nur für Modelle ECU-R (sunspec) und ECU-C)"
+          "scan_interval": "ECU Abfrage Frequenz in Sekunden (minimum 300 empfohlen).",
+          "CACHE": "Wiederholungen, wenn ECU ausfällt (Bereich zwischen 1 - 5 empfohlen)",
+          "SSID": "SSID angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
+          "WPA-PSK": "Kennwort angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
+          "stop_graphs": "Aktualisieren die Diagramme nicht, wenn die Wechselrichter offline sind"
         },
         "title": "APsystems ECU Konfiguration"
       }
     },
     "error": {
       "cannot_connect": "Es wurde keine ECU unter dieser IP-Adresse gefunden oder life-time energy ist Null.",
-      "inverter": "Unbekannter Wechselrichter Typ, bitte Logs überprüfen.",
       "no_ecuid": "Es wurde keine ECU ID von der ECU zurückgegeben.",
       "unknown": "Unbekannter Fehler, bitte Logs überprüfen."
     },
@@ -27,10 +27,11 @@
       "user": {
         "data": {
           "host": "ECU IP-Adresse (bitte Verbindungstabelle in der readme prüfen).",
-          "scan_interval" : "ECU Abfrage Frequenz in Sekunden (minimum 300 empfohlen).",
-          "CACHE" : "Wiederholungen, wenn ECU ausfällt (Bereich zwischen 1 - 5 empfohlen)",
-          "SSID" : "SSID angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
-          "WPA-PSK" : "Kennwort angeben (nur für Modelle ECU-R (sunspec) und ECU-C)"
+          "scan_interval": "ECU Abfrage Frequenz in Sekunden (minimum 300 empfohlen).",
+          "CACHE": "Wiederholungen, wenn ECU ausfällt (Bereich zwischen 1 - 5 empfohlen)",
+          "SSID": "SSID angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
+          "WPA-PSK": "Kennwort angeben (nur für Modelle ECU-R (sunspec) und ECU-C)",
+          "stop_graphs": "Aktualisieren die Diagramme nicht, wenn die Wechselrichter offline sind"
         },
         "title": "APsystems ECU Optionen"
       }

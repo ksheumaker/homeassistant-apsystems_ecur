@@ -4,10 +4,11 @@
       "init": {
         "data": {
           "host": "ECU IP-adres (volg de connectie methode tabel in de readme)",
-          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)",
-          "CACHE" : "Pogingen als de ECU niet reageert (tussen 1 - 5 aanbevolen)",
-          "SSID" : "Specificeer SSID (Alleen voor ECU-R (sunspec) en ECU-C modellen)",
-          "WPA-PSK" : "Specificeer wachtwoord (voor ECU-R (sunspec) en ECU-C modellen)"
+          "scan_interval": "ECU query interval in seconden (minimum 300 aanbevolen)",
+          "CACHE": "Pogingen als de ECU niet reageert (tussen 1 - 5 aanbevolen)",
+          "SSID": "Specificeer SSID (Alleen voor ECU-R (sunspec) en ECU-C modellen)",
+          "WPA-PSK": "Specificeer wachtwoord (voor ECU-R (sunspec) en ECU-C modellen)",
+          "stop_graphs": "Werk grafieken niet bij als de omvormers offline zijn"
         },
         "title": "APsystems ECU Configuratie"
       }
@@ -26,10 +27,11 @@
       "user": {
         "data": {
           "host": "ECU IP-adres (volg de connectie methode tabel in de readme)",
-          "scan_interval" : "ECU query interval in seconden (minimum 300 aanbevolen)",
-          "CACHE" : "Pogingen als de ECU niet reageert (tussen 1 - 5 aanbevolen)",
-          "SSID" : "Specificeer SSID (Alleen voor ECU-R (sunspec) en ECU-C modellen)",
-          "WPA-PSK" : "Specificeer wachtwoord (voor ECU-R (sunspec) en ECU-C modellen)"
+          "scan_interval": "ECU query interval in seconden (minimum 300 aanbevolen)",
+          "CACHE": "Pogingen als de ECU niet reageert (tussen 1 - 5 aanbevolen)",
+          "SSID": "Specificeer SSID (Alleen voor ECU-R (sunspec) en ECU-C modellen)",
+          "WPA-PSK": "Specificeer wachtwoord (voor ECU-R (sunspec) en ECU-C modellen)",
+          "stop_graphs": "Werk grafieken niet bij als de omvormers offline zijn"
         },
         "title": "APsystems ECU Opties"
       }

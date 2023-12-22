@@ -15,7 +15,6 @@
     },
     "error": {
       "cannot_connect": "Ne trouve pas d'ECU à cette adresse IP ou énergie totale produite nulle",
-      "inverter": "Type d'onduleur inconnu, veuillez vérifier les journaux",
       "no_ecuid": "Pas d'ID ECU retourné pour cet ECU",
       "unknown": "Erreur inconnue, veuillez consulter le journal des logs pour plus de détails"
     },

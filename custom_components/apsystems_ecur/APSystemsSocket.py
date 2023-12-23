@@ -323,6 +323,7 @@ class APSystemsSocket:
                                 power.append(None)
                                 power.append(None)
                             else:
+                                inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
                                 power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
                                 voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
                                 power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))

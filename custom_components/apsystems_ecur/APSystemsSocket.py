@@ -316,7 +316,7 @@ class APSystemsSocket:
                             if inv["online"]:
                                 inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
                             if inv["online"] == False and no_graphs == True:
-                                inv["temperature"] = None
+                                inv["frequency"] = None
                                 power.append(None)
                                 voltages.append(None)
                                 power.append(None)

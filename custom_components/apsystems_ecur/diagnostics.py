@@ -28,4 +28,3 @@ async def async_get_device_diagnostics(
     diag_data = {"entry": async_redact_data(ecu.ecu.dump_data(), TO_REDACT)}
 
     return diag_data
-

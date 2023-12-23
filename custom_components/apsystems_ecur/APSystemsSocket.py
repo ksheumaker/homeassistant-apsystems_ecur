@@ -12,7 +12,9 @@ class APSystemsInvalidData(Exception):
     pass
 
 class APSystemsSocket:
-    def __init__(self, ipaddr, port=8899, raw_ecu=None, raw_inverter=None):
+    def __init__(self, ipaddr, nographs, port=8899, raw_ecu=None, raw_inverter=None):
+        global no_graphs
+        no_graphs = nographs
         self.ipaddr = ipaddr
         self.port = port
 
@@ -51,8 +53,6 @@ class APSystemsSocket:
         self.inverter_raw_data = raw_inverter
         self.inverter_raw_signal = None
         self.read_buffer = b''
-        self.reader = None
-        self.writer = None
         self.socket = None
         self.socket_open = False
         self.errors = []
@@ -249,13 +249,23 @@ class APSystemsSocket:
                         if istr in [ '01', '04', '05']:
                             power = []
                             voltages = []
-                            inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
-                            if inv["online"]:
+
+                            # Should graphs be updated? 
+                            if inv["online"] == True:
                                 inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
-                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
-                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
+                            if inv["online"] == False and no_graphs == True:
+                                inv["frequency"] = None
+                                power.append(None)
+                                voltages.append(None)
+                                power.append(None)
+                                voltages.append(None)
+                            else:
+                                inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
+                                voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
+                                voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
+
                             inv_details = {
                             "model" : "YC600/DS3 series",
                             "channel_qty" : 2,
@@ -267,16 +277,29 @@ class APSystemsSocket:
                         elif istr == '02':
                             power = []
                             voltages = []
-                            inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
+
+                            # Should graphs be updated? 
                             if inv["online"]:
                                 inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
-                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
-                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 21, 2))
-                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 23, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 25, 2))
+                            if inv["online"] == False and no_graphs == True:
+                                inv["frequency"] = None
+                                power.append(None)
+                                voltages.append(None)
+                                power.append(None)
+                                voltages.append(None)
+                                power.append(None)
+                                voltages.append(None)
+                                power.append(None)
+                            else:
+                                inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
+                                voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
+                                voltages.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 21, 2))
+                                voltages.append(self.aps_int_from_bytes(data, cnt2 + 23, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 25, 2))
+
                             inv_details = {
                             "model" : "YC1000/QT2",
                             "channel_qty" : 4,
@@ -288,14 +311,24 @@ class APSystemsSocket:
                         elif istr == '03':
                             power = []
                             voltages = []
-                            inv["frequency"] = self.aps_int_from_bytes(data, cnt2 + 9, 2) / 10
+
+                            # Should graphs be updated? 
                             if inv["online"]:
                                 inv["temperature"] = self.aps_int_from_bytes(data, cnt2 + 11, 2) - 100
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
-                            voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
-                            power.append(self.aps_int_from_bytes(data, cnt2 + 21, 2))
+                            if inv["online"] == False and no_graphs == True:
+                                inv["temperature"] = None
+                                power.append(None)
+                                voltages.append(None)
+                                power.append(None)
+                                power.append(None)
+                                power.append(None)
+                            else:
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 13, 2))
+                                voltages.append(self.aps_int_from_bytes(data, cnt2 + 15, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 17, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 19, 2))
+                                power.append(self.aps_int_from_bytes(data, cnt2 + 21, 2))
+
                             inv_details = {
                             "model" : "QS1",
                             "channel_qty" : 4,

@@ -244,8 +244,8 @@ class APSystemsSocket:
                         inv["uid"] = inverter_uid
                         inv["online"] = bool(self.aps_int_from_bytes(data, cnt2 + 6, 1))
                         istr = self.aps_str(data, cnt2 + 7, 2)
+
                         # Should graphs be updated?
-                        _LOGGER.warning(f"status: inverter online = {inv['online']}, nographs = {no_graphs}")
                         if inv["online"] == False and no_graphs == True:
                             inv["signal"] = None
                         else:

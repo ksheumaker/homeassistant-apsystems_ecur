@@ -3,6 +3,7 @@ import requests
 
 import voluptuous as vol
 import traceback
+import datetime as dt
 from datetime import timedelta
 
 from .APSystemsSocket import APSystemsSocket, APSystemsInvalidData
@@ -29,8 +30,8 @@ WiFiSet = WiFiSet()
 
 # handle all the communications with the ECUR class and deal with our need for caching, etc
 class ECUR():
-    def __init__(self, ipaddr, ssid, wpa, cache):
-        self.ecu = APSystemsSocket(ipaddr)
+    def __init__(self, ipaddr, ssid, wpa, cache, nographs):
+        self.ecu = APSystemsSocket(ipaddr, nographs)
         self.cache_count = 0
         self.data_from_cache = False
         self.querying = True
@@ -132,24 +133,21 @@ async def update_listener(hass, config):
     ecu = ECUR(config.data["host"],
                config.data["SSID"],
                config.data["WPA-PSK"],
-               config.data["CACHE"]
+               config.data["CACHE"],
+               config.data["stop_graphs"]
               )
 
 async def async_setup_entry(hass, config):
     # Setup the APsystems platform """
     hass.data.setdefault(DOMAIN, {})
     host = config.data["host"]
+    nographs = config.data["stop_graphs"]
     interval = timedelta(seconds=config.data["scan_interval"])
-    # Default new parameters that haven't been set yet from previous integration versions
-    try:
-        cache = config.data["CACHE"]
-        ssid = config.data["SSID"]
-        wpa = config.data["WPA-PSK"]
-    except:
-        cache = 5
-        ssid = "ECU-WiFi_SSID"
-        wpa = "myWiFipassword"
-    ecu = ECUR(host, ssid, wpa, cache)
+    # Default to new parameters that might not have been set yet from previous integration versions
+    cache = hass.data.get(config.data["CACHE"], 5)
+    ssid = hass.data.get(config.data["SSID"], "ECU-WiFi_SSID")
+    wpa = hass.data.get(config.data["WPA-PSK"], "myWiFipassword")
+    ecu = ECUR(host, ssid, wpa, cache, nographs)
 
     async def do_ecu_update():
         return await hass.async_add_executor_job(ecu.update)

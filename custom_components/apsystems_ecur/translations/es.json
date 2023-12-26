@@ -7,7 +7,8 @@
           "scan_interval": "Intervalo de conexión a la ECU en segundos (Mínimo 300 recomendado)",
           "CACHE": "Reintentos cuando la ECU falla (Rango entre 1 - 5 recomendado)",
           "SSID": "Introduce SSID (Solo para modelos ECU-R (sunspec) and ECU-C)",
-          "WPA-PSK": "Introduce contraseña (Solo para modelos ECU-R (sunspec) and ECU-C)"
+          "WPA-PSK": "Introduce contraseña (Solo para modelos ECU-R (sunspec) and ECU-C)",
+          "stop_graphs": "No actualice los gráficos cuando los inversores estén fuera de línea"
         },
         "title": "Configuración APsystems ECU"
       }
@@ -29,7 +30,8 @@
           "scan_interval": "Intervalo de conexión a la ECU en segundos (Mínimo 300 recomendado)",
           "CACHE": "Reintentos cuando la ECU falla (Rango entre 1 - 5 recomendado)",
           "SSID": "Introduce SSID (Solo para modelos ECU-R (sunspec) and ECU-C)",
-          "WPA-PSK": "Introduce contraseña (Solo para modelos ECU-R (sunspec) and ECU-C)"
+          "WPA-PSK": "Introduce contraseña (Solo para modelos ECU-R (sunspec) and ECU-C)",
+          "stop_graphs": "No actualice los gráficos cuando los inversores estén fuera de línea"
         },
         "title": "Configuración APsystems ECU"
       }

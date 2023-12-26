@@ -4,10 +4,11 @@
       "init": {
         "data": {
           "host": "ECU IP address (follow connection method table in readme)",
-          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)",
-          "CACHE" : "Retries when ECU fails (range between 1 - 5 recommended)",
-          "SSID" : "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
-          "WPA-PSK" : "Specify password (For ECU-R (sunspec) and ECU-C models only)"
+          "scan_interval": "ECU query interval in seconds (minimum 300 recommended)",
+          "CACHE": "Retries when ECU fails (range between 1 - 5 recommended)",
+          "SSID": "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
+          "WPA-PSK": "Specify password (For ECU-R (sunspec) and ECU-C models only)",
+          "stop_graphs": "Do not update graphs when inverters are offline"
         },
         "title": "APsystems ECU Config"
       }
@@ -26,10 +27,11 @@
       "user": {
         "data": {
           "host": "ECU IP address (follow connection method table in readme)",
-          "scan_interval" : "ECU query interval in seconds (minimum 300 recommended)",
-          "CACHE" : "Retries when ECU fails (range between 1 - 5 recommended)",
-          "SSID" : "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
-          "WPA-PSK" : "Specify password (For ECU-R (sunspec) and ECU-C models only)"
+          "scan_interval": "ECU query interval in seconds (minimum 300 recommended)",
+          "CACHE": "Retries when ECU fails (range between 1 - 5 recommended)",
+          "SSID": "Specify SSID (For ECU-R (sunspec) and ECU-C models only)",
+          "WPA-PSK": "Specify password (For ECU-R (sunspec) and ECU-C models only)",
+          "stop_graphs": "Do not update graphs when inverters are offline"
         },
         "title": "APsystems ECU Options"
       }

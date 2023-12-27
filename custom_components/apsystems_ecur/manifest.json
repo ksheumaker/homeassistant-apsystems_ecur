@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues",
   "loggers": ["custom_components.apsystems_ecur"],
   "requirements": [],  
-  "version": "v1.3.0b"
+  "version": "v1.3.0"
 }

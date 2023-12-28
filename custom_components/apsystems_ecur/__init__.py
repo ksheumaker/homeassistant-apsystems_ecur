@@ -141,13 +141,14 @@ async def async_setup_entry(hass, config):
     # Setup the APsystems platform """
     hass.data.setdefault(DOMAIN, {})
     host = config.data["host"]
-    nographs = config.data["stop_graphs"]
     interval = timedelta(seconds=config.data["scan_interval"])
-    # Default to new parameters that might not have been set yet from previous integration versions
-    cache = hass.data.get(config.data["CACHE"], 5)
-    ssid = hass.data.get(config.data["SSID"], "ECU-WiFi_SSID")
-    wpa = hass.data.get(config.data["WPA-PSK"], "myWiFipassword")
+    # Defaults for new parameters that might not have been set yet from previous integration versions
+    cache = config.data.get("CACHE", 5)
+    ssid = config.data.get("SSID", "ECU-WiFi_SSID")
+    wpa = config.data.get("WPA-PSK", "myWiFipassword")
+    nographs = config.data.get("stop_graphs", False)
     ecu = ECUR(host, ssid, wpa, cache, nographs)
+    
 
     async def do_ecu_update():
         return await hass.async_add_executor_job(ecu.update)

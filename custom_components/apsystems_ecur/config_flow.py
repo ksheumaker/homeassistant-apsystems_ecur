@@ -17,7 +17,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema({vol.Required(CONF_HOST): str,
                                     vol.Optional(CONF_CACHE, default=5): int,
                                     vol.Optional(CONF_SSID, default="ECU-WIFI_local"): str,
                                     vol.Optional(CONF_WPA_PSK, default="default"): str,
-                                    vol.Optional(CONF_STOP_GRAPHS): bool,
+                                    vol.Optional(CONF_STOP_GRAPHS, default=False): bool,
                                     })
 
 @config_entries.HANDLERS.register(DOMAIN)

@@ -100,12 +100,6 @@ class APSystemsSocket:
         self.close_socket()
         try:
             self.process_ecu_data()
-            # conflicting interests of which 113 is just a temorary issue and less common
-            # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/126
-            # https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/113
-            if self.lifetime_energy == 0:
-                error = f"ECU returned 0 for lifetime energy, this is either a glitch from the ECU or a brand new installed ECU. Raw Data={self.ecu_raw_data}"
-                raise APSystemsInvalidData(error)
         except Exception as err:
             raise APSystemsInvalidData(err)
         
@@ -126,7 +120,8 @@ class APSystemsSocket:
         data = self.process_inverter_data()
         data["today_energy"] = self.today_energy
         data["ecu_id"] = self.ecu_id
-        data["lifetime_energy"] = self.lifetime_energy
+        if self.lifetime_energy != 0:
+            data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
         data["qty_of_inverters"] = self.qty_of_inverters
         data["qty_of_online_inverters"] = self.qty_of_online_inverters

@@ -50,7 +50,8 @@ Choose [Configuration] > [Devices & Services] > [+ Add Integration] and search f
 _It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often._ After selecting [Submit] the integration will setup the entities in around 12 seconds.
 
 ## Data caching
-The integration uses caching when needed (present previous data). **Use the binary_sensor.ecu_using_cached_data sensor to monitor the use of caching** 
+The integration uses caching when needed (present previous data). **Use the binary_sensor.ecu_using_cached_data sensor to monitor the use of caching**
+
 The reason for this is that the ECU does not always respond to data requests (due to other I/O tasks the ECU performs for example during maintenance tasks that take place on the ECU around 02.45-03.15 AM local time or due to timing changes an EMA upload initiated from the ECU can conflict with a query initiated from this integration). In most cases a 'time out' occurs, these are suppressed in the homeassistant.log and do no harm. Practice shows that it is then best to use the old data until the ECU responds again to the next query interval. If you experience cache usage frequently, try relocating the ECU. Some users even experience improvements by removing the WiFi antenna from the ECU.
 
 ![Integration data caching](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/integration_cache.jpg)

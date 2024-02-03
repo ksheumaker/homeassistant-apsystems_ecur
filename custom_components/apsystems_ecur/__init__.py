@@ -50,10 +50,25 @@ class ECUR():
         self.querying = True
         
     def inverters_off(self):
+        headers = {'X-Requested-With': 'XMLHttpRequest'}
+        url = 'http://'+ str(WiFiSet.ipaddr) + '/index.php/configuration/set_switch_all_off'
+        try:
+            get_url = requests.post(url, headers=headers)
+            _LOGGER.warning(f"Response from ECU on switching the inverters off: {str(get_url.status_code)}")
+        except Exception as err:
+            _LOGGER.warning(f"Attempt to switch inverters off failed with error: {err}")
         self.inverters_online = False
 
     def inverters_on(self):
+        headers = {'X-Requested-With': 'XMLHttpRequest'}
+        url = 'http://'+ str(WiFiSet.ipaddr) + '/index.php/configuration/set_switch_all_on'
+        try:
+            get_url = requests.post(url, headers=headers)
+            _LOGGER.warning(f"Response from ECU on switching the inverters on: {str(get_url.status_code)}")
+        except Exception as err:
+            _LOGGER.warning(f"Attempt to switch inverters on failed with error: {err}")
         self.inverters_online = True
+
 
     def use_cached_data(self, msg):
         # we got invalid data, so we need to pull from cache
@@ -89,26 +104,6 @@ class ECUR():
     def update(self):
         data = {}
         _LOGGER.warning(f"Inverters online: {self.inverters_online}")
-        if self.inverters_online == False:
-            self.querying = False
-            headers = {'X-Requested-With': 'XMLHttpRequest'}
-            url = 'http://'+ str(WiFiSet.ipaddr) + '/index.php/configuration/set_switch_all_off'
-            try:
-                get_url = requests.post(url, headers=headers)
-                _LOGGER.warning(f"Response from ECU on switching the inverters off: {str(get_url.status_code)}")
-            except Exception as err:
-                _LOGGER.warning(f"Attempt to switch inverters off failed with error: {err}")
-        else:
-            if self.querying == False:
-                self.querying = True
-                headers = {'X-Requested-With': 'XMLHttpRequest'}
-                url = 'http://'+ str(WiFiSet.ipaddr) + '/index.php/configuration/set_switch_all_on'
-                try:
-                    get_url = requests.post(url, headers=headers)
-                    _LOGGER.warning(f"Response from ECU on switching the inverters on: {str(get_url.status_code)}")
-                except Exception as err:
-                    _LOGGER.warning(f"Attempt to switch inverters on failed with error: {err}")
-
         # if we aren't actively quering data, pull data form the cache
         # this is so we can stop querying after sunset
         if not self.querying:

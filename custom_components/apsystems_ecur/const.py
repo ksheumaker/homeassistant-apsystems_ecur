@@ -5,6 +5,7 @@ SIGNAL_ICON = "mdi:signal"
 RELOAD_ICON = "mdi:reload"
 CACHE_ICON = "mdi:cached"
 RESTART_ICON = "mdi:restart"
+POWER_ICON = "mdi:power"
 
 CONF_SSID = "SSID"
 CONF_WPA_PSK = "WPA-PSK"

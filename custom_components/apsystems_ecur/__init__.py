@@ -102,7 +102,6 @@ class ECUR():
 
     def update(self):
         data = {}
-        _LOGGER.warning(f"Inverters online: {self.inverters_online}")
         # if we aren't actively quering data, pull data form the cache
         # this is so we can stop querying after sunset
         if not self.querying:

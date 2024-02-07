@@ -35,6 +35,7 @@ class ECUR():
         self.cache_count = 0
         self.data_from_cache = False
         self.querying = True
+        self.inverters_online = True
         self.ecu_restarting = False
         self.cached_data = {}
         WiFiSet.ipaddr = ipaddr
@@ -47,6 +48,26 @@ class ECUR():
 
     def start_query(self):
         self.querying = True
+        
+    def inverters_off(self):
+        headers = {'X-Requested-With': 'XMLHttpRequest'}
+        url = 'http://'+ str(WiFiSet.ipaddr) + '/index.php/configuration/set_switch_all_off'
+        try:
+            get_url = requests.post(url, headers=headers)
+            self.inverters_online = False
+            _LOGGER.debug(f"Response from ECU on switching the inverters off: {str(get_url.status_code)}")
+        except Exception as err:
+            _LOGGER.warning(f"Attempt to switch inverters off failed with error: {err}")
+
+    def inverters_on(self):
+        headers = {'X-Requested-With': 'XMLHttpRequest'}
+        url = 'http://'+ str(WiFiSet.ipaddr) + '/index.php/configuration/set_switch_all_on'
+        try:
+            get_url = requests.post(url, headers=headers)
+            self.inverters_online = True
+            _LOGGER.debug(f"Response from ECU on switching the inverters on: {str(get_url.status_code)}")
+        except Exception as err:
+            _LOGGER.warning(f"Attempt to switch inverters on failed with error: {err}")
 
     def use_cached_data(self, msg):
         # we got invalid data, so we need to pull from cache
@@ -64,7 +85,7 @@ class ECUR():
                 headers = {'X-Requested-With': 'XMLHttpRequest'}
                 try:
                     get_url = requests.post(url, headers=headers, data=data)
-                    _LOGGER.debug(f"Response from ECU on restart: {str(get_url.status_code)}.")
+                    _LOGGER.debug(f"Response from ECU on restart: {str(get_url.status_code)}")
                     self.ecu_restarting = True
                 except Exception as err:
                     _LOGGER.warning(f"Attempt to restart ECU failed with error: {err}. Querying is stopped automatically.")

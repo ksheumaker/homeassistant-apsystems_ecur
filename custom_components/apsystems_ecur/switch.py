@@ -9,7 +9,8 @@ from homeassistant.helpers.update_coordinator import (
 
 from .const import (
     DOMAIN,
-    RELOAD_ICON
+    RELOAD_ICON,
+    POWER_ICON
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -18,20 +19,17 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
-
     switches = [
         APSystemsECUQuerySwitch(coordinator, ecu, "query_device", 
             label="Query Device", icon=RELOAD_ICON),
+        APSystemsECUInvertersSwitch(coordinator, ecu, "inverters_online", 
+            label="Inverters Online", icon=POWER_ICON),
     ]
     add_entities(switches)
 
-
 class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
-
     def __init__(self, coordinator, ecu, field, label=None, icon=None):
-
         super().__init__(coordinator)
-
         self.coordinator = coordinator
         self._ecu = ecu
         self._field = field
@@ -39,7 +37,6 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
         if not label:
             self._label = field
         self._icon = icon
-
         self._name = f"ECU {self._label}"
         self._state = True
 
@@ -79,5 +76,57 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
     
     def turn_on(self, **kwargs):
         self._ecu.start_query()
+        self._state = True
+        self.schedule_update_ha_state()
+
+class APSystemsECUInvertersSwitch(CoordinatorEntity, SwitchEntity):
+    def __init__(self, coordinator, ecu, field, label=None, icon=None):
+        super().__init__(coordinator)
+        self.coordinator = coordinator
+        self._ecu = ecu
+        self._field = field
+        self._label = label
+        if not label:
+            self._label = field
+        self._icon = icon
+        self._name = f"ECU {self._label}"
+        self._state = True
+
+    @property
+    def unique_id(self):
+        return f"{self._ecu.ecu.ecu_id}_{self._field}"
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def icon(self):
+        return self._icon
+
+    @property
+    def device_info(self):
+        parent = f"ecu_{self._ecu.ecu.ecu_id}"
+        return {
+            "identifiers": {
+                (DOMAIN, parent),
+            }
+        }
+
+    @property
+    def entity_category(self):
+        return EntityCategory.CONFIG
+    
+    @property
+    def is_on(self):
+        return self._ecu.inverters_online
+
+    def turn_off(self, **kwargs):
+        self._ecu.inverters_off()
+        self._state = False
+        self.schedule_update_ha_state()
+    
+    def turn_on(self, **kwargs):
+        self._ecu.inverters_on()
         self._state = True
         self.schedule_update_ha_state()

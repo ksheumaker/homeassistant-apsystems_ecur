@@ -61,6 +61,9 @@ The reason for this is that the ECU does not always respond to data requests (du
 ## Using the ECU Query Device switch
 Although you can query the ECU 24/7, it is an option to stop the query after sunset and start the query again at sunrise. This is especially useful if too many query errors occur after sunset or during ECU maintenance. If you prefer to temporary stop querying the ECU, you can create an automation that flips the switch. manually flipping the switch causes the cache to be used the next intervals until an automation flips the switch on again. **It is recommended to place the switch on the dashboard so that you are able to see the state. The switch will turn off when the cache is used the set number of consecutively times**.
 
+## Using the ECU Inverters Online switch
+For newer type ECU-R pro and ECU-C devices you are able to switch off the inverters when electricity prices become negative. The change will happen immediately but will only be visible instantly on a P1 meter for example. The ECU data is updated after max 5 minutes. For the older ECU-R's starting with ECU-id 2160 this switch will ***not*** function. Use the switch in automations to anticipate on electricity prices.
+
 ## The temperature sensors
 When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part which converts the value to zero:
 ```
@@ -93,8 +96,9 @@ A new device will be created for each inverter called `Inverter_[UID]` where [UI
 ### Removing devices
 If an inverter fails and hardware is replaced, the old inverter can be easily removed from within the Device info card. The device is removed from the core.device_registry and placed under the "deleted devices" category.
 
-### Switch
+### Switches
 * switch.ecu_query_device - switch will turn off after the user configured number of intervals if cached data is used.
+* switch.ecu_inverters_online - switch the inverters on/off. This will happen immediately but is at max visible after the next 5 minute update.
 
 ### How to derive new sensors from excisting sensors
 * Total power for each inverter: Settings > Devices and Services > Helpers (top of the screen) > +Create Helper > +/- Combine the state of several sensors

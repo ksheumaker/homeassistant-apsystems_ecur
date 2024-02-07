@@ -19,7 +19,6 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
 
     ecu = hass.data[DOMAIN].get("ecu")
     coordinator = hass.data[DOMAIN].get("coordinator")
-
     switches = [
         APSystemsECUQuerySwitch(coordinator, ecu, "query_device", 
             label="Query Device", icon=RELOAD_ICON),
@@ -28,13 +27,9 @@ async def async_setup_entry(hass, config, add_entities, discovery_info=None):
     ]
     add_entities(switches)
 
-
 class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
-
     def __init__(self, coordinator, ecu, field, label=None, icon=None):
-
         super().__init__(coordinator)
-
         self.coordinator = coordinator
         self._ecu = ecu
         self._field = field
@@ -42,7 +37,6 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
         if not label:
             self._label = field
         self._icon = icon
-
         self._name = f"ECU {self._label}"
         self._state = True
 
@@ -86,11 +80,8 @@ class APSystemsECUQuerySwitch(CoordinatorEntity, SwitchEntity):
         self.schedule_update_ha_state()
 
 class APSystemsECUInvertersSwitch(CoordinatorEntity, SwitchEntity):
-
     def __init__(self, coordinator, ecu, field, label=None, icon=None):
-
         super().__init__(coordinator)
-
         self.coordinator = coordinator
         self._ecu = ecu
         self._field = field
@@ -98,7 +89,6 @@ class APSystemsECUInvertersSwitch(CoordinatorEntity, SwitchEntity):
         if not label:
             self._label = field
         self._icon = icon
-
         self._name = f"ECU {self._label}"
         self._state = True
 
@@ -140,4 +130,3 @@ class APSystemsECUInvertersSwitch(CoordinatorEntity, SwitchEntity):
         self._ecu.inverters_on()
         self._state = True
         self.schedule_update_ha_state()
-

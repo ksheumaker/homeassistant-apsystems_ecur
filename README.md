@@ -17,11 +17,11 @@ This integration queries the ECU with a set interval for new data. This was done
 ## Prerequisites
 You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000/QT2, DS3/DS3D, DS3-H or QS1/QS1A inverter. If your inverter is not supported, please raise an issue. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
-Connection | ECU Model | Automated Restart*
---- | --- | ---
-Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B | No
-Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes
-Wired | ECU-C | Yes
+Connection | ECU Model | Automated Restart* | Turn on/off Inverters
+--- | --- | --- | ---
+Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B | No | No
+Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes | Yes
+Wired | ECU-C | Yes | Yes
 
 ### Test your connection and find your ECU on the LAN
 Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. Sometimes it is difficult to find the ECU among all the other nodes, especially if you have many IOT devices. In any case, look for **Espressif Inc. or ESP** because the ECU's WiFi interface is from this brand. Testing the connection can be done from the terminal using the Netcat command, follow the example below but use the correct (fixed) IP address of your ECU. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration. If not, power cycle your ECU wait for it to get started and try again. **It is highly recommended to assign a fixed IP-Address to the ECU**.

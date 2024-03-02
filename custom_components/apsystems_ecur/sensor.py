@@ -186,6 +186,7 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,
             "last_update" : self._ecu.ecu.last_update,
+            "inverter_serial" : self._uid,
         }
         return attrs
 

@@ -182,11 +182,10 @@ class APSystemsECUInverterSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-
         attrs = {
             "ecu_id" : self._ecu.ecu.ecu_id,
+            "inverter_uid" : self._uid,
             "last_update" : self._ecu.ecu.last_update,
-            "inverter_serial" : self._uid,
         }
         return attrs
 

@@ -23,6 +23,8 @@ Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B |
 Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes | Yes
 Wired | ECU-C | Yes | Yes
 
+ECU-3 owners might want to take a look at: https://github.com/jeeshofone/ha-apc-ecu-3
+
 ### Test your connection and find your ECU on the LAN
 Final step to the prerequisites is testing the connection between HomeAssistant and the ECU. Sometimes it is difficult to find the ECU among all the other nodes, especially if you have many IOT devices. In any case, look for **Espressif Inc. or ESP** because the ECU's WiFi interface is from this brand. Testing the connection can be done from the terminal using the Netcat command, follow the example below but use the correct (fixed) IP address of your ECU. If connected you'll see line 2, then type in the command APS1100160001END if you get a response (line 4) you are ready to install the integration. If not, power cycle your ECU wait for it to get started and try again. **It is highly recommended to assign a fixed IP-Address to the ECU**.
 ```

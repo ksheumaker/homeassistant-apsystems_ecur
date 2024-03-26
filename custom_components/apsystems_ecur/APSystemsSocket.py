@@ -118,12 +118,14 @@ class APSystemsSocket:
         self.close_socket()
         
         data = self.process_inverter_data()
-        data["today_energy"] = self.today_energy
+        if self.qty_of_inverters > 0:
+            data["today_energy"] = self.today_energy
         data["ecu_id"] = self.ecu_id
         if self.lifetime_energy != 0:
             data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
-        data["qty_of_inverters"] = self.qty_of_inverters
+        if self.qty_of_inverters > 0:
+            data["qty_of_inverters"] = self.qty_of_inverters
         data["qty_of_online_inverters"] = self.qty_of_online_inverters
         return(data)
 

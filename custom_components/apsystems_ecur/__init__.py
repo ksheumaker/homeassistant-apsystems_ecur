@@ -12,12 +12,14 @@ from homeassistant.helpers.discovery import load_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant import config_entries, exceptions
 from homeassistant.helpers import device_registry as dr
+from homeassistant.components.persistent_notification import async_create
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
     )
 from .const import DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 

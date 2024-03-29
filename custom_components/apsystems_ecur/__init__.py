@@ -223,7 +223,7 @@ async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
         async_create(
             hass,
             title='Important notification',
-            message= f'The following device was removed from the system: {device_entry}'
+            message=f'The following device was removed from the system: {device_entry}'
         )
         return True
     else:

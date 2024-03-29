@@ -222,8 +222,8 @@ async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
         # Notify the user that the device has been removed
         async_create(
             hass,
-            f"The following device was removed from the system: {device_entry}",
-            title='Important notification'
+            title='Important notification',
+            message= f'The following device was removed from the system: {device_entry}'
         )
         return True
     else:

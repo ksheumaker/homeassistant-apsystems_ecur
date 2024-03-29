@@ -12,12 +12,16 @@ from homeassistant.helpers.discovery import load_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant import config_entries, exceptions
 from homeassistant.helpers import device_registry as dr
+from homeassistant.components.persistent_notification import (
+    create as create_persistent_notification
+    )
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
     )
 from .const import DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [ "sensor", "binary_sensor", "switch" ]
 
@@ -218,9 +222,10 @@ async def async_setup_entry(hass, config):
 async def async_remove_config_entry_device(hass, config, device_entry) -> bool:
     if device_entry is not None:
         # Notify the user that the device has been removed
-        hass.components.persistent_notification.async_create(
-            f"The following device was removed from the system: {device_entry}",
-            title="Device Removed",
+        create_persistent_notification(
+            hass,
+            title="Important notification",
+            message=f"The following device was removed from the system: {device_entry}"
         )
         return True
     else:

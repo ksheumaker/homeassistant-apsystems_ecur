@@ -118,14 +118,14 @@ class APSystemsSocket:
         self.close_socket()
         
         data = self.process_inverter_data()
-        if self.qty_of_inverters > 0:
-            data["today_energy"] = self.today_energy
         data["ecu_id"] = self.ecu_id
         if self.lifetime_energy != 0:
             data["lifetime_energy"] = self.lifetime_energy
         data["current_power"] = self.current_power
+        # apply filter for ECU-R-pro firmware bug where both are zero
         if self.qty_of_inverters > 0:
             data["qty_of_inverters"] = self.qty_of_inverters
+            data["today_energy"] = self.today_energy
         data["qty_of_online_inverters"] = self.qty_of_online_inverters
         return(data)
 

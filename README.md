@@ -17,7 +17,7 @@ This integration queries the ECU with a set interval for new data. This was done
 ## Prerequisites
 You own an APSystems ECU model ECU-B, ECU-R or ECU-C and any combination of YC600, YC1000/QT2, DS3/DS3D, DS3-H or QS1/QS1A inverter. If your inverter is not supported, please raise an issue. Your ECU is connected to your LAN, correctly configured (assigned a fixed IP address) and Home Assistant has free access to it. You also have HACS installed in Home Assistant.
 Connection method (ethernet or WiFi) depends on your ECU model, follow the table below.
-Connection | ECU Model | Automated Restart* | Turn on/off Inverters
+Connection required | ECU Model | Automated Restart* | Turn on/off Inverters
 --- | --- | --- | ---
 Wireless (unplugged Ethernet required) | ECU-R (2160xxxxxxxx series) and ECU-B | No | No
 Wireless | ECU-R (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) | Yes | Yes

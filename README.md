@@ -49,7 +49,7 @@ Feel free to participate by adding your language to the integration but remember
 
 ## Configuration
 Choose [Configuration] > [Devices & Services] > [+ Add Integration] and search for "APSystems PV solar ECU" which enables you to configure the integration settings. Provide the IP-address from the ECU (no leading zero's), and set the update interval (300 seconds is the recommended default).
-_It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often._ After selecting [Submit] the integration will setup the entities in around 12 seconds.
+_It's good to know that the ECU only contains new data once every 5 minutes so a smaller interval does not update info more often._ The optional fields [Specify SSID] and [Specify password] are the parameters you would like to assign to the ECU when an automatic software restart is being applied (for ECU-R (sunspec) and ECU-C models only). These parameters are not being used during setup. If setup fails, in most cases the wrong IP-address was specified. After selecting [Submit] the integration will setup the entities in around 12 seconds.
 
 ## Data caching
 The integration uses caching when needed (present previous data). **Tip: Use the binary_sensor.ecu_using_cached_data sensor to monitor the use of caching. If the use of caching is too often read on!**

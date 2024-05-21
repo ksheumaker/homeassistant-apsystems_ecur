@@ -100,6 +100,7 @@ If an inverter fails and hardware is replaced, the old inverter can be easily re
 
 ### Switches
 * switch.ecu_query_device - switch will turn off after the user configured number of intervals if cached data is used.
+This switch enable the user to create automations based on the state of the switch (restart ECU or temporary pause query during night time).
 * switch.ecu_inverters_online - switch the inverters on/off. This will happen immediately but is at max visible after the next 5 minute update.
 
 ### How to derive new sensors from excisting sensors

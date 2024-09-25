@@ -82,10 +82,16 @@ Although you can query the ECU 24/7, it is an option to stop the query after sun
 For newer type ECU-R pro and ECU-C devices you are able to switch off the inverters when electricity prices become negative. The change will happen immediately but will only be visible instantly on a P1 meter for example. The ECU data is updated after max 5 minutes. Use the switch in automations to anticipate on electricity prices. For the older ECU-R's starting with ECU-id 2160 and ECU-B this switch will ***not*** function, the switch will be kept on and a log message is posted.
 
 ## The temperature sensors
-When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part which converts the value to zero:
+When the inverters are turned off at sundown the ECU returns zero for inverters temperature. Users prefer to keep them as null values instead of zero so the graphs are not being updated during the offline periods. In return, this causes a non-numeric error message for the gauge if you use that as a temperature indicator. In that case you can use this template part in configuration.yaml which converts the value to zero:
 ```
-temperature_non_numeric_408xxxxxxxxx:
-        value_template: "{{ states('sensor.inverter_408xxxxxxxxx_temperature')|float(0) }}"
+sensor:
+  - platform: template
+    sensors:
+      temperature_non_numeric_4080xxxxxxxx:
+        value_template: "{{ states('sensor.inverter_4080xxxxxxxx_temperature')|float(0) }}"
+        unit_of_measurement: "°C"
+      temperature_non_numeric_8060xxxxxxxx:
+        value_template: "{{ states('sensor.inverter_8060xxxxxxxx_temperature')|float(0) }}"
         unit_of_measurement: "°C"
 ```
 

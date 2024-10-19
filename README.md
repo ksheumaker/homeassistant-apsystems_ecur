@@ -48,6 +48,7 @@ Final step to the prerequisites is testing the connection between HomeAssistant 
 APS1100160001END <┘
 APS11009400012160000xxxxxxxz%10012ECU_R_1.2.22009Etc/GMT-8
 ```
+Sometimes you might see the "Unknown error occurred" message. Installation can best be done in the daytime when inverters are running.
 
 ## Pre-release/Beta program
 If you're having trouble with the integration or you would like to help debugging/testing, consider joining the beta program. I am not able to test all ECU models as well as firmware versions so I could use some help there. To do this, select HACS > Integrations > click on APSystems ECU-R > Select the three dots (overflow menu) in the top right corner > Redownload > switch on the "Show beta versions" switch. In HA you will now also see notifications when there is a beta release. You are always able to roll-back to an official release. Please provide us with feedback when using beta releases.

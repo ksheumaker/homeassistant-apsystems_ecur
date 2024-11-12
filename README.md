@@ -129,5 +129,9 @@ This switch enable the user to create automations based on the state of the swit
 * Total power for each inverter: Settings > Devices and Services > Helpers (top of the screen) > +Create Helper > +/- Combine the state of several sensors
 * Show the total_energy_yesterday: https://community.home-assistant.io/t/statistic-sensor-reset-clear-at-midnight-for-daily-min-max-temperature/501688/8
 
+### Finally it's here!
+Although this integration now has more than 680 active installations, I would also like to invite you to try out this variant if you have an ECU-R (or ECU-B?). 
+Tell me what you think and which you prefer. https://github.com/HAEdwin/homeassistant-apsystems_ecu_proxy
+
 ## TODO
 Code cleanup - it probably needs some work

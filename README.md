@@ -5,6 +5,11 @@
 [![Validate with Hassfest](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml/badge.svg)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20Hassfest.yml)
 [![Validate with HACS](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20HACS.yml/badge.svg)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20HACS.yml)
 ![Home Assistant Dashboard](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/dashboard.jpg)
+
+### Finally it's here!
+Although this integration now has more than 680 active installations, I would also like to invite you to try out this variant if you have an ECU-R (or ECU-B?). 
+Tell me what you think and which you prefer. https://github.com/HAEdwin/homeassistant-apsystems_ecu_proxy
+
 # Home-Assistant APsystems ECU Integration
 This is an integration for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail. It currently supports one ECU (one instance of the integration) but a work-around is available https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/142
 
@@ -128,10 +133,6 @@ This switch enable the user to create automations based on the state of the swit
 ### How to derive new sensors from excisting sensors
 * Total power for each inverter: Settings > Devices and Services > Helpers (top of the screen) > +Create Helper > +/- Combine the state of several sensors
 * Show the total_energy_yesterday: https://community.home-assistant.io/t/statistic-sensor-reset-clear-at-midnight-for-daily-min-max-temperature/501688/8
-
-### Finally it's here!
-Although this integration now has more than 680 active installations, I would also like to invite you to try out this variant if you have an ECU-R (or ECU-B?). 
-Tell me what you think and which you prefer. https://github.com/HAEdwin/homeassistant-apsystems_ecu_proxy
 
 ## TODO
 Code cleanup - it probably needs some work

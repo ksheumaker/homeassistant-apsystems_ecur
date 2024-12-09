@@ -12,6 +12,7 @@ Tell me what you think and which you prefer. https://github.com/HAEdwin/homeassi
 
 # Home-Assistant APsystems ECU Integration
 📢 We have reached a milestone of 700 active installations 🎉
+
 This is an integration for [Home-Assistant](http://home-assistant.io) that adds support for the [APsystems](http://www.apsystems.com) Energy Communication Unit (ECU) so that you are able to monitor your PV installation (inverters) in detail. It currently supports one ECU (one instance of the integration) but a work-around is available https://github.com/ksheumaker/homeassistant-apsystems_ecur/issues/142
 
 Note: This integration was initially written for the older ECU-R (2160xxxxxxxx series) and is fully compatible with the ECU-B. For later ECU-R models (SunSpec logo/ECU-ID starting with 2162xxxxxxxx) and ECU-C owners, usage of this integration results in ECU outage over time. From version 1.2.21 the integration will restart the ECU automatically. This can be monitored by the "binary_sensor.restart_ecu". Unfortunately this is a firmware issue which can't be solved by the integration.

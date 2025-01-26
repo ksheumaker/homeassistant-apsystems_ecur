@@ -6,9 +6,10 @@
 [![Validate with HACS](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20HACS.yml/badge.svg)](https://github.com/ksheumaker/homeassistant-apsystems_ecur/actions/workflows/validate%20with%20HACS.yml)
 ![Home Assistant Dashboard](https://github.com/ksheumaker/homeassistant-apsystems_ecur/blob/main/dashboard.jpg)
 
-### Finally it's here!
+### Finally they're here!
 I would also like to invite you to try out this variant if you have an ECU-R (or ECU-B?). 
 Tell me what you think and which you prefer. https://github.com/HAEdwin/homeassistant-apsystems_ecu_proxy
+Further development of this integration will take place here: https://github.com/HAEdwin/homeassistant-apsystems_ecu_reader
 
 # Home-Assistant APsystems ECU Integration
 📢 We have reached a milestone of 700 active installations 🎉
